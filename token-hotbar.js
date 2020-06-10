@@ -20,13 +20,24 @@
         return game.settings.get("TokenHotbar", "page");
     }
 
+    function getTokenId(token) {
+        const useLink = game.settings.get("TokenHotbar", "link");
+        if (token.data.actorLink && useLink) {
+            return token.actor.id;
+        }
+
+        return token.id;
+    }
+
     async function loadBar(token, page) {
         const userBar = duplicate(game.user.data.hotbar);
         const hotBars = getBars();
-        console.debug("[Token Hotbar]", "Loading", token.id, hotBars[token.id]);
+        const tokenId = getTokenId(token);
+
+        console.debug("[Token Hotbar]", "Loading", tokenId, hotBars[tokenId]);
 
         for(let slot of getSlots(page)) {
-            let macro = (hotBars[token.id] || []).find(m => m.slot == slot);
+            let macro = (hotBars[tokenId] || []).find(m => m.slot == slot);
             macro = macro && game.macros.find(m => m.id === macro.id);
             if (!macro && (slot in userBar)) {
                 delete userBar[slot];
@@ -40,12 +51,13 @@
     }
 
     function saveBar(token, hotbarItems) {
-        let tokenBars = getBars();
-        tokenBars[token.id] = hotbarItems.map(item => { return {
+        const tokenBars = getBars();
+        const tokenId = getTokenId(token);
+        tokenBars[tokenId] = hotbarItems.map(item => { return {
             slot: item.slot,
             id: item.macro._id
         }});
-        console.debug("[Token Hotbar]", "Saving", token.id, tokenBars);
+        console.debug("[Token Hotbar]", "Saving", tokenId, tokenBars);
         setBars(tokenBars);
     }
 
@@ -57,6 +69,15 @@
             config: true,
             default: 5,
             type: Number
+        });
+
+        game.settings.register("TokenHotbar", "link", {
+            name: "Link to actor",
+            hint: "Link the token hotbar to the actor if the token is linked.",
+            scope: "world",
+            config: true,
+            default: true,
+            type: Boolean
         });
     });
     
