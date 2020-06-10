@@ -13,8 +13,9 @@ Install module and enter this url: https://raw.githubusercontent.com/janssen-io/
 ![Demo](./token-hotbar.gif)
 
 ## Changelog
-### 1.2.1
+### 1.2.2
 - Fixed 🐛 Token hotbar is not deleted with (unlinked) token
+- Fixed 🐛 Token hotbar is not deleted with linked actor
 
 ### 1.1.0
 - Token hotbar can now be linked to actor if token is linked (default: true)

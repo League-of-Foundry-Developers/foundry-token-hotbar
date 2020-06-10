@@ -20,9 +20,10 @@
         return game.settings.get("TokenHotbar", "page");
     }
 
+    function useLink() { return game.settings.get("TokenHotbar", "link") || game.settings.get("TokenHotbar", "linkToActor"); }
+
     function getTokenId(token) {
-        const useLink = game.settings.get("TokenHotbar", "link");
-        if (token.data.actorLink && useLink) {
+        if (token.data.actorLink && useLink()) {
             return token.actor.id;
         }
 
@@ -86,6 +87,15 @@
             default: true,
             type: Boolean
         });
+
+        game.settings.register("TokenHotbar", "linkToActor", {
+            name: "Always link to actor",
+            hint: "Link the token hotbar to the actor even if the token is unlinked.",
+            scope: "world",
+            config: true,
+            default: false,
+            type: Boolean
+        });
     });
     
     Hooks.on("renderHotbar", (data) => {
@@ -106,9 +116,14 @@
     });
 
     Hooks.on("deleteToken", (_, token) => {
-        if (!token.actorLink || !game.settings.get("TokenHotbar", "link")) {
+        if (!useLink() || !token.actorLink) {
             removeBar(token._id);
         }
+        return true;
+    });
+
+    Hooks.on("deleteActor", (actor) => {
+        removeBar(actor.data._id);
         return true;
     });
 })();
