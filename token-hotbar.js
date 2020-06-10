@@ -23,7 +23,7 @@
     function useLink() { return game.settings.get("TokenHotbar", "link") || game.settings.get("TokenHotbar", "linkToActor"); }
 
     function getTokenId(token) {
-        if (token.data.actorLink && useLink()) {
+        if ((token.data.actorLink && useLink()) || game.settings.get("TokenHotbar", "linkToActor")) {
             return token.actor.id;
         }
 
