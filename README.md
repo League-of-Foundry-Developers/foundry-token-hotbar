@@ -12,6 +12,11 @@ Install module and enter this url: https://raw.githubusercontent.com/janssen-io/
 
 ![Demo](./token-hotbar.gif)
 
+### Settings
+*Page:* the hotbar page to use as token hotbar.  
+*Link to actor:* link the token hotbar to the linked actor, such that for each linked token of this actor, the same token hotbar will be displayed.  
+*Always link to actor:* link the hotbar to the actor, even if the token itself is not linked.
+
 ## Changelog
 ### 1.2.3
 - Token hotbar can now be linked to actor even if token is unlinked
