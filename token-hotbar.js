@@ -61,6 +61,13 @@
         setBars(tokenBars);
     }
 
+    function removeBar(tokenId) {
+        let tokenBars = getBars();
+        delete tokenBars[tokenId];
+        console.debug("[Token Hotbar]", "Removing", tokenId, tokenBars);
+        setBars(tokenBars);
+    }
+
     Hooks.on("init", () => {
         game.settings.register("TokenHotbar", "page", {
             name: "Page",
@@ -94,6 +101,13 @@
     Hooks.on("controlToken", () => {
         if (canvas.tokens.controlled.length == 1) {
             loadBar(canvas.tokens.controlled[0], getTokenBarPage());
+        }
+        return true;
+    });
+
+    Hooks.on("deleteToken", (_, token) => {
+        if (!token.actorLink || !game.settings.get("TokenHotbar", "link")) {
+            removeBar(token._id);
         }
         return true;
     });
