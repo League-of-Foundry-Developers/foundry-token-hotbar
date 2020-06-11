@@ -1,0 +1,13 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "strictNullChecks": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "types": ["foundry-pc-types"],
+        "target": "ES6"
+    },
+    "include": [ "src/**/*" ]
+}
