@@ -10,7 +10,7 @@ Install module and enter this url: https://raw.githubusercontent.com/janssen-io/
 2. Select a single token
 3. Assign/remove some macros
 
-![Demo](./token-hotbar.gif)
+![Demo](./img/thb-basics.gif)
 
 ### Settings
 *Page:* the hotbar page to use as token hotbar.  
@@ -18,6 +18,14 @@ Install module and enter this url: https://raw.githubusercontent.com/janssen-io/
 *Always link to actor:* link the hotbar to the actor, even if the token itself is not linked.
 
 ## Changelog
+### 2.0.x
+- Token hotbars can now be shared. That is, any player that select the token will see the same token hotbar.
+- Shared token hotbars can be locked, meaning only GMs can edit them.
+- Fixed 🐛 Hotbar is not cleared when no tokens are controlled. Previous active hotbar is now shown.
+
+![Demo](./img/thb-locked.gif)
+![Demo](./img/thb-go-back-to-active.gif)
+
 ### 1.2.3
 - Token hotbar can now be linked to actor even if token is unlinked
 - Fixed 🐛 Token hotbar is not deleted with (unlinked) token
