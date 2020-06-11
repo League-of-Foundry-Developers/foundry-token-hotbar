@@ -3,11 +3,11 @@
     "title": "Token Hotbar",   
     "description": "Using this module, you can assign one of the hotbar pages to remember macros per token.",   
     "author": "Stan Janssen",
-    "version": "1.2.3",
+    "version": "2.0.0-beta",
     "minimumCoreVersion": "0.6.0",
     "compatibleCoreVersion":"0.6.2",
-    "scripts": ["token-hotbar.js"],
+    "scripts": ["TokenHotbar.js"],
     "packs": [],
-    "manifest": "https://raw.githubusercontent.com/janssen-io/foundry-token-hotbar/master/module.json",
-    "download": "https://raw.githubusercontent.com/janssen-io/foundry-token-hotbar/master/dist/TokenHotbar.zip"
+    "manifest": "https://raw.githubusercontent.com/janssen-io/foundry-token-hotbar/typescript/module.json",
+    "download": "https://raw.githubusercontent.com/janssen-io/foundry-token-hotbar/typescript/dist/TokenHotbar.zip"
   }

@@ -10,7 +10,7 @@ export type HotbarData = { [tokenId: string]: HotbarItem[] };
 
 export interface HotbarFlags { 
     get(entity: Token | Actor): HotbarData;
-    set(entity: Token | Actor, data: HotbarData): Promise<void>;
+    set(entity: Token | Actor, data: HotbarData): Promise<Entity | PlaceableObject>;
 }
 
 export class FoundryHotbarFlags implements HotbarFlags {
@@ -18,14 +18,14 @@ export class FoundryHotbarFlags implements HotbarFlags {
 
     get(entity: Token | Actor): HotbarData {
         const flags = this.getFlags(entity);
-        return flags.getFlag('world', CONSTANTS.moduleName);
+        const result = flags.getFlag('world', CONSTANTS.moduleName) || {};
+        return result;
     }
 
-    async set(entity: Token | Actor, data: HotbarData) {
-        const flags = this.getFlags(entity);
-
-        await flags.unsetFlag("world", "token-hotbar");
-        flags.setFlag('world', CONSTANTS.moduleName, data);
+     set(entity: Token | Actor, data: HotbarData) {
+        return this.getFlags(entity)
+            .unsetFlag("world", CONSTANTS.moduleName)
+            .then(entity => entity.setFlag('world', CONSTANTS.moduleName, data));
     }
 
     private getFlags(entity: Token | Actor) {

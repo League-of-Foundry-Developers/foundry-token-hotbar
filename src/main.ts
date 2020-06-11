@@ -1,25 +1,28 @@
 import { Settings } from './settings';
-import { Hotbar } from './hotbar';
+import { TokenHotbar } from './tokenHotbar';
 import { CONSTANTS } from './constants'; 
-import { FoundryHotbarFlags } from './hotbarLoader'; 
+import { FoundryHotbarFlags } from './hotbarFlags'; 
+import { UserHotbar } from './userHotbar';
+import { PageFlag } from './pageFlag';
 
 function migrateFlag() {
-    let data = game.user.getFlag("world", "token-hotbar");
-    if (!data) return;
+    let oldData = game.user.getFlag("world", "token-hotbar");
+    let newData = game.user.getFlag("world",  CONSTANTS.moduleName);
+    if (!oldData || newData) return;
 
-    game.user.setFlag("world", CONSTANTS.moduleName, data);
+    console.info("Migrating Token Hotbar...");
+
+    game.user.setFlag("world", CONSTANTS.moduleName, oldData);
     game.user.unsetFlag("world", "token-hotbar");
 }
 
 function createTokenHotbar() {
     const settings = new Settings().load(game.settings);
     const hotbarFlags = new FoundryHotbarFlags(settings);
-    return new Hotbar(settings, hotbarFlags, game.user);
+    return new TokenHotbar(settings, hotbarFlags, game.user, ui.notifications, (<any>ui).hotbar.page);
 }
 
 Hooks.on("init", () => {
-    migrateFlag();
-
     game.settings.register(CONSTANTS.moduleName, Settings.keys.hotbarPage, {
         name: "Page",
         hint: "The hotbar page that will be replaced with the token hotbar. Changing this will wipe existing token bars!",
@@ -64,27 +67,41 @@ Hooks.on("init", () => {
         default: false,
         type: Boolean
     });
+
+    console.log("initialized Token Hotbar");
+    setTimeout(migrateFlag, 200);
 });
 
 Hooks.on("renderHotbar", (data:any) => {
+    // const macros = data.macros;
+    // FIXME: due to a race condition, sometimes the wrong macros are passed.
+    //        We are only interested in the ones on the token hotbar.
+    const settings = new Settings().load(game.settings);
+    const macros = (<any>ui).hotbar._getMacrosByPage(settings.hotbarPage);
+
     const controlledTokens = canvas.tokens.controlled;
-    createTokenHotbar().save(controlledTokens, data.macros);
+    createTokenHotbar().save(controlledTokens, macros);
     return true;
 });
 
-Hooks.on("controlToken", () => {
+Hooks.on("controlToken", (token, isControlled) => {
     const controlledTokens = canvas.tokens.controlled;
-    // hotbar does not exist on game.user.data for some reason
-    createTokenHotbar().load(controlledTokens, duplicate((<any>game.user.data).hotbar));
+
+    // hotbar does not yet exist on game.user.data and ui definitions, hence the casts to any.
+    const pIsLoaded = createTokenHotbar().load(controlledTokens, duplicate((<any>game.user.data).hotbar));
+    pIsLoaded.then(isLoaded => {
+        const hotbar = new UserHotbar(new Settings().load(game.settings), (<any>ui).hotbar, new PageFlag());
+        hotbar.goToPage(isLoaded);
+    });
     return true;
 });
 
-Hooks.on("deleteToken", (_: Scene, token: any) => {
+Hooks.on("preDeleteToken", (_: Scene, token: any) => {
     createTokenHotbar().remove(token._id);
     return true;
 });
 
-Hooks.on("deleteActor", (actor: any) => {
+Hooks.on("preDeleteActor", (actor: any) => {
     createTokenHotbar().remove(actor.data._id);
     return true;
 });
