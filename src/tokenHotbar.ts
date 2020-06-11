@@ -19,7 +19,7 @@ export class TokenHotbar {
         const slots = this.getSlots();
         const currentMacros = macros.filter(m => m.macro && slots.includes(m.slot));
         const entity = this.getEntity(controlledTokens[0]);
-        let tokenMacros = this.hotbarFlag.get(entity)[entity.id];
+        let tokenMacros = this.hotbarFlag.get(entity)[entity.id] || [];
 
         // FIXME: this seems very inefficient
         if (!this.hasChanges(currentMacros, tokenMacros)) return false;
