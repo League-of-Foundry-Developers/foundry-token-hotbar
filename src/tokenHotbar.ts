@@ -2,13 +2,18 @@ import { Settings } from "./settings";
 import { HotbarFlags } from "./hotbarFlags";
 import { Notifier } from "./notifier";
 
+export interface IUser {
+    update(data: object): any;
+    isGM: boolean;
+}
+
 export class TokenHotbar { 
     private userHotbar: { [slot: string ]: string | null }
 
     constructor(
         private settings: Settings,
         private hotbarFlag: HotbarFlags,
-        private user: User,
+        private user: IUser, // TODO get rid of user entity here
         private notifier: Notifier,
         private currentPage: number) { }
 
@@ -55,9 +60,12 @@ export class TokenHotbar {
         
         const entity = this.getEntity(controlledTokens[0]);
         const hotBars = this.hotbarFlag.get(entity)[entity.id] || [];
+
+        if (hotBars.length === 0)
+            return Promise.resolve(false);        
         
         console.debug("[Token Hotbar]", "Loading", entity.id, hotBars);
-
+        
         for(let slot of this.getSlots()) {
             let slotMacro = hotBars.find(m => m.slot == slot);
             const tokenHotbarSlotIsEmpty = !slotMacro;
@@ -75,7 +83,7 @@ export class TokenHotbar {
             }
         }
         return this.user.update({ hotbar: this.userHotbar })
-            .then(() => hotBars.length > 0);
+            .then(() => true);
     }
 
     public remove(tokenId: string) {

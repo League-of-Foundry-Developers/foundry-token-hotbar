@@ -8,7 +8,7 @@ class TestClientSettings {
     }
 }
 
-describe('linkToLinkedActor', () => {
+describe('Settings.linkToLinkedActor', () => {
     it('should be true when linkToLinkedActor is true', () => {
         const clientSettings = {};
         clientSettings[Settings.keys.linkToLinkedActor] = true;
@@ -26,7 +26,7 @@ describe('linkToLinkedActor', () => {
     });
 });
 
-describe('lockHotbar', () => {
+describe('Settings.lockHotbar', () => {
     it('should be true when lockHotbar and shareHotbar are true', () => {
         const clientSettings = {};
         clientSettings[Settings.keys.lockHotbar] = true;
