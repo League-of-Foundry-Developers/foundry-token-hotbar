@@ -1,5 +1,9 @@
 import { CONSTANTS } from "./constants";
 
+export interface ClientSettingsReader {
+    get(scope: string, key: string): any;
+}
+
 export class Settings {
     alwaysLinkToActor: boolean;
     linkToLinkedActor: boolean;
@@ -17,7 +21,7 @@ export class Settings {
 
     constructor() { }
 
-    public load(s: ClientSettings) {
+    public load(s: ClientSettingsReader) {
         this.hotbarPage = this.getSetting(s, Settings.keys.hotbarPage);
 
         this.alwaysLinkToActor = this.getSetting(s, Settings.keys.alwaysLinkToActor);
@@ -29,7 +33,7 @@ export class Settings {
         return this;
     }
 
-    private getSetting(settings: ClientSettings, key: string) {
+    private getSetting(settings: ClientSettingsReader, key: string) {
         return settings.get(CONSTANTS.moduleName, key)
     }
 }
