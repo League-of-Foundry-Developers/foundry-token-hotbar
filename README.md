@@ -18,3 +18,5 @@ Install module and enter this url: https://raw.githubusercontent.com/janssen-io/
 *Page:* the hotbar page to use as token hotbar.  
 *Link to actor:* link the token hotbar to the linked actor, such that for each linked token of this actor, the same token hotbar will be displayed.  
 *Always link to actor:* link the hotbar to the actor, even if the token itself is not linked.
+*Share the hotbar with other players:* every player will see the same hotbar for the particular token.
+*Locked shared hotbar:* only GMs can modify hotbars (requires the above setting).
