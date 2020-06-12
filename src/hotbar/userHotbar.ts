@@ -1,5 +1,6 @@
 import { Settings } from '../settings';
 import { PageFlag } from '../flags/pageFlag';
+import { Logger } from '../logger';
 
 interface FoundryHotbar {
     page: number;
@@ -7,14 +8,14 @@ interface FoundryHotbar {
 }
 
 export class UserHotbar {
-    constructor(private settings: Settings, private hotbar: FoundryHotbar, private pageFlag: PageFlag) { }
+    constructor(private settings: Settings, private hotbar: FoundryHotbar, private pageFlag: PageFlag, private logger: Logger = console) { }
 
     public goToPage(hasTokenSelected: boolean) {
         if (hasTokenSelected) {
-            this.goToTokenHotbar();
+            return this.goToTokenHotbar();
         }
         else {
-            this.goToLastActivePage();
+            return this.goToLastActivePage();
         }
     }
 
@@ -22,21 +23,26 @@ export class UserHotbar {
         if (this.hotbar.page != this.settings.hotbarPage)
             this.pageFlag.set(this.hotbar.page);
 
-        this.render(this.settings.hotbarPage);
+        return this.render(this.settings.hotbarPage);
     }
 
     public goToLastActivePage() {
         if (this.hotbar.page != this.settings.hotbarPage)
             return; // user already moved away from the token hotbar.
 
-        this.render(this.pageFlag.get());
+        return this.render(this.pageFlag.get());
     }
 
     private render(page: number) {
         this.hotbar.page = page;
+        return new Promise((resolve, _) => {
         // FIXME: Render does not always work without the timeout.
-        setTimeout(() => this.hotbar.render(true), 50);
-        // this.hotbar.render(true);
+            setTimeout(() => {
+                this.hotbar.render();
+                this.logger.debug("[Token Hotbar]", "rendered page", page);
+                resolve();
+            }, 5);
+        });
     }
 
 }

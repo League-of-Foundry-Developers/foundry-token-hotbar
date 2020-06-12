@@ -1,4 +1,7 @@
 # Changelog
+## 2.1.0 (beta)
+- Fixed 🐛 Token Hotbars sometimes disappear due to race conditions.
+
 ## 2.0.2
 - Token hotbars can now be shared. That is, any player that select the token will see the same token hotbar.
 - Shared token hotbars can be locked, meaning only GMs can edit them.

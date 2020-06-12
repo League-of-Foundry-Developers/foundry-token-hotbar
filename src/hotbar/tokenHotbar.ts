@@ -1,6 +1,7 @@
 import { HotbarFlags, } from "../flags/hotbarFlags";
-import { Notifier, Identifiable, Macro, User } from "../foundry";
+import { Notifier, Identifiable, Macro } from "../foundry";
 import { FlagKeyStrategy, DefaultFlagKeyStrategy } from "../flags/flagKeyStrategies";
+import { Logger } from "../logger";
 
 export class TokenHotbar { 
     // Dev note: not fond of this many parameters. 
@@ -8,30 +9,31 @@ export class TokenHotbar {
     constructor(
         private hotbarFlag: HotbarFlags,
         private notifier: Notifier,
-        private currentPage: number,
         private hotbarPage: number,
-        private flagKeyStrategy: FlagKeyStrategy) { }
+        private flagKeyStrategy: FlagKeyStrategy,
+        private logger: Logger = console) { }
 
     public save(token: Identifiable, macrosToSave: Macro[], canSave: boolean) {
-        if (this.currentPage != this.hotbarPage) return false;
-
         const slots = this.getSlots();
         macrosToSave = macrosToSave.filter(m => m.macro && slots.includes(m.slot));
         const flagKey = this.flagKeyStrategy.get(token.id);
-        let tokenMacros = this.hotbarFlag.get(token.id)[flagKey] || [];
+
+        const tokenHotbars = this.hotbarFlag.get(token.id);
+        let tokenHotbar = tokenHotbars[flagKey] || [];
 
         // FIXME: this seems very inefficient
         //        will become unnecessary in v3.0.0
         //        ! Will be unnecessary to fix in v3.0.0 (separate hotbar, all pages/slots will be relevant)
-        if (!this.hasChanges(macrosToSave, tokenMacros)) return false;
+        if (!this.hasChanges(macrosToSave, tokenHotbar)) return false;
         if (!canSave) {
             this.notifier.warn("The token hotbar is locked for players. Any macros placed on this page will be replaced.")
             return false;
         }
 
-        let tokenBars = this.hotbarFlag.get(token.id);
+        this.logger.debug("[Token Hotbar]", "preSave", flagKey, tokenHotbars);
 
-        tokenBars[flagKey] = macrosToSave
+        tokenHotbars[flagKey] =
+             macrosToSave
             .map(item => { 
                 return {
                     slot: item.slot,
@@ -39,9 +41,9 @@ export class TokenHotbar {
                 }
             });
 
-        console.debug("[Token Hotbar]", "Saving", flagKey, tokenBars);
+        this.logger.debug("[Token Hotbar]", "Saving", flagKey, tokenHotbars);
 
-        this.hotbarFlag.set(token.id, tokenBars);
+        this.hotbarFlag.set(token.id, tokenHotbars);
         return true;
     }
     
@@ -55,7 +57,7 @@ export class TokenHotbar {
         if (tokenHotbar.length === 0)
             return { hasMacros: false, hotbar: userHotbar };
         
-        console.debug("[Token Hotbar]", "Loading", flagKey, tokenHotbar);
+        this.logger.debug("[Token Hotbar]", "Loading", flagKey, tokenHotbar);
         
         let hasValidMacros = false;
         for(let slot of this.getSlots()) {
@@ -101,8 +103,8 @@ export class TokenHotbar {
     }
 
     private hasChanges(barMacros, tokenMacros) {
+        this.logger.debug("[Token Hotbar]", "Comparing", barMacros, tokenMacros);
         // cant make changes if you are not on the page
-        if (this.currentPage != this.hotbarPage) return false;
         if (barMacros.length != tokenMacros.length) return true;
 
         for(let i = 0; i < barMacros.length; i++) {

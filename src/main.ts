@@ -4,6 +4,7 @@ import { CONSTANTS } from './constants';
 import { HotbarFlagsFactory, FlagKeyFactory } from './flags/factory';
 import { UserHotbar } from './hotbar/userHotbar';
 import { PageFlag } from './flags/pageFlag';
+import { Logger } from './logger';
 
 // TODO: Remove in v3.0.0
 function migrateFlag() {
@@ -33,9 +34,9 @@ function createTokenHotbar() {
     return new TokenHotbar(
         hotbarFlags.create(),
         ui.notifications,
-        (<any>ui).hotbar.page,
         settings.hotbarPage,
-        keyStrategy.create());
+        keyStrategy.create(),
+        new Logger());
 }
 
 Hooks.on("init", () => {
@@ -97,27 +98,31 @@ Hooks.on("renderHotbar", (data: any) => {
     const macros = (<any>ui).hotbar._getMacrosByPage(settings.hotbarPage);
 
     const token = canvas.tokens.controlled[0];
-    if (token)
+    if (token && settings.hotbarPage === (<any>ui).hotbar.page)
         createTokenHotbar().save(token, macros, !settings.lockHotbar || game.user.isGM);
     return true;
 });
 
-Hooks.on("controlToken", () => {
+Hooks.on("controlToken", async () => {
     const token = canvas.tokens.controlled[0];
 
-    const uiHotbar = new UserHotbar(new Settings().load(game.settings), (<any>ui).hotbar, new PageFlag());
-    if (token) {
+    const logger = new Logger();
+    const uiHotbar = new UserHotbar(new Settings().load(game.settings), (<any>ui).hotbar, new PageFlag(), logger);
+    if (token && canvas.tokens.controlled.length == 1) {
         // hotbar does not yet exist on game.user.data and ui definitions, hence the casts to any.
+        logger.debug("[Token Hotbar]", "controlled token", token);
         let result = createTokenHotbar()
             .load(token, duplicate((<any>game.user.data).hotbar), game.macros.entities);
         
-            if (result.hasMacros) {
-                game.user.update({hotbar: result.hotbar});
-            }
-            uiHotbar.goToPage(result.hasMacros);
+        if (result.hasMacros) {
+            await game.user.update({hotbar: result.hotbar});
+            logger.debug("[Token Hotbar]", "updated hotbar", token, result.hotbar);
+        }
+        uiHotbar.goToPage(result.hasMacros);
     }
     else {
         uiHotbar.goToPage(false);
+        logger.debug("[Token Hotbar]", "No or multiple controlled tokens");
     }
     return true;
 });

@@ -1,13 +1,14 @@
 {
     "name": "TokenHotbar",
     "title": "Token Hotbar",
-    "description": "<p>With Token Hotbar you can assign one of the hotbar pages to remember macros per token and/or actor. If the token is a linked token, the hotbar will be linked to the actor by default.</p><br><h4>Updates</h4><p>🎲 Token hotbars can now be shared. That is, any player that select the token will see the same token hotbar.<br>🎲 Shared token hotbars can be locked, meaning only GMs can edit them.<br> 🐛 Hotbar is not cleared when no tokens are controlled. Previous active hotbar is now shown.<br></p>",
+    "description": "<p>With Token Hotbar you can assign one of the hotbar pages to remember macros per token and/or actor. If the token is a linked token, the hotbar will be linked to the actor by default.</p><br><h4>Updates</h4><p> 🐛 Token Hotbars sometimes disappear due to race conditions.<br></p>",
     "author": "Stan Janssen",
-    "version": "2.0.2-beta",
+    "version": "2.1.0-beta",
     "minimumCoreVersion": "0.6.0",
     "compatibleCoreVersion":"0.6.2",
     "scripts": ["TokenHotbar.js"],
     "packs": [],
-    "manifest": "https://raw.githubusercontent.com/janssen-io/foundry-token-hotbar/master/module.json",
-    "download": "https://raw.githubusercontent.com/janssen-io/foundry-token-hotbar/master/dist/TokenHotbar.zip"
+    "manifest": "https://raw.githubusercontent.com/janssen-io/foundry-token-hotbar/v2-fixes/module.json",
+    "download": "https://raw.githubusercontent.com/janssen-io/foundry-token-hotbar/v2-fixes/dist/TokenHotbar.zip",
+    "url": "https://github.com/janssen-io/foundry-token-hotbar"
 }

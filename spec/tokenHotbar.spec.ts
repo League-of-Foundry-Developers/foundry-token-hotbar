@@ -9,21 +9,6 @@ import { DefaultFlagKeyStrategy, FlagKeyStrategy } from '../src/flags/flagKeyStr
 import { Macro } from '../src/foundry'
 
 describe('TokenHotbar.save', () => {
-    it('should not save if the current page is not the hotbar page', () => {
-        // Arrange
-        const flags = new TestHotbarFlags();
-        const tokenHotbar = new TokenHotbar(
-            flags,
-            new TestNotifier(),
-            1,
-            5,
-            new DefaultFlagKeyStrategy());
-        var token: Token = <Token>{};
-
-        // Act & Assert
-        expect(tokenHotbar.save(token, [], true)).toBeFalse();
-    });
-
     it('it will save macros placed in the right slots', () => {
         // Arrange
         const flags = new TestHotbarFlags();
@@ -32,7 +17,6 @@ describe('TokenHotbar.save', () => {
         const tokenHotbar = new TokenHotbar(
             flags,
             new TestNotifier(),
-            5,
             5,
             keyStrategy);
         var token = { id: "token-id" };
@@ -61,7 +45,6 @@ describe('TokenHotbar.load', () => {
             flags,
             new TestNotifier(),
             5,
-            5,
             new DefaultFlagKeyStrategy());
         var token: Token = <Token>{ data: { actorLink: false } };
 
@@ -79,7 +62,6 @@ describe('TokenHotbar.load', () => {
         const tokenHotbar = new TokenHotbar(
             flags,
             new TestNotifier(),
-            5,
             5,
             new DefaultFlagKeyStrategy());
         var token: Token = <Token>{ id: "token-id", data: { actorLink: false } };
@@ -100,7 +82,6 @@ describe('TokenHotbar.load', () => {
             flags,
             new TestNotifier(),
             5,
-            5,
             new DefaultFlagKeyStrategy());
         var token: Token = <Token>{ id: "token-id", data: { actorLink: false } };
         const gameMacros = [{id: "macro-id"}];
@@ -119,7 +100,6 @@ describe('TokenHotbar.load', () => {
         const tokenHotbar = new TokenHotbar(
             flags,
             new TestNotifier(),
-            5,
             5,
             new DefaultFlagKeyStrategy());
         var token: Token = <Token>{ id: "token-id", data: { actorLink: false } };
@@ -148,7 +128,6 @@ describe('TokenHotbar.remove', () => {
             flags,
             new TestNotifier(),
             5,
-            5,
             keyStrategy);
 
         // Act
@@ -176,7 +155,6 @@ describe('TokenHotbar.remove', () => {
         const tokenHotbar = new TokenHotbar(
             flags,
             new TestNotifier(),
-            5,
             5,
             linkedKeyStrategy);
 
