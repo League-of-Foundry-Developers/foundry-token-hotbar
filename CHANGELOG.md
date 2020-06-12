@@ -1,5 +1,5 @@
 # Changelog
-## 2.0.1
+## 2.0.2
 - Token hotbars can now be shared. That is, any player that select the token will see the same token hotbar.
 - Shared token hotbars can be locked, meaning only GMs can edit them.
 - Fixed 🐛 Hotbar is not cleared when no tokens are controlled. Previous active hotbar is now shown.
