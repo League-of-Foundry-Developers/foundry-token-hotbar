@@ -1,11 +1,13 @@
 /// <reference path="../node_modules/foundry-pc-types/index.d.ts" />
 
 import 'jasmine';
-import { TokenHotbar, Macro } from '../src/tokenHotbar';
+import { TokenHotbar } from '../src/hotbar/tokenHotbar';
 import { TestHotbarFlags } from './helpers/TestHotbarFlags';
 import { TestNotifier } from './helpers/TestNotifier';
 import { TestUser } from './helpers/TestUser';
-import { HotbarItem, HotbarData, DefaultFlagKeyStrategy } from '../src/hotbarFlags';
+import { HotbarItem, HotbarData } from '../src/flags/hotbarFlags';
+import { DefaultFlagKeyStrategy } from '../src/flags/flagKeyStrategies';
+import { Macro } from '../src/foundry'
 
 describe('TokenHotbar.save', () => {
     it('should not save if the current page is not the hotbar page', () => {
@@ -18,7 +20,7 @@ describe('TokenHotbar.save', () => {
             5,
             new DefaultFlagKeyStrategy());
         var token: Token = <Token>{};
-        expect(tokenHotbar.save(token, [])).toBeFalse();
+        expect(tokenHotbar.save(token, [], true)).toBeFalse();
     });
 
     it('it will save macros placed in the right slots', () => {
@@ -37,7 +39,7 @@ describe('TokenHotbar.save', () => {
             { slot: 1, macro: { id: "1" }},
             { slot: 42, macro: {id: "2" }}
         ]
-        expect(tokenHotbar.save(token, macrosToSave)).toBeTrue();
+        expect(tokenHotbar.save(token, macrosToSave, true)).toBeTrue();
         const key = keyStrategy.get(token.id);
         const item : HotbarItem = { slot: 42, id: "2" };
         const data: HotbarData = {};

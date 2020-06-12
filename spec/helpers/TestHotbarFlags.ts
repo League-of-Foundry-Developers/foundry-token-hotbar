@@ -1,4 +1,4 @@
-import { HotbarFlags, HotbarData} from '../../src/hotbarFlags';
+import { HotbarFlags, HotbarData} from '../../src/flags/hotbarFlags';
 
 export class TestHotbarFlags implements HotbarFlags {
     private flags: HotbarData;

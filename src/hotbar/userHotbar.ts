@@ -1,5 +1,5 @@
-import { Settings } from './settings';
-import { PageFlag } from './pageFlag';
+import { Settings } from '../settings';
+import { PageFlag } from '../flags/pageFlag';
 
 interface FoundryHotbar {
     page: number;

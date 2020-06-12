@@ -4,7 +4,7 @@
   "description": "Foundry VTT module to dynamically switch hotbars based on the selected token.",
   "main": "TokenHotbar.js",
   "directories": {
-    "test": "test"
+    "test": "spec"
   },
   "dependencies": {
     "foundry-pc-types": "^0.1.0",
@@ -20,7 +20,9 @@
     "ts-node": "^8.10.2"
   },
   "scripts": {
-    "test": "ts-node node_modules/jasmine/bin/jasmine"
+    "test": "ts-node node_modules/jasmine/bin/jasmine",
+    "dev": "npx webpack",
+    "prod": "npx webpack --mode production"
   },
   "repository": {
     "type": "git",

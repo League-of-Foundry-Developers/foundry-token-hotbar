@@ -1,29 +1,19 @@
-import { Settings } from "./settings";
-import { HotbarFlags, FlagKeyStrategy, Identifiable } from "./hotbarFlags";
-import { Notifier } from "./notifier";
-
-export interface IUser {
-    update(data: object): any;
-    isGM: boolean;
-}
-
-export interface Macro {
-    macro: Identifiable;
-    slot: number;
-}
+import { HotbarFlags, } from "../flags/hotbarFlags";
+import { Notifier, Identifiable, Macro, User } from "../foundry";
+import { FlagKeyStrategy } from "../flags/flagKeyStrategies";
 
 export class TokenHotbar { 
     private userHotbar: { [slot: string ]: string | null }
 
     constructor(
         private hotbarFlag: HotbarFlags,
-        private user: IUser,
+        private user: User,
         private notifier: Notifier,
         private currentPage: number,
         private hotbarPage: number,
         private flagKeyStrategy: FlagKeyStrategy) { }
 
-    public save(token: Identifiable, macrosToSave: Macro[]) {
+    public save(token: Identifiable, macrosToSave: Macro[], canSave: boolean) {
         if (this.currentPage != this.hotbarPage) return false;
 
         const slots = this.getSlots();
@@ -32,8 +22,10 @@ export class TokenHotbar {
         let tokenMacros = this.hotbarFlag.get(token.id)[flagKey] || [];
 
         // FIXME: this seems very inefficient
+        //        will become unnecessary in v3.0.0
+        //        ! Will be unnecessary to fix in v3.0.0 (separate hotbar, all pages/slots will be relevant)
         if (!this.hasChanges(macrosToSave, tokenMacros)) return false;
-        if (!this.canSave()) {
+        if (!canSave) {
             this.notifier.warn("The token hotbar is locked for players. Any macros placed on this page will be replaced.")
             return false;
         }
@@ -108,12 +100,6 @@ export class TokenHotbar {
     private unset(slot: number) {
         delete this.userHotbar[slot];
         this.userHotbar[`-=${slot}`] = null;
-    }
-
-    // TODO: Extract method
-    private canSave(): boolean {
-        // return !this.settings.lockHotbar || this.user.isGM;
-        return true;
     }
 
     private hasChanges(barMacros, tokenMacros) {

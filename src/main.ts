@@ -1,9 +1,9 @@
 import { Settings } from './settings';
-import { TokenHotbar } from './tokenHotbar';
+import { TokenHotbar } from './hotbar/tokenHotbar';
 import { CONSTANTS } from './constants';
-import { HotbarFlagsFactory, DefaultGetFlagKeyStrategy } from './hotbarFlags';
-import { UserHotbar } from './userHotbar';
-import { PageFlag } from './pageFlag';
+import { HotbarFlagsFactory, FlagKeyFactory } from './flags/factory';
+import { UserHotbar } from './hotbar/userHotbar';
+import { PageFlag } from './flags/pageFlag';
 
 function migrateFlag() {
     let oldData = game.user.getFlag("world", "token-hotbar");
@@ -19,13 +19,14 @@ function migrateFlag() {
 function createTokenHotbar() {
     const settings = new Settings().load(game.settings);
     const hotbarFlags = new HotbarFlagsFactory(settings);
+    const keyStrategy = new FlagKeyFactory(settings);
     return new TokenHotbar(
         hotbarFlags.create(),
         game.user,
         ui.notifications,
         (<any>ui).hotbar.page,
         settings.hotbarPage,
-        new DefaultGetFlagKeyStrategy()); // TODO: get appropriate one from settings
+        keyStrategy.create());
 }
 
 Hooks.on("init", () => {
@@ -82,26 +83,30 @@ Hooks.on("renderHotbar", (data: any) => {
     // const macros = data.macros;
     // FIXME: due to a race condition, sometimes the wrong macros are passed.
     //        We are only interested in the ones on the token hotbar.
+    //        ! Will be unnecessary to fix in v3.0.0 (separate hotbar, all pages/slots will be relevant)
     const settings = new Settings().load(game.settings);
     const macros = (<any>ui).hotbar._getMacrosByPage(settings.hotbarPage);
 
     const token = canvas.tokens.controlled[0];
     if (token)
-        createTokenHotbar().save(token, macros);
+        createTokenHotbar().save(token, macros, !settings.lockHotbar || game.user.isGM);
     return true;
 });
 
 Hooks.on("controlToken", () => {
     const token = canvas.tokens.controlled[0];
 
-    // hotbar does not yet exist on game.user.data and ui definitions, hence the casts to any.
+    const uiHotbar = new UserHotbar(new Settings().load(game.settings), (<any>ui).hotbar, new PageFlag());
     if (token) {
         createTokenHotbar()
+            // hotbar does not yet exist on game.user.data and ui definitions, hence the casts to any.
             .load(token, duplicate((<any>game.user.data).hotbar), game.macros.entities)
             .then(isLoaded => {
-                const hotbar = new UserHotbar(new Settings().load(game.settings), (<any>ui).hotbar, new PageFlag());
-                hotbar.goToPage(isLoaded);
+                uiHotbar.goToPage(isLoaded);
             });
+    }
+    else {
+        uiHotbar.goToPage(false);
     }
     return true;
 });
