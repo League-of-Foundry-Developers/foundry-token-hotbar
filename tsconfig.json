@@ -1,0 +1,15 @@
+{
+    "compileOnSave": true,
+    "compilerOptions": {
+        "target": "ES6",
+        "noImplicitAny": false,
+        "strictNullChecks": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "sourceMap": true,
+        "types": ["foundry-pc-types"],
+        "outDir": "./dist/"
+    },
+    "include": [ "src/**/*" ],
+    "exclude": [ "node_modules" ]
+}
