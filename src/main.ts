@@ -1,13 +1,13 @@
 import { Settings } from './settings';
 import { TokenHotbar } from './tokenHotbar';
-import { CONSTANTS } from './constants'; 
-import { FoundryHotbarFlags } from './hotbarFlags'; 
+import { CONSTANTS } from './constants';
+import { HotbarFlagsFactory, DefaultGetFlagKeyStrategy } from './hotbarFlags';
 import { UserHotbar } from './userHotbar';
 import { PageFlag } from './pageFlag';
 
 function migrateFlag() {
     let oldData = game.user.getFlag("world", "token-hotbar");
-    let newData = game.user.getFlag("world",  CONSTANTS.moduleName);
+    let newData = game.user.getFlag("world", CONSTANTS.moduleName);
     if (!oldData || newData) return;
 
     console.info("Migrating Token Hotbar...");
@@ -18,8 +18,14 @@ function migrateFlag() {
 
 function createTokenHotbar() {
     const settings = new Settings().load(game.settings);
-    const hotbarFlags = new FoundryHotbarFlags(settings);
-    return new TokenHotbar(settings, hotbarFlags, game.user, ui.notifications, (<any>ui).hotbar.page);
+    const hotbarFlags = new HotbarFlagsFactory(settings);
+    return new TokenHotbar(
+        hotbarFlags.create(),
+        game.user,
+        ui.notifications,
+        (<any>ui).hotbar.page,
+        settings.hotbarPage,
+        new DefaultGetFlagKeyStrategy()); // TODO: get appropriate one from settings
 }
 
 Hooks.on("init", () => {
@@ -72,27 +78,31 @@ Hooks.on("init", () => {
     setTimeout(migrateFlag, 200);
 });
 
-Hooks.on("renderHotbar", (data:any) => {
+Hooks.on("renderHotbar", (data: any) => {
     // const macros = data.macros;
     // FIXME: due to a race condition, sometimes the wrong macros are passed.
     //        We are only interested in the ones on the token hotbar.
     const settings = new Settings().load(game.settings);
     const macros = (<any>ui).hotbar._getMacrosByPage(settings.hotbarPage);
 
-    const controlledTokens = canvas.tokens.controlled;
-    createTokenHotbar().save(controlledTokens, macros);
+    const token = canvas.tokens.controlled[0];
+    if (token)
+        createTokenHotbar().save(token, macros);
     return true;
 });
 
-Hooks.on("controlToken", (token, isControlled) => {
-    const controlledTokens = canvas.tokens.controlled;
+Hooks.on("controlToken", () => {
+    const token = canvas.tokens.controlled[0];
 
     // hotbar does not yet exist on game.user.data and ui definitions, hence the casts to any.
-    const pIsLoaded = createTokenHotbar().load(controlledTokens, duplicate((<any>game.user.data).hotbar));
-    pIsLoaded.then(isLoaded => {
-        const hotbar = new UserHotbar(new Settings().load(game.settings), (<any>ui).hotbar, new PageFlag());
-        hotbar.goToPage(isLoaded);
-    });
+    if (token) {
+        createTokenHotbar()
+            .load(token, duplicate((<any>game.user.data).hotbar), game.macros.entities)
+            .then(isLoaded => {
+                const hotbar = new UserHotbar(new Settings().load(game.settings), (<any>ui).hotbar, new PageFlag());
+                hotbar.goToPage(isLoaded);
+            });
+    }
     return true;
 });
 
