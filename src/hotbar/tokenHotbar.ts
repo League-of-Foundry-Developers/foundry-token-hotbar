@@ -1,6 +1,6 @@
 import { HotbarFlags, } from "../flags/hotbarFlags";
 import { Notifier, Identifiable, Macro, User } from "../foundry";
-import { FlagKeyStrategy } from "../flags/flagKeyStrategies";
+import { FlagKeyStrategy, DefaultFlagKeyStrategy } from "../flags/flagKeyStrategies";
 
 export class TokenHotbar { 
     // Dev note: not fond of this many parameters. 
@@ -80,7 +80,8 @@ export class TokenHotbar {
     }
 
     public remove(tokenId: string) {
-        const flagKey = this.flagKeyStrategy.get(tokenId);
+        // use the default strategy, because otherwise a linked hotbar might be removed.
+        const flagKey = new DefaultFlagKeyStrategy().get(tokenId);
         const flags = this.hotbarFlag.get(tokenId);
         delete flags[flagKey];
         this.hotbarFlag.set(tokenId, flags);

@@ -17,12 +17,13 @@
   "devDependencies": {
     "@types/jasmine": "^3.5.10",
     "jasmine": "^3.5.0",
-    "ts-node": "^8.10.2"
+    "ts-node": "^8.10.2",
+    "webpack-merge": "^4.2.2"
   },
   "scripts": {
     "test": "ts-node node_modules/jasmine/bin/jasmine",
-    "dev": "npx webpack",
-    "prod": "npx webpack --mode production"
+    "dev": "npx webpack --config webpack.dev.js",
+    "prod": "npx webpack --config webpack.prod.js"
   },
   "repository": {
     "type": "git",

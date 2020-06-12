@@ -5,12 +5,22 @@ import { HotbarFlagsFactory, FlagKeyFactory } from './flags/factory';
 import { UserHotbar } from './hotbar/userHotbar';
 import { PageFlag } from './flags/pageFlag';
 
+// TODO: Remove in v3.0.0
 function migrateFlag() {
+    // ugly hack: game.user is not always set in the `init` hook.
+    if (!game.user) {
+        setTimeout(migrateFlag, 200);
+        return;
+    }
+
     let oldData = game.user.getFlag("world", "token-hotbar");
     let newData = game.user.getFlag("world", CONSTANTS.moduleName);
-    if (!oldData || newData) return;
+    if (!oldData || newData) {
+        console.debug("[Token Hotbar]", "Nothing to migrate.", !!oldData, !!newData);
+        return;
+    }
 
-    console.info("Migrating Token Hotbar...");
+    console.info("[Token Hotbar]", "Migrating to new flag key.");
 
     game.user.setFlag("world", CONSTANTS.moduleName, oldData);
     game.user.unsetFlag("world", "token-hotbar");
