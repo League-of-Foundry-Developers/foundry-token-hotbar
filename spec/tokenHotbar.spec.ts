@@ -4,7 +4,6 @@ import 'jasmine';
 import { TokenHotbar } from '../src/hotbar/tokenHotbar';
 import { TestHotbarFlags } from './helpers/TestHotbarFlags';
 import { TestNotifier } from './helpers/TestNotifier';
-import { TestUser } from './helpers/TestUser';
 import { HotbarItem, HotbarData } from '../src/flags/hotbarFlags';
 import { DefaultFlagKeyStrategy } from '../src/flags/flagKeyStrategies';
 import { Macro } from '../src/foundry'
@@ -14,7 +13,6 @@ describe('TokenHotbar.save', () => {
         const flags = new TestHotbarFlags();
         const tokenHotbar = new TokenHotbar(
             flags,
-            new TestUser(),
             new TestNotifier(),
             1,
             5,
@@ -29,7 +27,6 @@ describe('TokenHotbar.save', () => {
         const keyStrategy = new DefaultFlagKeyStrategy();
         const tokenHotbar = new TokenHotbar(
             flags,
-            new TestUser(),
             new TestNotifier(),
             5,
             5,
@@ -49,25 +46,24 @@ describe('TokenHotbar.save', () => {
 });
 
 describe('TokenHotbar.load', () => {
-    it('should return false if there is not token hotbar.', async () => {
+    it('should return false if there is not token hotbar.', () => {
         const flags = new TestHotbarFlags();
         const tokenHotbar = new TokenHotbar(
             flags,
-            new TestUser(),
             new TestNotifier(),
             5,
             5,
             new DefaultFlagKeyStrategy());
         var token: Token = <Token>{ data: { actorLink: false } };
-        await expectAsync(tokenHotbar.load(token, {}, [])).toBeResolvedTo(false);
+        let result = tokenHotbar.load(token, {}, []);
+        expect(result.hasMacros).toBeFalse();
     });
 
-    it('should return false if macros from the token bar no longer exist.', async () => {
+    it('should return false if macros from the token bar no longer exist.', () => {
         const flags = new TestHotbarFlags();
         flags.set("token-id", {"token-id": [ { id: "macro-id", slot: 41 }]})
         const tokenHotbar = new TokenHotbar(
             flags,
-            new TestUser(),
             new TestNotifier(),
             5,
             5,
@@ -75,15 +71,15 @@ describe('TokenHotbar.load', () => {
         var token: Token = <Token>{ id: "token-id", data: { actorLink: false } };
         const gameMacros = [{id: "other-macro-id"}];
         
-        await expectAsync(tokenHotbar.load(token, {}, gameMacros)).toBeResolvedTo(false);
+        let result = tokenHotbar.load(token, {}, gameMacros);
+        expect(result.hasMacros).toBeFalse();
     });
 
-    it('should return true if there is a token hotbar.', async () => {
+    it('should return true if there is a token hotbar.', () => {
         const flags = new TestHotbarFlags();
         flags.set("token-id", {"token-id": [ { id: "macro-id", slot: 41 }]})
         const tokenHotbar = new TokenHotbar(
             flags,
-            new TestUser(),
             new TestNotifier(),
             5,
             5,
@@ -91,17 +87,15 @@ describe('TokenHotbar.load', () => {
         var token: Token = <Token>{ id: "token-id", data: { actorLink: false } };
         const gameMacros = [{id: "macro-id"}];
         
-        await expectAsync(tokenHotbar.load(token, {}, gameMacros)).toBeResolvedTo(true);
+        let result = tokenHotbar.load(token, {}, gameMacros);
+        expect(result.hasMacros).toBeTrue();
     });
 
     it('should call update on user with intersection of token hotbar and game macros.', async () => {
         const flags = new TestHotbarFlags();
         flags.set("token-id", {"token-id": [ { id: "macro-id", slot: 41 }, { id: "non-existent-macro", slot: 42}]})
-        const user = new TestUser();
-        spyOn(user, "update").and.callThrough();
         const tokenHotbar = new TokenHotbar(
             flags,
-            user,
             new TestNotifier(),
             5,
             5,
@@ -109,8 +103,9 @@ describe('TokenHotbar.load', () => {
         var token: Token = <Token>{ id: "token-id", data: { actorLink: false } };
         const gameMacros = [{id: "macro-id"}, {id: "other-macro-id"}];
         
-        await tokenHotbar.load(token, {}, gameMacros);
-        expect(user.update).toHaveBeenCalledWith({hotbar: {41: "macro-id", "-=42": null, "-=43": null, "-=44": null, "-=45": null, "-=46": null, "-=47": null, "-=48": null, "-=49": null, "-=50": null }});
+        let result = tokenHotbar.load(token, {}, gameMacros);
+        expect(result.hasMacros).toBeTrue();
+        expect(result.hotbar).toEqual({41: "macro-id", "-=42": null, "-=43": null, "-=44": null, "-=45": null, "-=46": null, "-=47": null, "-=48": null, "-=49": null, "-=50": null })
     });
 });
 
@@ -125,7 +120,6 @@ describe('TokenHotbar.remove', () => {
         const keyStrategy = new DefaultFlagKeyStrategy();
         const tokenHotbar = new TokenHotbar(
             flags,
-            new TestUser(),
             new TestNotifier(),
             5,
             5,

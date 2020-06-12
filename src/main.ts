@@ -22,7 +22,6 @@ function createTokenHotbar() {
     const keyStrategy = new FlagKeyFactory(settings);
     return new TokenHotbar(
         hotbarFlags.create(),
-        game.user,
         ui.notifications,
         (<any>ui).hotbar.page,
         settings.hotbarPage,
@@ -98,12 +97,14 @@ Hooks.on("controlToken", () => {
 
     const uiHotbar = new UserHotbar(new Settings().load(game.settings), (<any>ui).hotbar, new PageFlag());
     if (token) {
-        createTokenHotbar()
-            // hotbar does not yet exist on game.user.data and ui definitions, hence the casts to any.
-            .load(token, duplicate((<any>game.user.data).hotbar), game.macros.entities)
-            .then(isLoaded => {
-                uiHotbar.goToPage(isLoaded);
-            });
+        // hotbar does not yet exist on game.user.data and ui definitions, hence the casts to any.
+        let result = createTokenHotbar()
+            .load(token, duplicate((<any>game.user.data).hotbar), game.macros.entities);
+        
+            if (result.hasMacros) {
+                game.user.update({hotbar: result.hotbar});
+            }
+            uiHotbar.goToPage(result.hasMacros);
     }
     else {
         uiHotbar.goToPage(false);

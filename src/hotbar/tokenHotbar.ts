@@ -3,11 +3,10 @@ import { Notifier, Identifiable, Macro, User } from "../foundry";
 import { FlagKeyStrategy } from "../flags/flagKeyStrategies";
 
 export class TokenHotbar { 
-    private userHotbar: { [slot: string ]: string | null }
-
+    // Dev note: not fond of this many parameters. 
+    // However, from v3 (separate hotbar) on at least two will be obsolete (pages)
     constructor(
         private hotbarFlag: HotbarFlags,
-        private user: User,
         private notifier: Notifier,
         private currentPage: number,
         private hotbarPage: number,
@@ -45,18 +44,16 @@ export class TokenHotbar {
         this.hotbarFlag.set(token.id, tokenBars);
         return true;
     }
-
+    
     // Returns true if the token has macros on the token hotbar
     //         otherwise false
-    public load(token: Token, userHotbar: { [slot: number]: string }, gameMacros: Identifiable[]) {
-        this.userHotbar = userHotbar;
-        
+    public load(token: Token, userHotbar: object, gameMacros: Identifiable[]) {
         const tokenHotbars = this.hotbarFlag.get(token.id);
         const flagKey = this.flagKeyStrategy.get(token.id);
         const tokenHotbar = tokenHotbars[flagKey] || [];
 
         if (tokenHotbar.length === 0)
-            return Promise.resolve(false);        
+            return { hasMacros: false, hotbar: userHotbar };
         
         console.debug("[Token Hotbar]", "Loading", flagKey, tokenHotbar);
         
@@ -65,21 +62,21 @@ export class TokenHotbar {
             let slotMacro = tokenHotbar.find(m => m.slot == slot);
             const tokenHotbarSlotIsEmpty = !slotMacro;
             if (tokenHotbarSlotIsEmpty) {
-                this.unset(slot);
+                this.unset(userHotbar, slot);
             }
             else {
                 let tokenMacro = gameMacros.find(m => m.id === slotMacro!.id);
                 if (tokenMacro) {
-                    this.userHotbar[slot] = tokenMacro.id;
+                    userHotbar[slot] = tokenMacro.id;
                     hasValidMacros = true;
                 }
                 else {
-                    this.unset(slot);
+                    this.unset(userHotbar, slot);
                 }
             }
         }
-        return this.user.update({ hotbar: this.userHotbar })
-            .then(() => hasValidMacros);
+
+        return { hasMacros: hasValidMacros, hotbar: userHotbar };
     }
 
     public remove(tokenId: string) {
@@ -97,9 +94,9 @@ export class TokenHotbar {
         return range(10, (this.hotbarPage - 1) * 10 + 1);
     }
 
-    private unset(slot: number) {
-        delete this.userHotbar[slot];
-        this.userHotbar[`-=${slot}`] = null;
+    private unset(userHotbar, slot: number) {
+        delete userHotbar[slot];
+        userHotbar[`-=${slot}`] = null;
     }
 
     private hasChanges(barMacros, tokenMacros) {
