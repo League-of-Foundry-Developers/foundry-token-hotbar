@@ -1,6 +1,7 @@
 import { Settings } from '../settings';
 import { FoundryHotbarFlags, HotbarFlags } from './hotbarFlags';
 import { IdentityFlagsStrategy, UserFlagsStrategy, LinkedFlagsStrategy, AlwaysLinkedFlagsStrategy, FlagsStrategy } from './flagStrategies';
+import { Game, Canvas } from '../foundry';
 
 export class HotbarFlagsFactory {
     constructor(private settings: Settings) { }
@@ -13,7 +14,7 @@ export class HotbarFlagsFactory {
 
 export class FlagStrategyFactory {
 
-    constructor(private settings: Settings, private game: any, private canvas: any) { }
+    constructor(private settings: Settings, private game: Game, private canvas: Canvas) { }
 
     public createFlagStrategy(): FlagsStrategy  {
         if (this.settings.shareHotbar) {

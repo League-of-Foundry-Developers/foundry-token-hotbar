@@ -90,11 +90,12 @@ Hooks.on("renderHotbar", (data: any) => {
     // FIXME: due to a race condition, sometimes the wrong macros are passed.
     //        We are only interested in the ones on the token hotbar.
     //        ! Will be unnecessary to fix in v3.0.0 (separate hotbar, all pages/slots will be relevant)
+    const uiHotbar = (<any>ui).hotbar;
     const settings = new Settings().load(game.settings);
-    const macros = (<any>ui).hotbar._getMacrosByPage(settings.hotbarPage);
+    const macros = uiHotbar._getMacrosByPage(settings.hotbarPage);
 
     const token = canvas.tokens.controlled[0];
-    if (token && settings.hotbarPage === (<any>ui).hotbar.page)
+    if (token && settings.hotbarPage === uiHotbar.page)
         createTokenHotbar().save(token, macros, !settings.lockHotbar || game.user.isGM);
     return true;
 });
@@ -104,11 +105,14 @@ Hooks.on("controlToken", async () => {
 
     const logger = new ConsoleLogger();
     const uiHotbar = new UserHotbar(new Settings().load(game.settings), (<any>ui).hotbar, new PageFlag(), logger);
+
+    const userMacroData = <any>game.user.data;
+
     if (token && canvas.tokens.controlled.length == 1) {
         // hotbar does not yet exist on game.user.data and ui definitions, hence the casts to any.
         logger.debug("[Token Hotbar]", "controlled token", token);
         let result = createTokenHotbar()
-            .load(token, duplicate((<any>game.user.data).hotbar), game.macros.entities);
+            .load(token, duplicate(userMacroData.hotbar), game.macros.entities);
         
         if (result.hasMacros) {
             await game.user.update({hotbar: result.hotbar});

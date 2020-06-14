@@ -3,6 +3,7 @@ import { Settings } from '../src/settings';
 import { FlagStrategyFactory } from '../src/flags/factory';
 import { UserFlagsStrategy, IdentityFlagsStrategy, LinkedFlagsStrategy, AlwaysLinkedFlagsStrategy } from '../src/flags/flagStrategies';
 import { TestClientSettings } from './helpers/TestSettings';
+import { Game, Canvas } from '../src/foundry';
 
 // Configuration combinations
 // shared |  link | always |  entity   | key
@@ -21,7 +22,7 @@ describe('FlagKeyStrategyFactory', () => {
             clientSettings[Settings.keys.linkToLinkedActor] = false;
             const settings = new Settings().load(new TestClientSettings(clientSettings));
 
-            expect(new FlagStrategyFactory(settings, {}, {}).createFlagKeyStrategy()).toBeInstanceOf(IdentityFlagsStrategy);
+            expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagKeyStrategy()).toBeInstanceOf(IdentityFlagsStrategy);
         });
 
         it('should return LinkedFlagKeyStrategy if hotbar is linked to linked actor.', () => {
@@ -30,7 +31,7 @@ describe('FlagKeyStrategyFactory', () => {
             clientSettings[Settings.keys.linkToLinkedActor] = true;
             const settings = new Settings().load(new TestClientSettings(clientSettings));
 
-            expect(new FlagStrategyFactory(settings, {}, {}).createFlagKeyStrategy()).toBeInstanceOf(LinkedFlagsStrategy);
+            expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagKeyStrategy()).toBeInstanceOf(LinkedFlagsStrategy);
         });
 
         it('should return AlwaysLinkedFlagKeyStrategy if hotbar is always linked to actor.', () => {
@@ -40,7 +41,7 @@ describe('FlagKeyStrategyFactory', () => {
             clientSettings[Settings.keys.alwaysLinkToActor] = true;
             const settings = new Settings().load(new TestClientSettings(clientSettings));
 
-            expect(new FlagStrategyFactory(settings, {}, {}).createFlagKeyStrategy()).toBeInstanceOf(AlwaysLinkedFlagsStrategy);
+            expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagKeyStrategy()).toBeInstanceOf(AlwaysLinkedFlagsStrategy);
         });
     });
 });
@@ -52,7 +53,7 @@ describe('FlagStrategyFactory', () => {
         clientSettings[Settings.keys.shareHotbar] = true;
         const settings = new Settings().load(new TestClientSettings(clientSettings));
 
-        expect(new FlagStrategyFactory(settings, {}, {}).createFlagStrategy()).toBeInstanceOf(LinkedFlagsStrategy);
+        expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagStrategy()).toBeInstanceOf(LinkedFlagsStrategy);
     });
 
     it('should return SharedAlwaysLinkedFlagsStrategy if hotbar is shared and linked to actor.', () => {
@@ -62,7 +63,7 @@ describe('FlagStrategyFactory', () => {
         clientSettings[Settings.keys.alwaysLinkToActor] = true;
         const settings = new Settings().load(new TestClientSettings(clientSettings));
 
-        expect(new FlagStrategyFactory(settings, {}, {}).createFlagStrategy()).toBeInstanceOf(AlwaysLinkedFlagsStrategy);
+        expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagStrategy()).toBeInstanceOf(AlwaysLinkedFlagsStrategy);
     });
 
     it('should return IdentityFlagsStrategy if hotbar is shared and not linked to linked actor.', () => {
@@ -72,7 +73,7 @@ describe('FlagStrategyFactory', () => {
         clientSettings[Settings.keys.alwaysLinkToActor] = false;
         const settings = new Settings().load(new TestClientSettings(clientSettings));
 
-        expect(new FlagStrategyFactory(settings, {}, {}).createFlagStrategy()).toBeInstanceOf(IdentityFlagsStrategy);
+        expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagStrategy()).toBeInstanceOf(IdentityFlagsStrategy);
     });
 
     it('should return UserFlagsStrategy if hotbar is not shared', () => {
@@ -82,7 +83,7 @@ describe('FlagStrategyFactory', () => {
         clientSettings[Settings.keys.alwaysLinkToActor] = true;
         const settings = new Settings().load(new TestClientSettings(clientSettings));
 
-        expect(new FlagStrategyFactory(settings, {}, {}).createFlagStrategy()).toBeInstanceOf(UserFlagsStrategy);
+        expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagStrategy()).toBeInstanceOf(UserFlagsStrategy);
     });
 
 });

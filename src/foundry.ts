@@ -32,3 +32,12 @@ export interface IToken extends Flaggable {
     data: { actorLink: boolean };
     actor?: IActor;
 }
+
+export interface Game {
+    actors: Map<string, IActor>;
+    user: Flaggable;
+}
+
+export interface Canvas {
+    tokens: Map<string, IToken>;
+}

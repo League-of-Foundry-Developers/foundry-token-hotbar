@@ -3,7 +3,7 @@
     "title": "Token Hotbar",
     "description": "<p>With Token Hotbar you can assign one of the hotbar pages to remember macros per token and/or actor. If the token is a linked token, the hotbar will be linked to the actor by default.</p><br><h4>Updates</h4><p> 🐛 Token Hotbars sometimes disappear due to race conditions.<br></p>",
     "author": "Stan Janssen",
-    "version": "2.1.1-beta",
+    "version": "2.1.2-beta",
     "minimumCoreVersion": "0.6.0",
     "compatibleCoreVersion":"0.6.2",
     "scripts": ["TokenHotbar.js"],
