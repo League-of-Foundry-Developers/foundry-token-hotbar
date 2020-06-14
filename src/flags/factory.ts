@@ -1,29 +1,21 @@
 import { Settings } from '../settings';
-import { FoundryHotbarFlags } from './hotbarFlags';
-import { IdentityFlagsStrategy, UserFlagsStrategy, LinkedFlagsStrategy, AlwaysLinkedFlagsStrategy } from './flagStrategies';
+import { FoundryHotbarFlags, HotbarFlags } from './hotbarFlags';
+import { IdentityFlagsStrategy, UserFlagsStrategy, LinkedFlagsStrategy, AlwaysLinkedFlagsStrategy, FlagsStrategy } from './flagStrategies';
 
 export class HotbarFlagsFactory {
     constructor(private settings: Settings) { }
 
-    public create() {
+    public create(): HotbarFlags {
         const factory = new FlagStrategyFactory(this.settings, game, canvas);
         return new FoundryHotbarFlags(factory.createFlagStrategy());
     }
 }
 
-// Configuration combinations
-// shared |  link | always |  entity   | key
-//    1   |   0   |    0   |  identity | identity
-//    1   |   1   |    0   |  link     | link
-//    1   |   -   |    1   |  actor    | actor
-//    0   |   0   |    0   |  user     | identity
-//    0   |   1   |    0   |  user     | link
-//    0   |   -   |    1   |  user     | actor
 export class FlagStrategyFactory {
 
     constructor(private settings: Settings, private game: any, private canvas: any) { }
 
-    public createFlagStrategy() {
+    public createFlagStrategy(): FlagsStrategy  {
         if (this.settings.shareHotbar) {
             if (this.settings.alwaysLinkToActor) {
                 return new AlwaysLinkedFlagsStrategy(this.game.actors, this.canvas.tokens);
@@ -36,7 +28,7 @@ export class FlagStrategyFactory {
         return new UserFlagsStrategy(this.game.user, this.game.actors, this.canvas.tokens);
     }
 
-    public createFlagKeyStrategy() {
+    public createFlagKeyStrategy(): FlagsStrategy {
         if (this.settings.alwaysLinkToActor)
             return new AlwaysLinkedFlagsStrategy(this.game.actors, this.canvas.tokens);
 

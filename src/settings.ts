@@ -1,6 +1,7 @@
-import { CONSTANTS } from "./constants";
+import { CONSTANTS } from './constants';
 
 export interface ClientSettingsReader {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     get(scope: string, key: string): any;
 }
 
@@ -19,9 +20,7 @@ export class Settings {
         lockHotbar: 'lock'
     }
 
-    constructor() { }
-
-    public load(s: ClientSettingsReader) {
+    public load(s: ClientSettingsReader) : Settings {
         this.hotbarPage = this.getSetting(s, Settings.keys.hotbarPage);
 
         this.alwaysLinkToActor = this.getSetting(s, Settings.keys.alwaysLinkToActor);
@@ -34,6 +33,6 @@ export class Settings {
     }
 
     private getSetting(settings: ClientSettingsReader, key: string) {
-        return settings.get(CONSTANTS.moduleName, key)
+        return settings.get(CONSTANTS.moduleName, key);
     }
 }

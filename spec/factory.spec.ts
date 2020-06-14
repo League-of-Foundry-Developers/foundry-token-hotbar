@@ -2,13 +2,7 @@ import 'jasmine';
 import { Settings } from '../src/settings';
 import { FlagStrategyFactory } from '../src/flags/factory';
 import { UserFlagsStrategy, IdentityFlagsStrategy, LinkedFlagsStrategy, AlwaysLinkedFlagsStrategy } from '../src/flags/flagStrategies';
-
-class TestClientSettings {
-    constructor(private settings: { [key: string]: any }) { }
-    public get(_: string, key: string) {
-        return this.settings[key];
-    }
-}
+import { TestClientSettings } from './helpers/TestSettings';
 
 // Configuration combinations
 // shared |  link | always |  entity   | key
@@ -18,6 +12,7 @@ class TestClientSettings {
 //    0   |   0   |    0   |  user     | identity
 //    0   |   1   |    0   |  user     | link
 //    0   |   -   |    1   |  user     | actor
+
 describe('FlagKeyStrategyFactory', () => {
     [true, false].forEach(isShared => {
         it('should return LinkedFlagKeyStrategy if hotbar is not linked to linked actor.', () => {

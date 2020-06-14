@@ -1,4 +1,4 @@
-import { Flaggable, IActor, IToken } from "../foundry";
+import { Flaggable, IActor, IToken } from '../foundry';
 
 export abstract class FlagsStrategy {
 
@@ -9,10 +9,14 @@ export abstract class FlagsStrategy {
     abstract get(entityId: string): Flaggable;
 
     protected getEntity(entityId: string) : IActor | IToken {
-        return this.actors.get(entityId) || this.tokens.get(entityId)!;
+        const entity = this.actors.get(entityId) || this.tokens.get(entityId); 
+        if (!entity) {
+            throw new Error(`No actor or token exists with id '${entityId}'`);
+        } 
+        return entity;
     }
 
-    protected isToken(entity: any): entity is IToken {
+    protected isToken(entity: IToken | IActor): entity is IToken {
         return 'actor' in entity;
     }
 }
@@ -22,7 +26,8 @@ export class UserFlagsStrategy extends FlagsStrategy {
         super(actors, tokens);
     }
 
-    get(_: string): Flaggable {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    get(_entityId: string): Flaggable {
         return this.user;
     }
 }
@@ -33,27 +38,24 @@ export class IdentityFlagsStrategy extends FlagsStrategy {
     }
 
     get(entityId: string): Flaggable {
-        return this.actors.get(entityId) || this.tokens.get(entityId)!;
+        return this.getEntity(entityId);
     }
 }
 
 export class LinkedFlagsStrategy extends FlagsStrategy {
     get(entityId: string): Flaggable {
         const entity = this.getEntity(entityId);
-        if (this.isToken(entity)) {
-            return entity.data.actorLink ? entity.actor! : entity;
-        }
-
-        return entity;
+        return this.isToken(entity) && entity.data.actorLink && entity.actor
+            ? entity.actor
+            : entity;
     }
 }
 
 export class AlwaysLinkedFlagsStrategy extends FlagsStrategy {
     get(entityId: string): Flaggable {
         const entity = this.getEntity(entityId);
-        if (this.isToken(entity)) {
-            return entity.actor!;
-        }
+        if (this.isToken(entity) && entity.actor)
+            return entity.actor;
 
         return entity;
     }

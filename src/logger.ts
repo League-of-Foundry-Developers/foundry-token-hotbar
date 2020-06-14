@@ -1,18 +1,32 @@
-export class Logger {
-    error(...message: any[]) {
-        console.error.apply(null, arguments);
+export interface Logger {
+    error(...message: unknown[]): void;
+    warn(...message: unknown[]): void;
+    info(...message: unknown[]): void;
+    debug(...message: unknown[]): void;
+}
+
+export class ConsoleLogger {
+
+    constructor(private showDebug: boolean = false) { }
+
+    static init(): void {
+        window['TokenHotbar'] = { debug: false };
     }
 
-    warn(...message: any[]) {
-        console.warn.apply(null, arguments);
+    error(...message: unknown[]): void {
+        console.error.apply(null, message);
     }
 
-    info(...message: any[]) {
-        console.info.apply(null, arguments);
+    warn(...message: unknown[]): void {
+        console.warn.apply(null, message);
     }
 
-    debug(...message: any[]) {
-        if ((<any>window).TokenHotbar?.debug)
-            console.debug.apply(null, arguments);
+    info(...message: unknown[]): void {
+        console.info.apply(null, message);
+    }
+
+    debug(...message: unknown[]): void {
+        if (this.showDebug)
+            console.debug.apply(null, ...message);
     }
 }

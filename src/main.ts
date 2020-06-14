@@ -4,7 +4,7 @@ import { CONSTANTS } from './constants';
 import { HotbarFlagsFactory, FlagStrategyFactory } from './flags/factory';
 import { UserHotbar } from './hotbar/userHotbar';
 import { PageFlag } from './flags/pageFlag';
-import { Logger } from './logger';
+import { ConsoleLogger } from './logger';
 
 // TODO: Remove in v3.0.0
 function migrateFlag() {
@@ -30,10 +30,12 @@ function createTokenHotbar() {
         ui.notifications,
         settings.hotbarPage,
         keyStrategy.createFlagKeyStrategy(),
-        new Logger());
+        new ConsoleLogger((<any>window).TokenHotbar.debug));
 }
 
 Hooks.on("init", () => {
+    ConsoleLogger.init();
+
     game.settings.register(CONSTANTS.moduleName, Settings.keys.hotbarPage, {
         name: "Page",
         hint: "The hotbar page that will be replaced with the token hotbar. Changing this will wipe existing token bars!",
@@ -79,7 +81,7 @@ Hooks.on("init", () => {
         type: Boolean
     });
 
-    console.log("initialized Token Hotbar");
+    console.log("[Token Hotbar]", "Initialized Token Hotbar");
     setTimeout(migrateFlag, 200);
 });
 
@@ -100,7 +102,7 @@ Hooks.on("renderHotbar", (data: any) => {
 Hooks.on("controlToken", async () => {
     const token = canvas.tokens.controlled[0];
 
-    const logger = new Logger();
+    const logger = new ConsoleLogger();
     const uiHotbar = new UserHotbar(new Settings().load(game.settings), (<any>ui).hotbar, new PageFlag(), logger);
     if (token && canvas.tokens.controlled.length == 1) {
         // hotbar does not yet exist on game.user.data and ui definitions, hence the casts to any.

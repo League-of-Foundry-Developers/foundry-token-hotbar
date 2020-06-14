@@ -4,7 +4,7 @@ import { FlagsStrategy } from './flagStrategies';
 
 export interface HotbarItem {
     id: string,
-    slot: Number
+    slot: number
 }
 
 export type HotbarData = { [tokenId: string]: HotbarItem[] };
@@ -29,11 +29,11 @@ export class FoundryHotbarFlags implements HotbarFlags {
         return result;
     }
 
-    set(tokenId: string, data: HotbarData) {
+    set(tokenId: string, data: HotbarData): Promise<Flaggable> {
         return this.getFlagStrategy.get(tokenId)
-            .unsetFlag("world", CONSTANTS.moduleName)
+            .unsetFlag('world', CONSTANTS.moduleName)
             .then(entity => {
-                return entity.setFlag('world', CONSTANTS.moduleName, data
-            )});
+                return entity.setFlag('world', CONSTANTS.moduleName, data);
+            });
     }
 }

@@ -1,12 +1,6 @@
 import 'jasmine';
 import { Settings }  from '../src/settings';
-
-class TestClientSettings {
-    constructor(private settings: {[key: string]: any }) { }
-    public get(scope: string, key: string) {
-        return this.settings[key];
-    }
-}
+import { TestClientSettings } from './helpers/TestSettings';
 
 describe('Settings.linkToLinkedActor', () => {
     it('should be true when linkToLinkedActor is true', () => {

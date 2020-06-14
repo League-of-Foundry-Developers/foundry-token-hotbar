@@ -1,14 +1,15 @@
 import { Flaggable, IToken, IActor } from '../../src/foundry';
+import { HotbarData } from '../../src/flags/hotbarFlags';
 
 export class TestFlaggable implements Flaggable {
-    private flags = new Map<string, any>();
+    private flags = new Map<string, HotbarData | undefined>();
 
     constructor(public id: string) { }
 
-    getFlag(scope: string, key: string) {
+    getFlag(scope: string, key: string): HotbarData | undefined {
         return this.flags.get(key);
     }
-    setFlag(scope: string, key: string, data: any): Promise<Flaggable> {
+    setFlag(scope: string, key: string, data?: HotbarData): Promise<Flaggable> {
         this.flags.set(key, data);
         return Promise.resolve(this);
     }

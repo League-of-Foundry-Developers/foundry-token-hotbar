@@ -6,7 +6,7 @@ import { TestFlaggable, TestToken } from './helpers/TestToken';
 
 describe('SharedFlagsStrategy', () => {
     it('should return the user (token)', () => {
-        const user = new TestFlaggable("user-1");
+        const user = new TestFlaggable('user-1');
         const actors = new Map<string, IActor>();
         const tokens = new Map<string, IToken>();
 
@@ -16,7 +16,7 @@ describe('SharedFlagsStrategy', () => {
     });
 
     it('should return the user (actor)', () => {
-        const user = new TestFlaggable("user-1");
+        const user = new TestFlaggable('user-1');
         const actors = new Map<string, IActor>();
         const tokens = new Map<string, IToken>();
 
@@ -33,8 +33,8 @@ describe('LinkedFlagsStrategy', () => {
     const strategy = new LinkedFlagsStrategy(actors, tokens);
 
     it('should return the id of the actor when linked', () => {
-        const actor = new TestFlaggable("actor-1");
-        const token = new TestToken("token-1", actor);
+        const actor = new TestFlaggable('actor-1');
+        const token = new TestToken('token-1', actor);
         actors.set(actor.id, actor);
         tokens.set(token.id, token);
 
@@ -42,8 +42,8 @@ describe('LinkedFlagsStrategy', () => {
     });
 
     it('should return the id of the token when unlinked', () => {
-        const actor = new TestFlaggable("actor-1");
-        const token = new TestToken("token-1", actor);
+        const actor = new TestFlaggable('actor-1');
+        const token = new TestToken('token-1', actor);
         token.data.actorLink = false;
 
         actors.set(actor.id, actor);
@@ -53,8 +53,8 @@ describe('LinkedFlagsStrategy', () => {
     });
 
     it('should return the id of the actor', () => {
-        const actor = new TestFlaggable("actor-1");
-        const token = new TestToken("token-1", actor);
+        const actor = new TestFlaggable('actor-1');
+        const token = new TestToken('token-1', actor);
 
         actors.set(actor.id, actor);
         tokens.set(token.id, token);
@@ -71,8 +71,8 @@ describe('AlwaysLinkedFlagStrategy', () => {
 
 
     it('should return the id of the actor when linked', () => {
-        const actor = new TestFlaggable("actor-1");
-        const token = new TestToken("token-1", actor);
+        const actor = new TestFlaggable('actor-1');
+        const token = new TestToken('token-1', actor);
         actors.set(actor.id, actor);
         tokens.set(token.id, token);
 
@@ -80,8 +80,8 @@ describe('AlwaysLinkedFlagStrategy', () => {
     });
 
     it('should return the id of the actor when unlinked', () => {
-        const actor = new TestFlaggable("actor-1");
-        const token = new TestToken("token-1", actor);
+        const actor = new TestFlaggable('actor-1');
+        const token = new TestToken('token-1', actor);
         token.data.actorLink = false;
 
         actors.set(actor.id, actor);
@@ -91,8 +91,8 @@ describe('AlwaysLinkedFlagStrategy', () => {
     });
 
     it('should return the id of the actor', () => {
-        const actor = new TestFlaggable("actor-1");
-        const token = new TestToken("token-1", actor);
+        const actor = new TestFlaggable('actor-1');
+        const token = new TestToken('token-1', actor);
 
         actors.set(actor.id, actor);
         tokens.set(token.id, token);
@@ -107,8 +107,8 @@ describe('IdentityFlagKeyStrategy', () => {
         const tokens = new Map<string, IToken>();
 
         const strategy = new IdentityFlagsStrategy(actors, tokens);
-        const actor = new TestFlaggable("actor-1");
-        const token = new TestToken("token-1", actor);
+        const actor = new TestFlaggable('actor-1');
+        const token = new TestToken('token-1', actor);
         token.data.actorLink = false;
 
         actors.set(actor.id, actor);
@@ -122,8 +122,8 @@ describe('IdentityFlagKeyStrategy', () => {
         const tokens = new Map<string, IToken>();
 
         const strategy = new IdentityFlagsStrategy(actors, tokens);
-        const actor = new TestFlaggable("actor-1");
-        const token = new TestToken("token-1", actor);
+        const actor = new TestFlaggable('actor-1');
+        const token = new TestToken('token-1', actor);
         token.data.actorLink = false;
 
         actors.set(actor.id, actor);
