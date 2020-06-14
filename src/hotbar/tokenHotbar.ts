@@ -1,7 +1,7 @@
 import { HotbarFlags, } from "../flags/hotbarFlags";
-import { Notifier, Identifiable, Macro } from "../foundry";
-import { FlagKeyStrategy, DefaultFlagKeyStrategy } from "../flags/flagKeyStrategies";
+import { Notifier, Identifiable, Macro, IToken, IActor } from "../foundry";
 import { Logger } from "../logger";
+import { FlagsStrategy, IdentityFlagsStrategy } from "../flags/flagStrategies";
 
 export class TokenHotbar { 
     // Dev note: not fond of this many parameters. 
@@ -10,7 +10,7 @@ export class TokenHotbar {
         private hotbarFlag: HotbarFlags,
         private notifier: Notifier,
         private hotbarPage: number,
-        private flagKeyStrategy: FlagKeyStrategy,
+        private flagKeyStrategy: FlagsStrategy,
         private logger: Logger = console) { }
 
     public save(token: Identifiable, macrosToSave: Macro[], canSave: boolean) {
@@ -19,7 +19,7 @@ export class TokenHotbar {
         const flagKey = this.flagKeyStrategy.get(token.id);
 
         const tokenHotbars = this.hotbarFlag.get(token.id);
-        let tokenHotbar = tokenHotbars[flagKey] || [];
+        let tokenHotbar = tokenHotbars[flagKey.id] || [];
 
         // FIXME: this seems very inefficient
         //        will become unnecessary in v3.0.0
@@ -32,7 +32,7 @@ export class TokenHotbar {
 
         this.logger.debug("[Token Hotbar]", "preSave", flagKey, tokenHotbars);
 
-        tokenHotbars[flagKey] =
+        tokenHotbars[flagKey.id] =
              macrosToSave
             .map(item => { 
                 return {
@@ -49,10 +49,10 @@ export class TokenHotbar {
     
     // Returns true if the token has macros on the token hotbar
     //         otherwise false
-    public load(token: Token, userHotbar: object, gameMacros: Identifiable[]) {
+    public load(token: IToken, userHotbar: object, gameMacros: Identifiable[]) {
         const tokenHotbars = this.hotbarFlag.get(token.id);
         const flagKey = this.flagKeyStrategy.get(token.id);
-        const tokenHotbar = tokenHotbars[flagKey] || [];
+        const tokenHotbar = tokenHotbars[flagKey.id] || [];
 
         if (tokenHotbar.length === 0)
             return { hasMacros: false, hotbar: userHotbar };
@@ -81,12 +81,13 @@ export class TokenHotbar {
         return { hasMacros: hasValidMacros, hotbar: userHotbar };
     }
 
-    public remove(tokenId: string) {
+    public remove(tokenId: string, actors: Map<string, IActor>, tokens: Map<string, IToken>) {
         // use the default strategy, because otherwise a linked hotbar might be removed.
-        const flagKey = new DefaultFlagKeyStrategy().get(tokenId);
+        // FIXME: ideally this should not be hard coded in here
+        const flagKey = new IdentityFlagsStrategy(actors, tokens).get(tokenId);
         const flags = this.hotbarFlag.get(tokenId);
-        delete flags[flagKey];
-        this.hotbarFlag.set(tokenId, flags);
+        delete flags[flagKey.id];
+        return this.hotbarFlag.set(tokenId, flags);
     }
 
     private getSlots() {
@@ -108,6 +109,9 @@ export class TokenHotbar {
         if (barMacros.length != tokenMacros.length) return true;
 
         for(let i = 0; i < barMacros.length; i++) {
+            if (barMacros[i].slot != tokenMacros[i].slot)
+                return true;
+                
             if (barMacros[i].macro._id != tokenMacros[i].id)
                 return true;
         }

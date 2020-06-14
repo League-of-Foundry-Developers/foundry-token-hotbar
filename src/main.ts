@@ -1,19 +1,13 @@
 import { Settings } from './settings';
 import { TokenHotbar } from './hotbar/tokenHotbar';
 import { CONSTANTS } from './constants';
-import { HotbarFlagsFactory, FlagKeyFactory } from './flags/factory';
+import { HotbarFlagsFactory, FlagStrategyFactory } from './flags/factory';
 import { UserHotbar } from './hotbar/userHotbar';
 import { PageFlag } from './flags/pageFlag';
 import { Logger } from './logger';
 
 // TODO: Remove in v3.0.0
 function migrateFlag() {
-    // ugly hack: game.user is not always set in the `init` hook.
-    if (!game.user) {
-        setTimeout(migrateFlag, 200);
-        return;
-    }
-
     let oldData = game.user.getFlag("world", "token-hotbar");
     let newData = game.user.getFlag("world", CONSTANTS.moduleName);
     if (!oldData || newData) {
@@ -30,12 +24,12 @@ function migrateFlag() {
 function createTokenHotbar() {
     const settings = new Settings().load(game.settings);
     const hotbarFlags = new HotbarFlagsFactory(settings);
-    const keyStrategy = new FlagKeyFactory(settings);
+    const keyStrategy = new FlagStrategyFactory(settings, game, canvas);
     return new TokenHotbar(
         hotbarFlags.create(),
         ui.notifications,
         settings.hotbarPage,
-        keyStrategy.create(),
+        keyStrategy.createFlagKeyStrategy(),
         new Logger());
 }
 
@@ -128,11 +122,15 @@ Hooks.on("controlToken", async () => {
 });
 
 Hooks.on("preDeleteToken", (_: Scene, token: any) => {
-    createTokenHotbar().remove(token._id);
+    createTokenHotbar().remove(token._id, game.actors, canvas.tokens);
     return true;
 });
 
 Hooks.on("preDeleteActor", (actor: any) => {
-    createTokenHotbar().remove(actor.data._id);
+    createTokenHotbar().remove(actor.data._id, game.actors, canvas.tokens);
     return true;
+});
+
+Hooks.on("ready", () => {
+    migrateFlag();
 });

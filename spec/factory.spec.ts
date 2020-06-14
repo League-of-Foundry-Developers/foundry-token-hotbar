@@ -1,44 +1,53 @@
 import 'jasmine';
-import { Settings }  from '../src/settings';
-import { SharedFlagKeyStrategy, AlwaysLinkedFlagKeyStrategy, LinkedFlagKeyStrategy } from '../src/flags/flagKeyStrategies';
-import { FlagKeyFactory, FlagStrategyFactory } from '../src/flags/factory';
-import { SharedLinkedFlagsStrategy, SharedAlwaysLinkedFlagsStrategy, DefaultFlagsStrategy } from '../src/flags/flagStrategies';
+import { Settings } from '../src/settings';
+import { FlagStrategyFactory } from '../src/flags/factory';
+import { UserFlagsStrategy, IdentityFlagsStrategy, LinkedFlagsStrategy, AlwaysLinkedFlagsStrategy } from '../src/flags/flagStrategies';
 
 class TestClientSettings {
-    constructor(private settings: {[key: string]: any }) { }
+    constructor(private settings: { [key: string]: any }) { }
     public get(_: string, key: string) {
         return this.settings[key];
     }
 }
 
+// Configuration combinations
+// shared |  link | always |  entity   | key
+//    1   |   0   |    0   |  identity | identity
+//    1   |   1   |    0   |  link     | link
+//    1   |   -   |    1   |  actor    | actor
+//    0   |   0   |    0   |  user     | identity
+//    0   |   1   |    0   |  user     | link
+//    0   |   -   |    1   |  user     | actor
 describe('FlagKeyStrategyFactory', () => {
-    it('should return LinkedFlagKeyStrategy if hotbar is linked to actor.', () => {
-        const clientSettings = {};
-        clientSettings[Settings.keys.linkToLinkedActor] = true;
-        const settings = new Settings().load(new TestClientSettings(clientSettings));
+    [true, false].forEach(isShared => {
+        it('should return LinkedFlagKeyStrategy if hotbar is not linked to linked actor.', () => {
+            const clientSettings = {};
+            clientSettings[Settings.keys.shareHotbar] = isShared;
+            clientSettings[Settings.keys.linkToLinkedActor] = false;
+            const settings = new Settings().load(new TestClientSettings(clientSettings));
 
-        expect(new FlagKeyFactory(settings).create()).toBeInstanceOf(LinkedFlagKeyStrategy);
+            expect(new FlagStrategyFactory(settings, {}, {}).createFlagKeyStrategy()).toBeInstanceOf(IdentityFlagsStrategy);
+        });
+
+        it('should return LinkedFlagKeyStrategy if hotbar is linked to linked actor.', () => {
+            const clientSettings = {};
+            clientSettings[Settings.keys.shareHotbar] = isShared;
+            clientSettings[Settings.keys.linkToLinkedActor] = true;
+            const settings = new Settings().load(new TestClientSettings(clientSettings));
+
+            expect(new FlagStrategyFactory(settings, {}, {}).createFlagKeyStrategy()).toBeInstanceOf(LinkedFlagsStrategy);
+        });
+
+        it('should return AlwaysLinkedFlagKeyStrategy if hotbar is always linked to actor.', () => {
+            const clientSettings = {};
+            clientSettings[Settings.keys.shareHotbar] = isShared;
+            clientSettings[Settings.keys.linkToLinkedActor] = true;
+            clientSettings[Settings.keys.alwaysLinkToActor] = true;
+            const settings = new Settings().load(new TestClientSettings(clientSettings));
+
+            expect(new FlagStrategyFactory(settings, {}, {}).createFlagKeyStrategy()).toBeInstanceOf(AlwaysLinkedFlagsStrategy);
+        });
     });
-
-    it('should return AlwaysLinkedFlagKeyStrategy if hotbar is linked to actor.', () => {
-        const clientSettings = {};
-        clientSettings[Settings.keys.linkToLinkedActor] = true;
-        clientSettings[Settings.keys.alwaysLinkToActor] = true;
-        const settings = new Settings().load(new TestClientSettings(clientSettings));
-
-        expect(new FlagKeyFactory(settings).create()).toBeInstanceOf(AlwaysLinkedFlagKeyStrategy);
-    });
-
-    it('should return SharedFlagKeyStrategy if hotbar is shared', () => {
-        const clientSettings = {};
-        clientSettings[Settings.keys.shareHotbar] = true;
-        clientSettings[Settings.keys.linkToLinkedActor] = true;
-        clientSettings[Settings.keys.alwaysLinkToActor] = true;
-        const settings = new Settings().load(new TestClientSettings(clientSettings));
-
-        expect(new FlagKeyFactory(settings).create()).toBeInstanceOf(SharedFlagKeyStrategy);
-    });
-
 });
 
 describe('FlagStrategyFactory', () => {
@@ -48,7 +57,7 @@ describe('FlagStrategyFactory', () => {
         clientSettings[Settings.keys.shareHotbar] = true;
         const settings = new Settings().load(new TestClientSettings(clientSettings));
 
-        expect(new FlagStrategyFactory(settings).create()).toBeInstanceOf(SharedLinkedFlagsStrategy);
+        expect(new FlagStrategyFactory(settings, {}, {}).createFlagStrategy()).toBeInstanceOf(LinkedFlagsStrategy);
     });
 
     it('should return SharedAlwaysLinkedFlagsStrategy if hotbar is shared and linked to actor.', () => {
@@ -58,17 +67,27 @@ describe('FlagStrategyFactory', () => {
         clientSettings[Settings.keys.alwaysLinkToActor] = true;
         const settings = new Settings().load(new TestClientSettings(clientSettings));
 
-        expect(new FlagStrategyFactory(settings).create()).toBeInstanceOf(SharedAlwaysLinkedFlagsStrategy);
+        expect(new FlagStrategyFactory(settings, {}, {}).createFlagStrategy()).toBeInstanceOf(AlwaysLinkedFlagsStrategy);
     });
 
-    it('should return DefaultFlagsStrategy if hotbar is not shared', () => {
+    it('should return IdentityFlagsStrategy if hotbar is shared and not linked to linked actor.', () => {
+        const clientSettings = {};
+        clientSettings[Settings.keys.shareHotbar] = true;
+        clientSettings[Settings.keys.linkToLinkedActor] = false;
+        clientSettings[Settings.keys.alwaysLinkToActor] = false;
+        const settings = new Settings().load(new TestClientSettings(clientSettings));
+
+        expect(new FlagStrategyFactory(settings, {}, {}).createFlagStrategy()).toBeInstanceOf(IdentityFlagsStrategy);
+    });
+
+    it('should return UserFlagsStrategy if hotbar is not shared', () => {
         const clientSettings = {};
         clientSettings[Settings.keys.shareHotbar] = false;
         clientSettings[Settings.keys.linkToLinkedActor] = true;
         clientSettings[Settings.keys.alwaysLinkToActor] = true;
         const settings = new Settings().load(new TestClientSettings(clientSettings));
 
-        expect(new FlagStrategyFactory(settings).create()).toBeInstanceOf(DefaultFlagsStrategy);
+        expect(new FlagStrategyFactory(settings, {}, {}).createFlagStrategy()).toBeInstanceOf(UserFlagsStrategy);
     });
 
 });

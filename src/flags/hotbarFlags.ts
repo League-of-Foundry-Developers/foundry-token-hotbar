@@ -1,6 +1,6 @@
 import { CONSTANTS } from '../constants';
-import { FlagsStrategy } from './flagStrategies';
 import { Flaggable } from '../foundry';
+import { FlagsStrategy } from './flagStrategies';
 
 export interface HotbarItem {
     id: string,
@@ -32,6 +32,8 @@ export class FoundryHotbarFlags implements HotbarFlags {
     set(tokenId: string, data: HotbarData) {
         return this.getFlagStrategy.get(tokenId)
             .unsetFlag("world", CONSTANTS.moduleName)
-            .then(entity => entity.setFlag('world', CONSTANTS.moduleName, data));
+            .then(entity => {
+                return entity.setFlag('world', CONSTANTS.moduleName, data
+            )});
     }
 }
