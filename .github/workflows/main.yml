@@ -21,11 +21,11 @@ jobs:
     - name: Create Release body
       shell: bash
       id: create-release-body
-      run: node notes.js > release-notes.txt
+      run: 'node ./.github/workflows/notes.js > release-notes.txt'
     - name: Extract Version
       shell: bash
       id: extract-version
-      run: echo "::set-output name=version::$(node version.js)"
+      run: echo "::set-output name=version::$(node ./.github/workflows/version.js)"
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -36,7 +36,7 @@ jobs:
         tag_name: ${{ steps.extract-version.outputs.version}}
         release_name: Release ${{ steps.extract-version.outputs.version}}
         draft: false
-        prerelease: true
+        prerelease: ${{ endsWith(steps.extract-version.outputs.version, 'a') }}
         bodyFile: './release-notes.txt'
     - name: Upload Release Asset
       id: upload-module-zip
