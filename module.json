@@ -1,6 +1,6 @@
-{   
-    "name": "TokenHotbar",   
-    "title": "Token Hotbar",   
+{
+    "name": "TokenHotbar",
+    "title": "Token Hotbar",
     "description": "Using this module, you can assign one of the hotbar pages to remember macros per token.",
     "author": "Stan Janssen",
     "version": "2.0.2",

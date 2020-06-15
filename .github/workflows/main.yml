@@ -1,0 +1,41 @@
+name: Node.js CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Use Node.js 12.x
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12.x
+    - run: npm install
+    - run: npm test
+    - run: ./build dev
+      env:
+        CI: true
+    - name: Create Release body
+      shell: bash
+      id: create-release-body
+      run: 'node ./.github/workflows/notes.js > release-notes.txt'
+    - name: Extract Version
+      shell: bash
+      id: extract-version
+      run: echo "::set-output name=version::$(node ./.github/workflows/version.js)"
+    - name: Create Release
+      id: create_release
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        name: Release ${{ steps.extract-version.outputs.version}}
+        draft: false
+        prerelease: ${{ endsWith(steps.extract-version.outputs.version, 'a') }}
+        bodyFile: './release-notes.txt'
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: './dist/TokenHotbar.zip,./module.json'
+        commit: ${{ github.sha }}
+        tag: ${{ steps.extract-version.outputs.version }}
