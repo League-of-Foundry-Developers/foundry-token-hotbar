@@ -32,7 +32,7 @@ jobs:
       with:
         allowUpdates: true
         tag: ${{ steps.extract-version.outputs.version}}
-        release_name: Release ${{ steps.extract-version.outputs.version}}
+        name: Release ${{ steps.extract-version.outputs.version}}
         draft: false
         prerelease: ${{ endsWith(steps.extract-version.outputs.version, 'a') }}
         bodyFile: './release-notes.txt'
