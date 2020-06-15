@@ -1,5 +1,5 @@
 import { Settings } from '../settings';
-import { FoundryHotbarFlags, HotbarFlags } from './hotbarFlags';
+import { HotbarFlags, MigratingHotbarFlags } from './hotbarFlags';
 import { IdentityFlagsStrategy, UserFlagsStrategy, LinkedFlagsStrategy, AlwaysLinkedFlagsStrategy, FlagsStrategy } from './flagStrategies';
 import { Game, Canvas } from '../foundry';
 
@@ -8,7 +8,7 @@ export class HotbarFlagsFactory {
 
     public create(): HotbarFlags {
         const factory = new FlagStrategyFactory(this.settings, game, canvas);
-        return new FoundryHotbarFlags(factory.createFlagStrategy());
+        return new MigratingHotbarFlags(factory.createFlagStrategy());
     }
 }
 

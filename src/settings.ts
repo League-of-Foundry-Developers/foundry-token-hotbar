@@ -36,6 +36,9 @@ export class Settings {
         return this;
     }
 
+    /**
+     * Helper method to quickly construct Settings from game.settings
+     */
     static _load(): Settings { return new Settings().load(game.settings); }
 
     private getSetting(settings: ClientSettingsReader, key: string) {

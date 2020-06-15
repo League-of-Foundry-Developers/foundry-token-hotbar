@@ -1,7 +1,7 @@
 import 'jasmine';
 import { TokenHotbar } from '../src/hotbar/tokenHotbar';
 import { TestNotifier } from './helpers/TestNotifier';
-import { FoundryHotbarFlags, HotbarItem, HotbarData } from '../src/flags/hotbarFlags';
+import { ModuleHotbarFlags, HotbarItem, HotbarData } from '../src/flags/hotbarFlags';
 import { Macro, IToken, IActor } from '../src/foundry';
 import { IdentityFlagsStrategy, UserFlagsStrategy, LinkedFlagsStrategy } from '../src/flags/flagStrategies';
 import { TestFlaggable, TestToken } from './helpers/TestToken';
@@ -15,7 +15,7 @@ describe('TokenHotbar.save', async () => {
 
     it('it will save macros placed in the right slots', async () => {
         // Arrange
-        const flags = new FoundryHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), new Map(), tokens));
+        const flags = new ModuleHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), new Map(), tokens));
         const keyStrategy = new IdentityFlagsStrategy(new Map(), tokens);
         const tokenHotbar = new TokenHotbar(flags, notifier, 5, keyStrategy, new ConsoleLogger(new Settings()));
         const token = tokens.get('token-1');
@@ -52,7 +52,7 @@ describe('TokenHotbar.load', () => {
 
     it('should return false if there is no token hotbar.', () => {
         // Arrange
-        const flags = new FoundryHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
+        const flags = new ModuleHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
         const tokenHotbar = new TokenHotbar(flags, new TestNotifier(), 5, new IdentityFlagsStrategy(actors, tokens), new ConsoleLogger(new Settings()));
 
         // Act
@@ -64,7 +64,7 @@ describe('TokenHotbar.load', () => {
 
     it('should return false if macros from the token bar no longer exist.', () => {
         // Arrange
-        const flags = new FoundryHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
+        const flags = new ModuleHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
         flags.set(token1.id, {'token-1': [ { id: 'macro-id', slot: 41 }]});
         const tokenHotbar = new TokenHotbar(
             flags,
@@ -83,7 +83,7 @@ describe('TokenHotbar.load', () => {
 
     it('should return true if there is a token hotbar.', async () => {
         // Arrange
-        const flags = new FoundryHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
+        const flags = new ModuleHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
         await flags.set(token1.id, {'token-1': [ { id: 'macro-id', slot: 41 }]});
         const tokenHotbar = new TokenHotbar(
             flags,
@@ -102,7 +102,7 @@ describe('TokenHotbar.load', () => {
 
     it('should call update on user with intersection of token hotbar and game macros.', async () => {
         // Arrange
-        const flags = new FoundryHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
+        const flags = new ModuleHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
         await flags.set(token1.id, {'token-1': [ { id: 'macro-id', slot: 41 }, { id: 'non-existent-macro', slot: 42}]});
         const tokenHotbar = new TokenHotbar(
             flags,
@@ -136,7 +136,7 @@ describe('TokenHotbar.remove', () => {
 
     it('updates the flags with the specific key removed', async () => {
         // Arrange
-        const flags = new FoundryHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
+        const flags = new ModuleHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
         await flags.set(token1.id, { 
             'token-1': [ { id: 'macro-1', slot: 1 } ],
             'token-2': [ { id: 'macro-1', slot: 1 } ]
@@ -177,7 +177,7 @@ describe('TokenHotbar.remove', () => {
         const hotbarData = { 'actor-1': [ { id: 'macro-1', slot: 1 } ] };
         const expectedData = JSON.parse(JSON.stringify(hotbarData)); // ensure we have a clone instead of a reference
 
-        const flags = new FoundryHotbarFlags(
+        const flags = new ModuleHotbarFlags(
             new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
         await flags.set(linkedKeyStrategy.get(token.id).id, hotbarData);
         spyOn(flags, 'set').and.callThrough();
