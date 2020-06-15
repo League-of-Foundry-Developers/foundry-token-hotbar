@@ -28,9 +28,7 @@ jobs:
       run: echo "::set-output name=version::$(node ./.github/workflows/version.js)"
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: ncipollo/release-action@v1
       with:
         allowUpdates: true
         tag_name: ${{ steps.extract-version.outputs.version}}
@@ -38,23 +36,5 @@ jobs:
         draft: false
         prerelease: ${{ endsWith(steps.extract-version.outputs.version, 'a') }}
         bodyFile: './release-notes.txt'
-    - name: Upload Release Asset
-      id: upload-module-zip
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./dist/TokenHotbar.zip
-        asset_name: TokenHotbar.zip
-        asset_content_type: application/zip
-    - name: Upload Release Asset
-      id: upload-manifest
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./module.json
-        asset_name: module.json
-        asset_content_type: application/json
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: './dist/TokenHotbar.zip,./module.json'
