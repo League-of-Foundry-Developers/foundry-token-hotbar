@@ -38,3 +38,4 @@ jobs:
         bodyFile: './release-notes.txt'
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: './dist/TokenHotbar.zip,./module.json'
+        commit: ${{ github.sha }}
