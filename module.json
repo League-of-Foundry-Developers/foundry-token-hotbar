@@ -7,7 +7,6 @@
     "minimumCoreVersion": "0.6.0",
     "compatibleCoreVersion":"0.6.2",
     "scripts": ["TokenHotbar.js"],
-    "packs": [],
     "manifest": "https://hotbar.janssen.io/beta/module.json",
     "download": "https://hotbar.janssen.io/beta/TokenHotbar.zip",
     "url": "https://github.com/janssen-io/foundry-token-hotbar"
