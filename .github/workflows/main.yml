@@ -38,3 +38,4 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: './dist/TokenHotbar.zip,./module.json'
         commit: ${{ github.sha }}
+        tag: ${{ steps.extract-version.outputs.version }}

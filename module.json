@@ -1,7 +1,7 @@
 {
     "name": "TokenHotbar",
     "title": "Token Hotbar",
-    "description": "TEST2 Using this module, you can assign one of the hotbar pages to remember macros per token.",
+    "description": "Using this module, you can assign one of the hotbar pages to remember macros per token.",
     "author": "Stan Janssen",
     "version": "2.0.2-beta",
     "minimumCoreVersion": "0.6.0",
