@@ -18,6 +18,10 @@ jobs:
     - run: ./build dev
       env:
         CI: true
+    - name: Create Release body
+      shell: bash
+      id: create-release-body
+      run: node notes.js > release-notes.txt
     - name: Extract Version
       shell: bash
       id: extract-version
@@ -28,10 +32,12 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
+        allowUpdates: true
         tag_name: ${{ steps.extract-version.outputs.version}}
         release_name: Release ${{ steps.extract-version.outputs.version}}
-        draft: true
+        draft: false
         prerelease: true
+        bodyFile: './release-notes.txt'
     - name: Upload Release Asset
       id: upload-module-zip
       uses: actions/upload-release-asset@v1
