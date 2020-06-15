@@ -1,3 +1,5 @@
+import { Settings } from './settings';
+
 export interface Logger {
     error(...message: unknown[]): void;
     warn(...message: unknown[]): void;
@@ -7,11 +9,7 @@ export interface Logger {
 
 export class ConsoleLogger {
 
-    constructor(private showDebug: boolean = false) { }
-
-    static init(): void {
-        window['TokenHotbar'] = { debug: false };
-    }
+    constructor(private settings: Settings) { }
 
     error(...message: unknown[]): void {
         console.error.apply(null, message);
@@ -26,7 +24,7 @@ export class ConsoleLogger {
     }
 
     debug(...message: unknown[]): void {
-        if (this.showDebug)
-            console.debug.apply(null, ...message);
+        if (this.settings.debugMode)
+            console.debug.apply(null, message);
     }
 }

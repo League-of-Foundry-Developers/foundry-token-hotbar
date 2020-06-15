@@ -6,6 +6,7 @@ import { Macro, IToken, IActor } from '../src/foundry';
 import { IdentityFlagsStrategy, UserFlagsStrategy, LinkedFlagsStrategy } from '../src/flags/flagStrategies';
 import { TestFlaggable, TestToken } from './helpers/TestToken';
 import { ConsoleLogger } from '../src/logger';
+import { Settings } from '../src/settings';
 
 describe('TokenHotbar.save', async () => {
     const notifier = new TestNotifier();
@@ -16,7 +17,7 @@ describe('TokenHotbar.save', async () => {
         // Arrange
         const flags = new FoundryHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), new Map(), tokens));
         const keyStrategy = new IdentityFlagsStrategy(new Map(), tokens);
-        const tokenHotbar = new TokenHotbar(flags, notifier, 5, keyStrategy, new ConsoleLogger());
+        const tokenHotbar = new TokenHotbar(flags, notifier, 5, keyStrategy, new ConsoleLogger(new Settings()));
         const token = tokens.get('token-1');
         const macrosToSave: Macro[] = [
             { slot: 1, macro: { id: '1' }},
@@ -52,7 +53,7 @@ describe('TokenHotbar.load', () => {
     it('should return false if there is no token hotbar.', () => {
         // Arrange
         const flags = new FoundryHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
-        const tokenHotbar = new TokenHotbar(flags, new TestNotifier(), 5, new IdentityFlagsStrategy(actors, tokens), new ConsoleLogger());
+        const tokenHotbar = new TokenHotbar(flags, new TestNotifier(), 5, new IdentityFlagsStrategy(actors, tokens), new ConsoleLogger(new Settings()));
 
         // Act
         const result = tokenHotbar.load(token1, {}, []);
@@ -70,7 +71,7 @@ describe('TokenHotbar.load', () => {
             new TestNotifier(),
             5,
             new IdentityFlagsStrategy(actors, tokens),
-            new ConsoleLogger());
+            new ConsoleLogger(new Settings()));
         const gameMacros = [{id: 'other-macro-id'}];
 
         // Act
@@ -89,7 +90,7 @@ describe('TokenHotbar.load', () => {
             new TestNotifier(),
             5,
             new IdentityFlagsStrategy(actors, tokens),
-            new ConsoleLogger());
+            new ConsoleLogger(new Settings()));
         const gameMacros = [{id: 'macro-id'}];
         
         // Act
@@ -108,7 +109,7 @@ describe('TokenHotbar.load', () => {
             new TestNotifier(),
             5,
             new IdentityFlagsStrategy(actors, tokens),
-            new ConsoleLogger());
+            new ConsoleLogger(new Settings()));
         const gameMacros = [{id: 'macro-id'}, {id: 'other-macro-id'}];
         
         // Act
@@ -147,7 +148,7 @@ describe('TokenHotbar.remove', () => {
             new TestNotifier(),
             5,
             keyStrategy,
-            new ConsoleLogger());
+            new ConsoleLogger(new Settings()));
 
         // Act
         tokenHotbar.remove(token1.id, actors, tokens);
@@ -185,7 +186,7 @@ describe('TokenHotbar.remove', () => {
             new TestNotifier(),
             5,
             linkedKeyStrategy,
-            new ConsoleLogger());
+            new ConsoleLogger(new Settings()));
 
         // Act
         await tokenHotbar.remove(token.id, actors, tokens);

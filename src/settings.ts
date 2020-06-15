@@ -11,13 +11,15 @@ export class Settings {
     hotbarPage: number;
     shareHotbar: boolean;
     lockHotbar: boolean;
+    debugMode: boolean;
 
     static keys = {
         alwaysLinkToActor: 'linkToActor',
         linkToLinkedActor: 'link',
         hotbarPage: 'page',
         shareHotbar: 'share',
-        lockHotbar: 'lock'
+        lockHotbar: 'lock',
+        debugMode: 'debug'
     }
 
     public load(s: ClientSettingsReader) : Settings {
@@ -28,9 +30,13 @@ export class Settings {
 
         this.shareHotbar = this.getSetting(s, Settings.keys.shareHotbar);
         this.lockHotbar = this.getSetting(s, Settings.keys.lockHotbar) && this.shareHotbar;
-    
+
+        this.debugMode = this.getSetting(s, Settings.keys.debugMode);
+
         return this;
     }
+
+    static _load(): Settings { return new Settings().load(game.settings); }
 
     private getSetting(settings: ClientSettingsReader, key: string) {
         return settings.get(CONSTANTS.moduleName, key);
