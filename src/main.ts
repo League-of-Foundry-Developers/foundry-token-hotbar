@@ -2,9 +2,10 @@ import { Settings } from './settings';
 import { TokenHotbar } from './hotbar/tokenHotbar';
 import { CONSTANTS } from './constants';
 import { HotbarFlagsFactory, FlagStrategyFactory } from './flags/factory';
-import { UserHotbar } from './hotbar/userHotbar';
+import { FoundryHotbar, CustomHotbar, UiHotbar } from './hotbar/userHotbar';
 import { PageFlag } from './flags/pageFlag';
-import { ConsoleLogger } from './logger';
+import { ConsoleLogger, Logger } from './logger';
+import { IToken } from './foundry';
 
 // TODO: Remove in v3.0.0
 function migrateFlag() {
@@ -135,18 +136,18 @@ Hooks.on('controlToken', () => {
         const settings = Settings._load();
         const logger = new ConsoleLogger(settings);
         // hotbar does not yet exist on game.user.data and ui definitions, hence the casts to any.
-        const uiHotbar = new UserHotbar(settings, (<any>ui).CustomHotbar, new PageFlag(), logger);
+        // const uiHotbar = new FoundryHotbar(settings, (<any>ui).hotbar, new PageFlag(), logger);
+        const uiHotbar = new CustomHotbar((<any>ui).CustomHotbar);
 
         if (token && canvas.tokens.controlled.length == 1)
             loadTokenHotbar(logger, token, uiHotbar);
         else
-            (<any>window).chbSetMacros([null, null, null, null, null, null, null, null, null, null, null]);
-            // loadRegularPage(logger, uiHotbar);
+            hideTokenHotbar(logger, uiHotbar);
 
         return true;
     }
 
-    async function loadTokenHotbar(logger, token, uiHotbar) {
+    async function loadTokenHotbar(logger: Logger, token: IToken, uiHotbar: UiHotbar) {
         logger.debug('[Token Hotbar]', 'controlled token', token);
         
         const userMacroData = { hotbar: (<any>window).chbGetMacros() };
@@ -159,11 +160,11 @@ Hooks.on('controlToken', () => {
             logger.debug('[Token Hotbar]', 'updated hotbar', token, result.hotbar);
         }
 
-        uiHotbar.goToPage(result.hasMacros);
+        uiHotbar.toggleHotbar(result.hasMacros);
     }
 
-    function loadRegularPage(logger, uiHotbar) {
-        uiHotbar.goToPage(false);
+    function hideTokenHotbar(logger: Logger, uiHotbar: UiHotbar) {
+        uiHotbar.toggleHotbar(false);
         logger.debug('[Token Hotbar]', 'No or multiple controlled tokens');
     }
 });

@@ -2,31 +2,39 @@ import { Settings } from '../settings';
 import { PageFlag } from '../flags/pageFlag';
 import { Logger } from '../logger';
 
-interface FoundryHotbar {
+interface FoundryUiHotbar {
     page: number;
     render: (force?: boolean) => void;
+    expand: () => Promise<unknown>;
+    collapse: () => Promise<unknown>;
 }
 
-export class UserHotbar {
-    constructor(private settings: Settings, private hotbar: FoundryHotbar, private pageFlag: PageFlag, private logger: Logger = console) { }
+export interface UiHotbar {
+    toggleHotbar(showTokenBar: boolean): Promise<unknown>;
+    showTokenHotbar(): Promise<unknown>;
+    hideTokenHotbar(): Promise<unknown>;
+}
 
-    public goToPage(hasTokenSelected: boolean): Promise<unknown> {
-        if (hasTokenSelected) {
-            return this.goToTokenHotbar();
+export class FoundryHotbar implements UiHotbar {
+    constructor(private settings: Settings, private hotbar: FoundryUiHotbar, private pageFlag: PageFlag, private logger: Logger = console) { }
+
+    public toggleHotbar(showTokenBar: boolean): Promise<unknown> {
+        if (showTokenBar) {
+            return this.showTokenHotbar();
         }
         else {
-            return this.goToLastActivePage();
+            return this.hideTokenHotbar();
         }
     }
 
-    public goToTokenHotbar(): Promise<unknown> {
+    public showTokenHotbar(): Promise<unknown> {
         if (this.hotbar.page != this.settings.hotbarPage)
             this.pageFlag.set(this.hotbar.page);
 
         return this.render(this.settings.hotbarPage);
     }
 
-    public goToLastActivePage(): Promise<unknown> {
+    public hideTokenHotbar(): Promise<unknown> {
         if (this.hotbar.page != this.settings.hotbarPage)
             return Promise.resolve(); // user already moved away from the token hotbar.
 
@@ -43,6 +51,20 @@ export class UserHotbar {
                 resolve();
             }, 5);
         });
+    }
+}
+
+export class CustomHotbar implements UiHotbar {
+    constructor(private hotbar: FoundryUiHotbar) { }
+
+    toggleHotbar(showTokenBar: boolean): Promise<unknown> {
+        return showTokenBar ? this.showTokenHotbar() : this.hideTokenHotbar();
+    }
+    showTokenHotbar(): Promise<unknown> {
+        return this.hotbar.expand();
+    }
+    hideTokenHotbar(): Promise<unknown> {
+        return this.hotbar.collapse();
     }
 
 }
