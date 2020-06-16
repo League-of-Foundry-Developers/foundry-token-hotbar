@@ -117,7 +117,7 @@ describe('TokenHotbar.load', () => {
 
         // Assert
         expect(result.hasMacros).toBeTrue();
-        expect(result.hotbar).toEqual({41: 'macro-id', '-=42': null, '-=43': null, '-=44': null, '-=45': null, '-=46': null, '-=47': null, '-=48': null, '-=49': null, '-=50': null });
+        expect(result.hotbar).toEqual({'41': 'macro-id', '-=42': null, '-=43': null, '-=44': null, '-=45': null, '-=46': null, '-=47': null, '-=48': null, '-=49': null, '-=50': null });
     });
 });
 

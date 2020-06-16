@@ -12,6 +12,7 @@ export class Settings {
     shareHotbar: boolean;
     lockHotbar: boolean;
     debugMode: boolean;
+    useCustomHotbar: boolean;
 
     static keys = {
         alwaysLinkToActor: 'linkToActor',
@@ -19,7 +20,8 @@ export class Settings {
         hotbarPage: 'page',
         shareHotbar: 'share',
         lockHotbar: 'lock',
-        debugMode: 'debug'
+        debugMode: 'debug',
+        useCustomHotbar: 'customHotbar'
     }
 
     public load(s: ClientSettingsReader) : Settings {
@@ -32,6 +34,8 @@ export class Settings {
         this.lockHotbar = this.getSetting(s, Settings.keys.lockHotbar) && this.shareHotbar;
 
         this.debugMode = this.getSetting(s, Settings.keys.debugMode);
+
+        this.useCustomHotbar = this.getSetting(s, Settings.keys.useCustomHotbar);
 
         return this;
     }

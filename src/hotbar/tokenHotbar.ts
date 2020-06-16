@@ -45,7 +45,8 @@ export class TokenHotbar {
     
     // Returns true if the token has macros on the token hotbar
     //         otherwise false
-    public load(token: IToken, userHotbar: { [slot: number]: string }, gameMacros: Identifiable[]): { hasMacros: boolean, hotbar: { [slot: number]: string } } {
+    public load(token: IToken, userHotbar: { [slot: number]: string }, gameMacros: Identifiable[])
+        : { hasMacros: boolean, hotbar: { [slot: string]: string | null } } { // slot can be number or `-=<number>`
         const tokenHotbars = this.hotbarFlag.get(token.id);
         const flagKey = this.flagKeyStrategy.get(token.id);
         const tokenHotbar = tokenHotbars[flagKey.id] || [];
