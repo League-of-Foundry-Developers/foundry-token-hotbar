@@ -145,8 +145,6 @@ Hooks.on('controlToken', () => {
 
         const settings = Settings._load();
         const logger = new ConsoleLogger(settings);
-        // hotbar does not yet exist on game.user.data and ui definitions, hence the casts to any.
-        // const uiHotbar = new FoundryHotbar(settings, (<any>ui).hotbar, new PageFlag(), logger);
         const factory = new UiHotbarFactory(settings);
         const uiHotbar = factory.create();
 
@@ -191,4 +189,11 @@ Hooks.on('preDeleteActor', (actor: any) => {
 
 Hooks.on('ready', () => {
     migrateFlag();
+});
+
+Hooks.once('renderCustomHotbar', () => {
+    // on first render, check if it should be expanded or collapses.
+    const settings = Settings._load();
+    const factory = new UiHotbarFactory(settings);
+    factory.create().toggleHotbar(canvas.tokens.controlled.length === 1);
 });

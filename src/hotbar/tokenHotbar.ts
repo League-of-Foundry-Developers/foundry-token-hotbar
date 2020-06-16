@@ -2,6 +2,7 @@ import { HotbarFlags, } from '../flags/hotbarFlags';
 import { Notifier, Identifiable, Macro, IToken, IActor, Flaggable } from '../foundry';
 import { Logger } from '../logger';
 import { FlagsStrategy, IdentityFlagsStrategy } from '../flags/flagStrategies';
+import { HotbarSlots } from './uiHotbar';
 
 export class TokenHotbar { 
     // Dev note: not fond of this many parameters. 
@@ -45,8 +46,8 @@ export class TokenHotbar {
     
     // Returns true if the token has macros on the token hotbar
     //         otherwise false
-    public load(token: IToken, userHotbar: { [slot: number]: string }, gameMacros: Identifiable[])
-        : { hasMacros: boolean, hotbar: { [slot: string]: string | null } } { // slot can be number or `-=<number>`
+    public load(token: IToken, userHotbar: HotbarSlots, gameMacros: Identifiable[])
+        : { hasMacros: boolean, hotbar: HotbarSlots } { // slot can be number or `-=<number>`
         const tokenHotbars = this.hotbarFlag.get(token.id);
         const flagKey = this.flagKeyStrategy.get(token.id);
         const tokenHotbar = tokenHotbars[flagKey.id] || [];

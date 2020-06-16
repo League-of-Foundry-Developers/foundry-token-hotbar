@@ -3,6 +3,8 @@ import { PageFlag } from '../flags/pageFlag';
 import { Logger } from '../logger';
 import { Macro } from '../foundry';
 
+export type HotbarSlots = { [slot: string] : string | null }
+
 export interface FoundryUiHotbar {
     page: number;
     _getMacrosByPage: (page: number) => Macro[];
@@ -15,8 +17,8 @@ export interface UiHotbar {
     toggleHotbar(showTokenBar: boolean): Promise<unknown>;
     showTokenHotbar(): Promise<unknown>;
     hideTokenHotbar(): Promise<unknown>;
-    setTokenMacros(data: { hotbar: { [ slot: number]: string }}): Promise<unknown>;
-    getTokenMacros(): { hotbar: { [slot: number]: string } };
+    setTokenMacros(data: { hotbar: HotbarSlots }): Promise<unknown>;
+    getTokenMacros(): { hotbar: HotbarSlots };
 }
 
 export class FoundryHotbar implements UiHotbar {
@@ -45,10 +47,10 @@ export class FoundryHotbar implements UiHotbar {
     }
 
     public getTokenMacros() {
-        return <{ hotbar: { [slot: number]: string } }><unknown>game.user.data;
+        return <{ hotbar: HotbarSlots }><unknown>game.user.data;
     }
 
-    setTokenMacros(data: { hotbar: { [slot: number]: string; }; }): Promise<unknown> {
+    setTokenMacros(data: { hotbar: HotbarSlots }): Promise<unknown> {
         return game.user.update({ hotbar: data.hotbar });
     }
 
@@ -67,15 +69,15 @@ export class FoundryHotbar implements UiHotbar {
 
 export class CustomHotbar implements UiHotbar {
     constructor(private hotbar: FoundryUiHotbar) { }
-    setTokenMacros(data: { hotbar: { [slot: number]: string; }; }): Promise<unknown> {
+    setTokenMacros(data: { hotbar: HotbarSlots }): Promise<unknown> {
         return (<any>window).chbSetMacros(data.hotbar);
     }
-    getTokenMacros(): { hotbar: { [slot: number]: string; } } {
+    getTokenMacros(): { hotbar: HotbarSlots } {
         return { hotbar: (<any>window).chbGetMacros() };
     }
 
     toggleHotbar(showTokenBar: boolean): Promise<unknown> {
-        return showTokenBar ? this.showTokenHotbar() : this.hideTokenHotbar();
+        return showTokenBar || canvas.tokens.controlled.length === 1 ? this.showTokenHotbar() : this.hideTokenHotbar();
     }
     showTokenHotbar(): Promise<unknown> {
         return this.hotbar.expand();
