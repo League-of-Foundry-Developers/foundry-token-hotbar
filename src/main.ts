@@ -99,20 +99,20 @@ Hooks.on('init', () => {
 });
 
 let renderHotbarTimeout: number;
-Hooks.on('renderHotbar', (data: any) => {
+Hooks.on('renderCustomHotbar', (data: any) => {
     if (renderHotbarTimeout)
         clearTimeout(renderHotbarTimeout);
 
-    renderHotbarTimeout = window.setTimeout(delayedSave, 20);
+    renderHotbarTimeout = window.setTimeout(delayedSave, 100);
 
     function delayedSave() {
         // const macros = data.macros;
         // FIXME: due to a race condition, sometimes the wrong macros are passed.
         //        We are only interested in the ones on the token hotbar.
         //        ! Will be unnecessary to fix in v3.0.0 (separate hotbar, all pages/slots will be relevant)
-        const uiHotbar = (<any>ui).hotbar;
+        const uiHotbar = (<any>ui).CustomHotbar;
         const settings = Settings._load();
-        const macros = uiHotbar._getMacrosByPage(settings.hotbarPage);
+        const macros = uiHotbar.getCustomHotbarMacros(settings.hotbarPage);
         const token = canvas.tokens.controlled[0];
 
         if (token && settings.hotbarPage === uiHotbar.page)
@@ -127,7 +127,7 @@ Hooks.on('controlToken', () => {
     if (controlTokenTimeout)
         clearTimeout(controlTokenTimeout);
 
-    controlTokenTimeout = window.setTimeout(delayedLoad, 20);
+    controlTokenTimeout = window.setTimeout(delayedLoad, 100);
 
     async function delayedLoad() {
         const token = canvas.tokens.controlled[0];
@@ -135,12 +135,13 @@ Hooks.on('controlToken', () => {
         const settings = Settings._load();
         const logger = new ConsoleLogger(settings);
         // hotbar does not yet exist on game.user.data and ui definitions, hence the casts to any.
-        const uiHotbar = new UserHotbar(settings, (<any>ui).hotbar, new PageFlag(), logger);
+        const uiHotbar = new UserHotbar(settings, (<any>ui).CustomHotbar, new PageFlag(), logger);
 
         if (token && canvas.tokens.controlled.length == 1)
             loadTokenHotbar(logger, token, uiHotbar);
         else
-            loadRegularPage(logger, uiHotbar);
+            (<any>window).chbSetMacros([null, null, null, null, null, null, null, null, null, null, null]);
+            // loadRegularPage(logger, uiHotbar);
 
         return true;
     }
@@ -148,12 +149,13 @@ Hooks.on('controlToken', () => {
     async function loadTokenHotbar(logger, token, uiHotbar) {
         logger.debug('[Token Hotbar]', 'controlled token', token);
         
-        const userMacroData = <any>game.user.data;
+        const userMacroData = { hotbar: (<any>window).chbGetMacros() };
         const result = createTokenHotbar()
             .load(token, duplicate(userMacroData.hotbar), game.macros.entities);
 
         if (result.hasMacros) {
-            await game.user.update({ hotbar: result.hotbar });
+            // await game.user.update({ hotbar: result.hotbar });
+            await (<any>window).chbSetMacros(result.hotbar);
             logger.debug('[Token Hotbar]', 'updated hotbar', token, result.hotbar);
         }
 

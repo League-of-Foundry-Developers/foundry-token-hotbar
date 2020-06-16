@@ -37,7 +37,7 @@ export class TokenHotbar {
                 return { slot: item.slot, id: item.macro.id };
             });
 
-        this.logger.debug('[Token Hotbar]', 'Saving', flagKey, tokenHotbars);
+        this.logger.debug('[Token Hotbar]', 'Saving', flagKey.id, tokenHotbars);
 
         await this.hotbarFlag.set(token.id, tokenHotbars);
         return true;
@@ -45,7 +45,7 @@ export class TokenHotbar {
     
     // Returns true if the token has macros on the token hotbar
     //         otherwise false
-    public load(token: IToken, userHotbar: { [slot: number]: string }, gameMacros: Identifiable[]): { hasMacros: boolean, hotbar: unknown } {
+    public load(token: IToken, userHotbar: { [slot: number]: string }, gameMacros: Identifiable[]): { hasMacros: boolean, hotbar: { [slot: number]: string } } {
         const tokenHotbars = this.hotbarFlag.get(token.id);
         const flagKey = this.flagKeyStrategy.get(token.id);
         const tokenHotbar = tokenHotbars[flagKey.id] || [];
