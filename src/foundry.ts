@@ -1,3 +1,5 @@
+import { HotbarData } from './flags/hotbarFlags';
+
 export interface Notifier {
     info: (string) => void;
     warn: (string) => void;
@@ -5,8 +7,12 @@ export interface Notifier {
 }
 
 export interface User {
-    update(data: object): any;
+    update(data: unknown): unknown;
     isGM: boolean;
+}
+
+export interface Identifiable {
+    id: string;
 }
 
 export interface Macro {
@@ -14,12 +20,24 @@ export interface Macro {
     slot: number;
 }
 
-export interface Identifiable {
-    id: string;
+export interface Flaggable extends Identifiable {
+    getFlag(scope: string, key: string): HotbarData | undefined;
+    setFlag(scope: string, key: string, data?: HotbarData): Promise<Flaggable>;
+    unsetFlag(scope: string, key: string): Promise<Flaggable>;
 }
 
-export interface Flaggable extends Identifiable {
-    getFlag(scope: string, key: string): any;
-    setFlag(scope: string, key: string, data: any): Promise<Flaggable>;
-    unsetFlag(scope: string, key: string): Promise<Flaggable>;
+export type IActor = Flaggable
+
+export interface IToken extends Flaggable {
+    data: { actorLink: boolean };
+    actor?: IActor;
+}
+
+export interface Game {
+    actors: Map<string, IActor>;
+    user: Flaggable;
+}
+
+export interface Canvas {
+    tokens: Map<string, IToken>;
 }

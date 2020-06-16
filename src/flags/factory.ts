@@ -1,51 +1,41 @@
 import { Settings } from '../settings';
-import { FoundryHotbarFlags } from './hotbarFlags';
-import { SharedAlwaysLinkedFlagsStrategy, SharedLinkedFlagsStrategy, DefaultFlagsStrategy } from './flagStrategies';
-import { SharedFlagKeyStrategy, LinkedFlagKeyStrategy, AlwaysLinkedFlagKeyStrategy, DefaultFlagKeyStrategy } from './flagKeyStrategies';
+import { HotbarFlags, MigratingHotbarFlags } from './hotbarFlags';
+import { IdentityFlagsStrategy, UserFlagsStrategy, LinkedFlagsStrategy, AlwaysLinkedFlagsStrategy, FlagsStrategy } from './flagStrategies';
+import { Game, Canvas } from '../foundry';
 
 export class HotbarFlagsFactory {
     constructor(private settings: Settings) { }
 
-    public create() {
-        const flagStrategy = this.createFlagStrategy();
-        return new FoundryHotbarFlags(flagStrategy);  
-    }
-
-    private createFlagStrategy() {
-        return new FlagStrategyFactory(this.settings).create();
+    public create(): HotbarFlags {
+        const factory = new FlagStrategyFactory(this.settings, game, canvas);
+        return new MigratingHotbarFlags(factory.createFlagStrategy());
     }
 }
 
 export class FlagStrategyFactory {
 
-    constructor(private settings: Settings) { }
+    constructor(private settings: Settings, private game: Game, private canvas: Canvas) { }
 
-    public create() {
+    public createFlagStrategy(): FlagsStrategy  {
         if (this.settings.shareHotbar) {
             if (this.settings.alwaysLinkToActor) {
-                return new SharedAlwaysLinkedFlagsStrategy();
+                return new AlwaysLinkedFlagsStrategy(this.game.actors, this.canvas.tokens);
             }
             if (this.settings.linkToLinkedActor) {
-                return new SharedLinkedFlagsStrategy();
+                return new LinkedFlagsStrategy(this.game.actors, this.canvas.tokens);
             }
+            return new IdentityFlagsStrategy(this.game.actors, this.canvas.tokens);
         }
-        return new DefaultFlagsStrategy();
+        return new UserFlagsStrategy(this.game.user, this.game.actors, this.canvas.tokens);
     }
-}
 
-export class FlagKeyFactory {
-    constructor(private settings: Settings) { }
-
-    public create() {
-        if (this.settings.shareHotbar)
-            return new SharedFlagKeyStrategy();
-        
+    public createFlagKeyStrategy(): FlagsStrategy {
         if (this.settings.alwaysLinkToActor)
-            return new AlwaysLinkedFlagKeyStrategy();
+            return new AlwaysLinkedFlagsStrategy(this.game.actors, this.canvas.tokens);
 
         if (this.settings.linkToLinkedActor)
-            return new LinkedFlagKeyStrategy();
+            return new LinkedFlagsStrategy(this.game.actors, this.canvas.tokens);
 
-        return new DefaultFlagKeyStrategy();
+        return new IdentityFlagsStrategy(this.game.actors, this.canvas.tokens);
     }
 }

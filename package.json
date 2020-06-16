@@ -16,7 +16,11 @@
   },
   "devDependencies": {
     "@types/jasmine": "^3.5.10",
+    "@typescript-eslint/eslint-plugin": "^3.2.0",
+    "@typescript-eslint/parser": "^3.2.0",
+    "eslint": "^7.2.0",
     "jasmine": "^3.5.0",
+    "jasmine-spec-reporter": "^5.0.2",
     "ts-node": "^8.10.2",
     "webpack-merge": "^4.2.2"
   },
