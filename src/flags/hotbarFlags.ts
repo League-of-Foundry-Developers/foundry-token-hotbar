@@ -45,10 +45,10 @@ export class MigratingHotbarFlags extends ModuleHotbarFlags {
 
     get(tokenId: string): HotbarData {
         const value = super.get(tokenId);
-        if (value !== {}) 
+        if (Object.keys(value).length > 0) 
             return value;
 
-        const flags = super.flagStrategy.get(tokenId);
+        const flags = this.flagStrategy.get(tokenId);
         const oldValue = flags.getFlag('world', CONSTANTS.moduleName) || {};
 
         super.set(tokenId, oldValue);
