@@ -111,6 +111,24 @@ Hooks.on('init', () => {
 
 let renderHotbarTimeout: number;
 Hooks.on('renderCustomHotbar', (data: any) => {
+    const settings = Settings._load();
+    if (!settings.useCustomHotbar)
+        return true;
+
+    save();
+    return true;
+});
+
+Hooks.on('renderHotbar', (data: any) => {
+    const settings = Settings._load();
+    if (settings.useCustomHotbar)
+        return true;
+
+    save();
+    return true;
+});
+
+function save() {
     if (renderHotbarTimeout)
         clearTimeout(renderHotbarTimeout);
 
@@ -132,7 +150,7 @@ Hooks.on('renderCustomHotbar', (data: any) => {
 
         return true;
     }
-});
+}
 
 let controlTokenTimeout: number;
 Hooks.on('controlToken', () => {
