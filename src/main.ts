@@ -164,10 +164,8 @@ Hooks.on('controlToken', () => {
         const result = createTokenHotbar()
             .load(token, duplicate(userMacroData.hotbar), game.macros.entities);
 
-        if (result.hasMacros) {
-            await uiHotbar.setTokenMacros(result);
-            logger.debug('[Token Hotbar]', 'updated hotbar', token, result.hotbar);
-        }
+        await uiHotbar.setTokenMacros(result);
+        logger.debug('[Token Hotbar]', 'updated hotbar', token, result.hotbar);
 
         uiHotbar.toggleHotbar(result.hasMacros);
     }

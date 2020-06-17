@@ -52,9 +52,6 @@ export class TokenHotbar {
         const flagKey = this.flagKeyStrategy.get(token.id);
         const tokenHotbar = tokenHotbars[flagKey.id] || [];
 
-        if (tokenHotbar.length === 0)
-            return { hasMacros: false, hotbar: userHotbar };
-        
         this.logger.debug('[Token Hotbar]', 'Loading', flagKey, tokenHotbar);
         
         let hasValidMacros = false;

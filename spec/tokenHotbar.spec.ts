@@ -8,7 +8,7 @@ import { TestFlaggable, TestToken } from './helpers/TestToken';
 import { ConsoleLogger } from '../src/logger';
 import { Settings } from '../src/settings';
 
-describe('TokenHotbar.save', async () => {
+describe('TokenHotbar.save', () => {
     const notifier = new TestNotifier();
     const tokens = new Map();
     tokens.set('token-1', <IToken>{ id : 'token-1' });
@@ -60,6 +60,20 @@ describe('TokenHotbar.load', () => {
 
         // Assert
         expect(result.hasMacros).toBeFalse();
+    });
+
+    it('should return an empty hotbar if there is no token hotbar.', () => {
+        // Arrange
+        const flags = new ModuleHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
+        const tokenHotbar = new TokenHotbar(flags, new TestNotifier(), 5, new IdentityFlagsStrategy(actors, tokens), new ConsoleLogger(new Settings()));
+
+        // Act
+        const result = tokenHotbar.load(token1, {}, []);
+
+        // Assert
+        let values = obj => Object.keys(obj).map(key => obj[key]);
+        expect(values(result.hotbar).length).toBeGreaterThan(0);
+        expect(values(result.hotbar).reduce((acc, cur) => acc || cur)).toBeFalsy();
     });
 
     it('should return false if macros from the token bar no longer exist.', () => {

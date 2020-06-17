@@ -1,1 +1,4 @@
-🐛 Fix: `page` should set to 1 when using @Norc his Custom Hotbar. The page will now default to 1 if `Use Custom Hotbar` is set.
+🐛 Fix: hotbar should be emptied when the selected token has no macros.
+
+**Known issues:**
+- When using Norc's Custom Hotbar, the 'regular' token hotbar is deleted unless it's on page 1. (#14)
