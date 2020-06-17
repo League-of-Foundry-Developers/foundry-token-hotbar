@@ -18,10 +18,6 @@ jobs:
     - run: ./build dev
       env:
         CI: true
-    - name: Create Release body
-      shell: bash
-      id: create-release-body
-      run: 'node ./.github/workflows/notes.js > release-notes.txt'
     - name: Extract Version
       shell: bash
       id: extract-version
@@ -34,7 +30,7 @@ jobs:
         name: Release ${{ steps.extract-version.outputs.version}}
         draft: false
         prerelease: ${{ endsWith(steps.extract-version.outputs.version, 'a') }}
-        bodyFile: './release-notes.txt'
+        bodyFile: './PATCH_NOTES.md'
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: './dist/TokenHotbar.zip,./module.json'
         commit: ${{ github.sha }}

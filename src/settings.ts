@@ -25,7 +25,9 @@ export class Settings {
     }
 
     public load(s: ClientSettingsReader) : Settings {
-        this.hotbarPage = this.getSetting(s, Settings.keys.hotbarPage);
+        // TODO V3: remove the page override as soon as the logic is fixed. 
+        this.useCustomHotbar = this.getSetting(s, Settings.keys.useCustomHotbar);
+        this.hotbarPage = this.useCustomHotbar ? 1 : this.getSetting(s, Settings.keys.hotbarPage);
 
         this.alwaysLinkToActor = this.getSetting(s, Settings.keys.alwaysLinkToActor);
         this.linkToLinkedActor = this.getSetting(s, Settings.keys.linkToLinkedActor) || this.alwaysLinkToActor;
@@ -35,7 +37,6 @@ export class Settings {
 
         this.debugMode = this.getSetting(s, Settings.keys.debugMode);
 
-        this.useCustomHotbar = this.getSetting(s, Settings.keys.useCustomHotbar);
 
         return this;
     }

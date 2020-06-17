@@ -2,6 +2,7 @@ import { FoundryUiHotbar, CustomHotbar, FoundryHotbar, UiHotbar } from './uiHotb
 import { Settings } from '../settings';
 import { PageFlag } from '../flags/pageFlag';
 import { ConsoleLogger } from '../logger';
+import { Hotbar } from './hotbar';
 export class UiHotbarFactory {
     constructor(private settings: Settings) { }
 
@@ -13,7 +14,7 @@ export class UiHotbarFactory {
         return (<any>ui).hotbar;
     }
 
-    public create(): UiHotbar {
+    public create(): UiHotbar & Hotbar {
         if (this.useCustomHotbar()) {
             return new CustomHotbar((<any>ui).CustomHotbar);
         }

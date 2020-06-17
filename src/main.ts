@@ -6,6 +6,7 @@ import { CustomHotbar, UiHotbar } from './hotbar/uiHotbar';
 import { UiHotbarFactory } from './hotbar/uiHotbarFactory';
 import { ConsoleLogger, Logger } from './logger';
 import { IToken } from './foundry';
+import { Hotbar } from './hotbar/hotbar';
 
 // TODO: Remove in v3.0.0
 function migrateFlag() {
@@ -156,7 +157,7 @@ Hooks.on('controlToken', () => {
         return true;
     }
 
-    async function loadTokenHotbar(logger: Logger, token: IToken, uiHotbar: UiHotbar) {
+    async function loadTokenHotbar(logger: Logger, token: IToken, uiHotbar: UiHotbar & Hotbar) {
         logger.debug('[Token Hotbar]', 'controlled token', token);
         
         const userMacroData = uiHotbar.getTokenMacros();
@@ -171,7 +172,7 @@ Hooks.on('controlToken', () => {
         uiHotbar.toggleHotbar(result.hasMacros);
     }
 
-    function hideTokenHotbar(logger: Logger, uiHotbar: UiHotbar) {
+    function hideTokenHotbar(logger: Logger, uiHotbar: UiHotbar & Hotbar) {
         uiHotbar.toggleHotbar(false);
         logger.debug('[Token Hotbar]', 'No or multiple controlled tokens');
     }

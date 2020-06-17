@@ -2,7 +2,7 @@ import { HotbarFlags, } from '../flags/hotbarFlags';
 import { Notifier, Identifiable, Macro, IToken, IActor, Flaggable } from '../foundry';
 import { Logger } from '../logger';
 import { FlagsStrategy, IdentityFlagsStrategy } from '../flags/flagStrategies';
-import { HotbarSlots } from './uiHotbar';
+import { HotbarSlots, Hotbar } from './hotbar';
 
 export class TokenHotbar { 
     // Dev note: not fond of this many parameters. 

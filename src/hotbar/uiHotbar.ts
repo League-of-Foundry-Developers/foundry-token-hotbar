@@ -2,8 +2,7 @@ import { Settings } from '../settings';
 import { PageFlag } from '../flags/pageFlag';
 import { Logger } from '../logger';
 import { Macro } from '../foundry';
-
-export type HotbarSlots = { [slot: string] : string | null }
+import { HotbarSlots, Hotbar } from './hotbar';
 
 export interface FoundryUiHotbar {
     page: number;
@@ -17,11 +16,9 @@ export interface UiHotbar {
     toggleHotbar(showTokenBar: boolean): Promise<unknown>;
     showTokenHotbar(): Promise<unknown>;
     hideTokenHotbar(): Promise<unknown>;
-    setTokenMacros(data: { hotbar: HotbarSlots }): Promise<unknown>;
-    getTokenMacros(): { hotbar: HotbarSlots };
 }
 
-export class FoundryHotbar implements UiHotbar {
+export class FoundryHotbar implements UiHotbar, Hotbar {
     constructor(private settings: Settings, private hotbar: FoundryUiHotbar, private pageFlag: PageFlag, private logger: Logger = console) { }
     public toggleHotbar(showTokenBar: boolean): Promise<unknown> {
         if (showTokenBar) {
@@ -67,7 +64,7 @@ export class FoundryHotbar implements UiHotbar {
     }
 }
 
-export class CustomHotbar implements UiHotbar {
+export class CustomHotbar implements UiHotbar, Hotbar {
     constructor(private hotbar: FoundryUiHotbar) { }
     setTokenMacros(data: { hotbar: HotbarSlots }): Promise<unknown> {
         return (<any>window).chbSetMacros(data.hotbar);

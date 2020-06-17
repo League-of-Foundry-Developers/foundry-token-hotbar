@@ -1,0 +1,1 @@
+🐛 Fix: `page` should set to 1 when using @Norc his Custom Hotbar. The page will now default to 1 if `Use Custom Hotbar` is set.
