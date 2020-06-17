@@ -2,7 +2,7 @@ import { Settings } from './settings';
 import { TokenHotbar } from './hotbar/tokenHotbar';
 import { CONSTANTS } from './constants';
 import { HotbarFlagsFactory, FlagStrategyFactory } from './flags/factory';
-import { CustomHotbar, UiHotbar } from './hotbar/uiHotbar';
+import { UiHotbar } from './hotbar/uiHotbar';
 import { UiHotbarFactory } from './hotbar/uiHotbarFactory';
 import { ConsoleLogger, Logger } from './logger';
 import { IToken, Flaggable } from './foundry';
@@ -14,6 +14,7 @@ async function migrateFlags() {
     if (!game.user.isGM || game.user.getFlag(CONSTANTS.moduleName, 'v3.0.4 migration')) {
         return;
     }
+    let success = false;
     ui.notifications.warn('Starting Token Hotbar migration, please wait...');
     try {
         const tokens: Flaggable[] = game.scenes.entities.map(scene => (<any>scene.data).tokens).deepFlatten().map(data => new Token(data));
@@ -21,28 +22,32 @@ async function migrateFlags() {
         const users  = game.users.entities;
 
         for(let flaggable of tokens.concat(actors).concat(users)) {
-            const newFlags = ((<any>flaggable).data.flags[CONSTANTS.moduleName]);
-            if (newFlags) {
-                continue;
+            let oldFlags = ((<any>flaggable).data.flags[CONSTANTS.moduleName]);
+            if (!oldFlags) {
+                oldFlags = (<any>flaggable).data.flags.world?.[CONSTANTS.moduleName];
             }
 
-            const oldFlags = (<any>flaggable).data.flags.world?.[CONSTANTS.moduleName];
             if (oldFlags) {
+                debugger;
                 for(let key in oldFlags) {
+                    console.log("Token Hotbar", "Migration", oldFlags[key]);
                     const newData = translateDataStructure(oldFlags[key]);
+                    console.log("Token Hotbar", "Migration", flaggable.id, key, newData)
                     await flaggable.setFlag(CONSTANTS.moduleName, key, newData);
                     await flaggable.unsetFlag('world', CONSTANTS.moduleName);
                     await delay(50); // prevent race conditions
                 }
             }
         }
+        success = true;
     }
-    catch {
+    catch(e) {
+        console.error(e);
         ui.notifications.error('Something went wrong during the migration. Please check your console and notify @Stan on Discord.');
     }
 
-    game.user.setFlag(CONSTANTS.moduleName, 'v3.0.4 migration', true)
-    ui.notifications.info('Token Hotbar migration finished.');
+    game.user.setFlag(CONSTANTS.moduleName, 'v3.0.4 migration', success)
+    if (success) ui.notifications.info('Token Hotbar migration finished.');
 }
 
 function translateDataStructure(oldData: OldHotbarData) {
@@ -182,7 +187,7 @@ function save() {
         const uiHotbar = factory.create();
         const token = canvas.tokens.controlled[0];
 
-        if (token && settings.hotbarPage === uiObject.page)
+        if (token) //&& settings.hotbarPage === uiObject.page)
             createTokenHotbar(token.id).setTokenMacros(uiHotbar.getTokenMacros());
 
         return true;

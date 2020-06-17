@@ -4,6 +4,7 @@ import { Logger } from '../logger';
 import { FlagsStrategy, IdentityFlagsStrategy } from '../flags/flagStrategies';
 import { HotbarSlots, Hotbar } from './hotbar';
 import { Settings } from '../settings';
+import { calculatePageSlots } from './uiHotbar';
 
 export class TokenHotbar implements Hotbar {
     constructor(
@@ -23,27 +24,24 @@ export class TokenHotbar implements Hotbar {
         this.logger.debug('[Token Hotbar]', 'Loading', flagKey, tokenHotbar);
         
         const tokenHotbarPage = {};
-        for(const slot of this.getSlots()) {
+        for(const slot in tokenHotbar) {
             const slotMacro = tokenHotbar[slot];
-            if (!slotMacro) {
-                this.unset(tokenHotbarPage, slot);
-            }
-            else {
-                const tokenMacro = this.existingMacroIds.find(m => m.id === slotMacro);
-                if (tokenMacro) {
-                    tokenHotbarPage[slot] = tokenMacro.id;
-                }
-                else {
-                    this.unset(tokenHotbarPage, slot);
-                }
+            const tokenMacro = this.existingMacroIds.find(m => m.id === slotMacro);
+            if (tokenMacro) {
+                tokenHotbarPage[slot] = tokenMacro.id;
             }
         }
 
         return { hotbar: tokenHotbarPage };
     }
 
+    // TODO: TokenHotbar should return whatever page is request by ui hotbar.
+    // But what for normal hotbar? Logic in main seems ugly...
+    // First ask ui hotbar for page, then load token bar into ui hotbar.
+    // Why again not return / set everything? Make UI responsible for updating the right ones?
+    // But then when to update?
     async setTokenMacros(data: { hotbar: HotbarSlots; }): Promise<unknown> {
-        const slots = this.getSlots();
+        const slots = calculatePageSlots(this.settings.hotbarPage);
         const flagKey = this.flagKeyStrategy.get(this.tokenId).id;
         const tokenHotbars = this.hotbarFlags.get(this.tokenId);
         const tokenHotbar = tokenHotbars[flagKey] || {};
@@ -51,9 +49,9 @@ export class TokenHotbar implements Hotbar {
         if (!this.hasChanges(data.hotbar, tokenHotbar)) return false;
 
         this.logger.debug('[Token Hotbar]', 'preSave', flagKey, tokenHotbars);
+
         for(let slot of slots) {
             tokenHotbar[slot] = data.hotbar[slot];
-            console.log(slot);
         }
 
         tokenHotbars[flagKey] = tokenHotbar;
@@ -69,19 +67,6 @@ export class TokenHotbar implements Hotbar {
         const flags = this.hotbarFlags.get(this.tokenId);
         delete flags[flagKey.id];
         return this.hotbarFlags.set(this.tokenId, flags);
-    }
-
-    private getSlots() {
-        function range(size: number, startAt = 0) {
-            return [...Array(size).keys()].map(i => i + startAt);
-        }
-
-        return range(10, (this.settings.hotbarPage - 1) * 10 + 1);
-    }
-
-    private unset(hotbar, slot: number) {
-        hotbar[slot] = null;
-        hotbar[`-=${slot}`] = null;
     }
 
     private hasChanges(newMacros: HotbarSlots, oldMacros: HotbarSlots) {
