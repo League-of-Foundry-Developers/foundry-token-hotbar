@@ -1,87 +1,74 @@
 import { HotbarFlags, } from '../flags/hotbarFlags';
-import { Notifier, Identifiable, Macro, IToken, IActor, Flaggable } from '../foundry';
+import { Identifiable, IToken, IActor, } from '../foundry';
 import { Logger } from '../logger';
 import { FlagsStrategy, IdentityFlagsStrategy } from '../flags/flagStrategies';
 import { HotbarSlots, Hotbar } from './hotbar';
+import { Settings } from '../settings';
 
-export class TokenHotbar { 
-    // Dev note: not fond of this many parameters. 
-    // However, from v3 (separate hotbar) on at least two will be obsolete (pages)
+export class TokenHotbar implements Hotbar {
     constructor(
-        private hotbarFlag: HotbarFlags,
-        private notifier: Notifier,
-        private hotbarPage: number,
+        private tokenId: string,
+        private existingMacroIds: Identifiable[],
+        private hotbarFlags: HotbarFlags,
         private flagKeyStrategy: FlagsStrategy,
-        private logger: Logger = console) { }
+        private settings: Settings,
+        private logger: Logger
+    ) {}
 
-    public async save(token: Identifiable, macrosToSave: Macro[], canSave: boolean): Promise<boolean> {
-        const slots = this.getSlots();
-        macrosToSave = macrosToSave.filter(m => m.macro && slots.includes(m.slot));
-        const flagKey = this.flagKeyStrategy.get(token.id);
-
-        const tokenHotbars = this.hotbarFlag.get(token.id);
-        const tokenHotbar = tokenHotbars[flagKey.id] || [];
-
-        // FIXME: this seems very inefficient
-        //        will become unnecessary in v3.0.0
-        //        ! Will be unnecessary to fix in v3.0.0 (separate hotbar, all pages/slots will be relevant)
-        if (!this.hasChanges(macrosToSave, tokenHotbar)) return false;
-        if (!canSave) {
-            this.notifier.warn('The token hotbar is locked for players. Any macros placed on this page will be replaced.');
-            return false;
-        }
-
-        this.logger.debug('[Token Hotbar]', 'preSave', flagKey, tokenHotbars);
-
-        tokenHotbars[flagKey.id] =
-            macrosToSave.map(item => { 
-                return { slot: item.slot, id: item.macro.id };
-            });
-
-        this.logger.debug('[Token Hotbar]', 'Saving', flagKey.id, tokenHotbars);
-
-        await this.hotbarFlag.set(token.id, tokenHotbars);
-        return true;
-    }
-    
-    // Returns true if the token has macros on the token hotbar
-    //         otherwise false
-    public load(token: IToken, userHotbar: HotbarSlots, gameMacros: Identifiable[])
-        : { hasMacros: boolean, hotbar: HotbarSlots } { // slot can be number or `-=<number>`
-        const tokenHotbars = this.hotbarFlag.get(token.id);
-        const flagKey = this.flagKeyStrategy.get(token.id);
-        const tokenHotbar = tokenHotbars[flagKey.id] || [];
+    getTokenMacros(): { hotbar: HotbarSlots; } {
+        const tokenHotbars = this.hotbarFlags.get(this.tokenId);
+        const flagKey = this.flagKeyStrategy.get(this.tokenId).id;
+        const tokenHotbar = tokenHotbars[flagKey] || [];
 
         this.logger.debug('[Token Hotbar]', 'Loading', flagKey, tokenHotbar);
         
-        let hasValidMacros = false;
+        const tokenHotbarPage = {};
         for(const slot of this.getSlots()) {
-            const slotMacro = tokenHotbar.find(m => m.slot == slot);
+            const slotMacro = tokenHotbar[slot];
             if (!slotMacro) {
-                this.unset(userHotbar, slot);
+                this.unset(tokenHotbarPage, slot);
             }
             else {
-                const tokenMacro = gameMacros.find(m => m.id === slotMacro.id);
+                const tokenMacro = this.existingMacroIds.find(m => m.id === slotMacro);
                 if (tokenMacro) {
-                    userHotbar[slot] = tokenMacro.id;
-                    hasValidMacros = true;
+                    tokenHotbarPage[slot] = tokenMacro.id;
                 }
                 else {
-                    this.unset(userHotbar, slot);
+                    this.unset(tokenHotbarPage, slot);
                 }
             }
         }
 
-        return { hasMacros: hasValidMacros, hotbar: userHotbar };
+        return { hotbar: tokenHotbarPage };
     }
 
-    public remove(tokenId: string, actors: Map<string, IActor>, tokens: Map<string, IToken>): Promise<Flaggable> {
-        // use the default strategy, because otherwise a linked hotbar might be removed.
-        // FIXME: ideally this should not be hard coded in here
-        const flagKey = new IdentityFlagsStrategy(actors, tokens).get(tokenId);
-        const flags = this.hotbarFlag.get(tokenId);
+    async setTokenMacros(data: { hotbar: HotbarSlots; }): Promise<unknown> {
+        const slots = this.getSlots();
+        const flagKey = this.flagKeyStrategy.get(this.tokenId).id;
+        const tokenHotbars = this.hotbarFlags.get(this.tokenId);
+        const tokenHotbar = tokenHotbars[flagKey] || {};
+
+        if (!this.hasChanges(data.hotbar, tokenHotbar)) return false;
+
+        this.logger.debug('[Token Hotbar]', 'preSave', flagKey, tokenHotbars);
+        for(let slot of slots) {
+            tokenHotbar[slot] = data.hotbar[slot];
+            console.log(slot);
+        }
+
+        tokenHotbars[flagKey] = tokenHotbar;
+
+        await this.hotbarFlags.set(this.tokenId, tokenHotbars);
+        this.logger.debug('[Token Hotbar]', 'Saving', flagKey, tokenHotbars);
+
+        return true;  
+    }
+
+    removeTokenMacros(actors: Map<string, IActor>, tokens: Map<string, IToken>) {
+        const flagKey = new IdentityFlagsStrategy(actors, tokens).get(this.tokenId);
+        const flags = this.hotbarFlags.get(this.tokenId);
         delete flags[flagKey.id];
-        return this.hotbarFlag.set(tokenId, flags);
+        return this.hotbarFlags.set(this.tokenId, flags);
     }
 
     private getSlots() {
@@ -89,27 +76,19 @@ export class TokenHotbar {
             return [...Array(size).keys()].map(i => i + startAt);
         }
 
-        return range(10, (this.hotbarPage - 1) * 10 + 1);
+        return range(10, (this.settings.hotbarPage - 1) * 10 + 1);
     }
 
-    private unset(userHotbar, slot: number) {
-        delete userHotbar[slot];
-        userHotbar[`-=${slot}`] = null;
+    private unset(hotbar, slot: number) {
+        hotbar[slot] = null;
+        hotbar[`-=${slot}`] = null;
     }
 
-    private hasChanges(barMacros, tokenMacros) {
-        this.logger.debug('[Token Hotbar]', 'Comparing', barMacros, tokenMacros);
-        // cant make changes if you are not on the page
-        if (barMacros.length != tokenMacros.length) return true;
-
-        for(let i = 0; i < barMacros.length; i++) {
-            if (barMacros[i].slot != tokenMacros[i].slot)
-                return true;
-                
-            if (barMacros[i].macro._id != tokenMacros[i].id)
-                return true;
+    private hasChanges(newMacros: HotbarSlots, oldMacros: HotbarSlots) {
+        if (Object.keys(newMacros).length !== Object.keys(oldMacros).length) {
+            return true;
         }
 
-        return false;
+        return Object.keys(newMacros).every(key => newMacros[key] === oldMacros[key]);
     }
 }

@@ -12,6 +12,8 @@ export interface FoundryUiHotbar {
     collapse: () => Promise<unknown>;
 }
 
+// TODO: move copying onto ui-hotbar macros  to UiHotbars
+// Reason: they know which page is used for the hotbar. (core just 1 page, Norc all pages)
 export interface UiHotbar {
     toggleHotbar(showTokenBar: boolean): Promise<unknown>;
     showTokenHotbar(): Promise<unknown>;
@@ -48,7 +50,9 @@ export class FoundryHotbar implements UiHotbar, Hotbar {
     }
 
     setTokenMacros(data: { hotbar: HotbarSlots }): Promise<unknown> {
-        return game.user.update({ hotbar: data.hotbar });
+        let macros = this.getTokenMacros()
+        let combinedMacros = Object.assign(macros, data.hotbar);
+        return game.user.update({ hotbar: combinedMacros });
     }
 
     private render(page: number): Promise<unknown> {
@@ -65,22 +69,54 @@ export class FoundryHotbar implements UiHotbar, Hotbar {
 }
 
 export class CustomHotbar implements UiHotbar, Hotbar {
-    constructor(private hotbar: FoundryUiHotbar) { }
-    setTokenMacros(data: { hotbar: HotbarSlots }): Promise<unknown> {
-        return (<any>window).chbSetMacros(data.hotbar);
-    }
-    getTokenMacros(): { hotbar: HotbarSlots } {
-        return { hotbar: (<any>window).chbGetMacros() };
-    }
+    constructor(protected settings: Settings, private hotbar: FoundryUiHotbar) { }
 
     toggleHotbar(showTokenBar: boolean): Promise<unknown> {
         return showTokenBar || canvas.tokens.controlled.length === 1 ? this.showTokenHotbar() : this.hideTokenHotbar();
     }
+
     showTokenHotbar(): Promise<unknown> {
         return this.hotbar.expand();
     }
+
     hideTokenHotbar(): Promise<unknown> {
         return this.hotbar.collapse();
     }
 
+    getTokenMacros(): { hotbar: HotbarSlots } {
+        return { hotbar: (<any>window).chbGetMacros() };
+    }
+
+    setTokenMacros(data: { hotbar: HotbarSlots }): Promise<unknown> {
+        return (<any>window).chbSetMacros(data.hotbar);
+    }
+}
+
+export class SinglePageCustomHotbar extends CustomHotbar {
+    getTokenMacros(): { hotbar: HotbarSlots } {
+        const data = super.getTokenMacros();
+        const offset = this.calculatePageOffset();
+
+        const offsetSlots = {};
+        for(let slot in data.hotbar) {
+            offsetSlots[+slot - offset] = data.hotbar[slot];
+        }
+
+        return { hotbar: offsetSlots };
+    }
+
+    setTokenMacros(data: { hotbar: HotbarSlots }): Promise<unknown> {
+        const offset = this.calculatePageOffset();
+
+        const offsetSlots = {};
+        for(let slot in data.hotbar) {
+            offsetSlots[+slot + offset] = data.hotbar[slot];
+        }
+
+        return super.setTokenMacros({ hotbar: offsetSlots });
+    }
+
+    private calculatePageOffset(): number {
+        return 10 - this.settings.hotbarPage * 10;
+    }
 }

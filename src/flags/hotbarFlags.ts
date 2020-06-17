@@ -1,13 +1,15 @@
 import { CONSTANTS } from '../constants';
 import { Flaggable } from '../foundry';
 import { FlagsStrategy } from './flagStrategies';
+import { HotbarSlots } from '../hotbar/hotbar';
 
 export interface HotbarItem {
     id: string,
     slot: number
 }
 
-export type HotbarData = { [tokenId: string]: HotbarItem[] };
+export type OldHotbarData = { [tokenId: string]: HotbarItem[] };
+export type HotbarData = { [tokenId: string]: HotbarSlots }
 
 export interface HotbarFlags { 
     /**
@@ -35,25 +37,5 @@ export class ModuleHotbarFlags implements HotbarFlags {
             .then(entity => {
                 return entity.setFlag(CONSTANTS.moduleName, this.key, data);
             });
-    }
-}
-
-export class MigratingHotbarFlags extends ModuleHotbarFlags {
-    constructor(flagStrategy: FlagsStrategy) {
-        super(flagStrategy);
-    }
-
-    get(tokenId: string): HotbarData {
-        const value = super.get(tokenId);
-        if (Object.keys(value).length > 0) 
-            return value;
-
-        const flags = this.flagStrategy.get(tokenId);
-        const oldValue = flags.getFlag('world', CONSTANTS.moduleName) || {};
-
-        super.set(tokenId, oldValue);
-        flags.unsetFlag('world', CONSTANTS.moduleName);
-
-        return oldValue;
     }
 }

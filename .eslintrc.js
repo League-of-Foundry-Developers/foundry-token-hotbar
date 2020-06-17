@@ -1,4 +1,4 @@
-export default {
+module.export = {
     'env': {
         'browser': true,
         'es2020': true
