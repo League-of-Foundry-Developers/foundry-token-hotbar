@@ -1,5 +1,8 @@
 import { HotbarData } from './flags/hotbarFlags';
 
+/**
+ * This module contains only interfaces as they occur in Foundry
+ */
 export interface Notifier {
     info: (string) => void;
     warn: (string) => void;
@@ -41,3 +44,12 @@ export interface Game {
 export interface Canvas {
     tokens: Map<string, IToken>;
 }
+
+export interface FoundryUiHotbar {
+    page: number;
+    _getMacrosByPage: (page: number) => Macro[];
+    render: (force?: boolean) => void;
+    expand: () => Promise<unknown>;
+    collapse: () => Promise<unknown>;
+}
+

@@ -73,7 +73,6 @@ function createTokenHotbar(tokenId: string) {
         game.macros.entities,
         hotbarFlags.create(),
         keyStrategy.createFlagKeyStrategy(),
-        settings,
         new ConsoleLogger(settings));
 }
 
@@ -177,18 +176,16 @@ function save() {
     renderHotbarTimeout = window.setTimeout(delayedSave, 35);
 
     function delayedSave() {
-        // const macros = data.macros;
-        // FIXME: due to a race condition, sometimes the wrong macros are passed.
-        //        We are only interested in the ones on the token hotbar.
-        //        ! Will be unnecessary to fix in v3.0.0 (separate hotbar, all pages/slots will be relevant)
         const settings = Settings._load();
         const factory = new UiHotbarFactory(settings);
-        const uiObject = factory.getFoundryUiObject();
         const uiHotbar = factory.create();
         const token = canvas.tokens.controlled[0];
 
-        if (token) //&& settings.hotbarPage === uiObject.page)
-            createTokenHotbar(token.id).setTokenMacros(uiHotbar.getTokenMacros());
+        if (token && uiHotbar.shouldUpdateTokenHotbar()) {
+            const hotbarPage = uiHotbar.getTokenHotbarPage();
+            const macros = uiHotbar.getMacrosByPage(hotbarPage);
+            createTokenHotbar(token.id).setTokenMacros(hotbarPage, macros);
+        }
 
         return true;
     }
@@ -200,37 +197,40 @@ Hooks.on('controlToken', () => {
         clearTimeout(controlTokenTimeout);
 
     controlTokenTimeout = window.setTimeout(delayedLoad, 35);
-
-    async function delayedLoad() {
-        const token = canvas.tokens.controlled[0];
-
-        const settings = Settings._load();
-        const logger = new ConsoleLogger(settings);
-        const factory = new UiHotbarFactory(settings);
-        const uiHotbar = factory.create();
-
-        if (token && canvas.tokens.controlled.length == 1)
-            loadTokenHotbar(logger, token, uiHotbar);
-        else
-            hideTokenHotbar(logger, uiHotbar);
-
-        return true;
-    }
-
-    async function loadTokenHotbar(logger: Logger, token: IToken, uiHotbar: UiHotbar & Hotbar) {
-        const result = createTokenHotbar(token.id).getTokenMacros();
-        await uiHotbar.setTokenMacros(result);
-
-        logger.debug('[Token Hotbar]', 'updated hotbar', token, result.hotbar);
-
-        uiHotbar.toggleHotbar(Object.values(result).every(macro => macro));
-    }
-
-    function hideTokenHotbar(logger: Logger, uiHotbar: UiHotbar & Hotbar) {
-        uiHotbar.toggleHotbar(false);
-        logger.debug('[Token Hotbar]', 'No or multiple controlled tokens');
-    }
 });
+
+async function delayedLoad() {
+    const token = canvas.tokens.controlled[0];
+
+    const settings = Settings._load();
+    const logger = new ConsoleLogger(settings);
+    const factory = new UiHotbarFactory(settings);
+    const uiHotbar = factory.create();
+
+    if (token && canvas.tokens.controlled.length == 1)
+        loadTokenHotbar(logger, token, uiHotbar);
+    else {
+        hideTokenHotbar(logger, uiHotbar);
+    }
+
+    return true;
+}
+
+async function loadTokenHotbar(logger: Logger, token: IToken, uiHotbar: UiHotbar & Hotbar) {
+    const hotbarPage = uiHotbar.getTokenHotbarPage();
+    const result = createTokenHotbar(token.id).getMacrosByPage(hotbarPage);
+    await uiHotbar.setTokenMacros(hotbarPage, result);
+
+    logger.debug('[Token Hotbar]', 'updated hotbar', token, result.hotbar);
+
+    const macros = Object.values(result.hotbar);
+    uiHotbar.toggleHotbar(macros.length > 0 && macros.every(macro => !!macro));
+}
+
+function hideTokenHotbar(logger: Logger, uiHotbar: UiHotbar & Hotbar) {
+    uiHotbar.toggleHotbar(false);
+    logger.debug('[Token Hotbar]', 'No or multiple controlled tokens');
+}
 
 Hooks.on('preDeleteToken', (_: Scene, token: any) => {
     createTokenHotbar(token._id).removeTokenMacros(game.actors, canvas.tokens);

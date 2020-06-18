@@ -3,8 +3,7 @@ import { Identifiable, IToken, IActor, } from '../foundry';
 import { Logger } from '../logger';
 import { FlagsStrategy, IdentityFlagsStrategy } from '../flags/flagStrategies';
 import { HotbarSlots, Hotbar } from './hotbar';
-import { Settings } from '../settings';
-import { calculatePageSlots } from './uiHotbar';
+import { calculatePageSlots, pickPageSlots } from './uiHotbar';
 
 export class TokenHotbar implements Hotbar {
     constructor(
@@ -12,52 +11,45 @@ export class TokenHotbar implements Hotbar {
         private existingMacroIds: Identifiable[],
         private hotbarFlags: HotbarFlags,
         private flagKeyStrategy: FlagsStrategy,
-        private settings: Settings,
         private logger: Logger
     ) {}
 
-    getTokenMacros(): { hotbar: HotbarSlots; } {
+    getMacrosByPage(page: number): { hotbar: HotbarSlots; } {
         const tokenHotbars = this.hotbarFlags.get(this.tokenId);
         const flagKey = this.flagKeyStrategy.get(this.tokenId).id;
-        const tokenHotbar = tokenHotbars[flagKey] || [];
+        const tokenHotbar = tokenHotbars[flagKey] || {};
 
         this.logger.debug('[Token Hotbar]', 'Loading', flagKey, tokenHotbar);
         
         const tokenHotbarPage = {};
+        const pageSlots = calculatePageSlots(page);
         for(const slot in tokenHotbar) {
-            const slotMacro = tokenHotbar[slot];
-            const tokenMacro = this.existingMacroIds.find(m => m.id === slotMacro);
-            if (tokenMacro) {
-                tokenHotbarPage[slot] = tokenMacro.id;
+            if (!pageSlots.includes(+slot)) continue;
+
+            const macroExists = this.existingMacroIds.some(m => m.id === tokenHotbar[slot]);
+            if (macroExists) {
+                tokenHotbarPage[slot] = tokenHotbar[slot];
             }
         }
 
         return { hotbar: tokenHotbarPage };
     }
 
-    // TODO: TokenHotbar should return whatever page is request by ui hotbar.
-    // But what for normal hotbar? Logic in main seems ugly...
-    // First ask ui hotbar for page, then load token bar into ui hotbar.
-    // Why again not return / set everything? Make UI responsible for updating the right ones?
-    // But then when to update?
-    async setTokenMacros(data: { hotbar: HotbarSlots; }): Promise<unknown> {
-        const slots = calculatePageSlots(this.settings.hotbarPage);
+    async setTokenMacros(page: number, data: { hotbar: HotbarSlots; }): Promise<unknown> {
         const flagKey = this.flagKeyStrategy.get(this.tokenId).id;
         const tokenHotbars = this.hotbarFlags.get(this.tokenId);
         const tokenHotbar = tokenHotbars[flagKey] || {};
 
-        if (!this.hasChanges(data.hotbar, tokenHotbar)) return false;
+        if (!this.hasChanges(data.hotbar, tokenHotbar, calculatePageSlots(page)))
+            return false;
 
         this.logger.debug('[Token Hotbar]', 'preSave', flagKey, tokenHotbars);
 
-        for(let slot of slots) {
-            tokenHotbar[slot] = data.hotbar[slot];
-        }
-
-        tokenHotbars[flagKey] = tokenHotbar;
+        const newTokenHotbar = Object.assign({}, tokenHotbar, pickPageSlots(page, data.hotbar));
+        tokenHotbars[flagKey] = newTokenHotbar;
 
         await this.hotbarFlags.set(this.tokenId, tokenHotbars);
-        this.logger.debug('[Token Hotbar]', 'Saving', flagKey, tokenHotbars);
+        this.logger.debug('[Token Hotbar]', 'Saved', flagKey, tokenHotbars);
 
         return true;  
     }
@@ -69,11 +61,7 @@ export class TokenHotbar implements Hotbar {
         return this.hotbarFlags.set(this.tokenId, flags);
     }
 
-    private hasChanges(newMacros: HotbarSlots, oldMacros: HotbarSlots) {
-        if (Object.keys(newMacros).length !== Object.keys(oldMacros).length) {
-            return true;
-        }
-
-        return Object.keys(newMacros).every(key => newMacros[key] === oldMacros[key]);
+    private hasChanges(newMacros: HotbarSlots, oldMacros: HotbarSlots, slots: number[]) {
+        return slots.some(slot => newMacros[slot] !== oldMacros[slot]);
     }
 }

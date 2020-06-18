@@ -1,12 +1,21 @@
 import { Settings } from "../settings";
-import { UiHotbar, FoundryUiHotbar, calculatePageSlots } from "./uiHotbar";
+import { UiHotbar, calculatePageSlots, pickPageSlots } from "./uiHotbar";
 import { Hotbar, HotbarSlots } from "./hotbar";
+import { FoundryUiHotbar } from "../foundry";
 
 export class CustomHotbar implements UiHotbar, Hotbar {
     constructor(protected settings: Settings, private hotbar: FoundryUiHotbar) { }
 
     toggleHotbar(showTokenBar: boolean): Promise<unknown> {
         return showTokenBar || canvas.tokens.controlled.length === 1 ? this.showTokenHotbar() : this.hideTokenHotbar();
+    }
+
+    shouldUpdateTokenHotbar(): boolean {
+        return this.hotbar.page == this.getTokenHotbarPage();
+    }
+
+    getTokenHotbarPage() {
+        return this.hotbar.page;
     }
 
     showTokenHotbar(): Promise<unknown> {
@@ -17,18 +26,38 @@ export class CustomHotbar implements UiHotbar, Hotbar {
         return this.hotbar.collapse();
     }
 
-    getTokenMacros(): { hotbar: HotbarSlots } {
-        return { hotbar: (<any>window).chbGetMacros() };
+    getMacrosByPage(page: number): { hotbar: HotbarSlots } {
+        const allSlots =  (<any>window).chbGetMacros();
+        const pageSlots = pickPageSlots(page, allSlots);
+        return { hotbar: pageSlots };
     }
 
-    setTokenMacros(data: { hotbar: HotbarSlots }): Promise<unknown> {
-        return (<any>window).chbSetMacros(data.hotbar);
+    setTokenMacros(page: number, data: { hotbar: HotbarSlots }): Promise<unknown> {
+        const continuousTokenHotbar = pickPageSlots(page, data.hotbar);
+        const allSlots = this.getAllHotbarMacros();
+        let combinedMacros = Object.assign({}, allSlots, continuousTokenHotbar);
+
+        return (<any>window).chbSetMacros(combinedMacros);
+    }
+
+    private getAllHotbarMacros(): HotbarSlots {
+        return (<any>window).chbGetMacros();
     }
 }
 
 export class SinglePageCustomHotbar extends CustomHotbar {
-    getTokenMacros(): { hotbar: HotbarSlots } {
-        const data = super.getTokenMacros();
+    shouldUpdateTokenHotbar(): boolean {
+        return true;
+    }
+
+    getTokenHotbarPage() {
+        // technically the page is 1, but we mimic placing token macros on the core hotbar
+        // so that when Norc's Custom Hotbar is turned off, we see the tokens on the core hotbar.
+        return this.settings.hotbarPage;
+    }
+
+    getMacrosByPage(page: number): { hotbar: HotbarSlots } {
+        const data = super.getMacrosByPage(1); //only one page with macros
         const offset = this.calculatePageOffset();
 
         const offsetSlots = {};
@@ -39,7 +68,7 @@ export class SinglePageCustomHotbar extends CustomHotbar {
         return { hotbar: offsetSlots };
     }
 
-    setTokenMacros(data: { hotbar: HotbarSlots }): Promise<unknown> {
+    setTokenMacros(page: number, data: { hotbar: HotbarSlots }): Promise<unknown> {
         const offset = this.calculatePageOffset();
 
         const offsetSlots = {};
@@ -47,7 +76,7 @@ export class SinglePageCustomHotbar extends CustomHotbar {
             offsetSlots[slot] = data.hotbar[slot + offset];
         }
 
-        return super.setTokenMacros({ hotbar: offsetSlots });
+        return (<any>window).chbSetMacros(offsetSlots);
     }
 
     /**

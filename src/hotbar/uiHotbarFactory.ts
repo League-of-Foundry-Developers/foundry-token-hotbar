@@ -1,10 +1,11 @@
-import { FoundryUiHotbar, UiHotbar } from './uiHotbar';
+import { UiHotbar } from './uiHotbar';
 import { Settings } from '../settings';
 import { PageFlag } from '../flags/pageFlag';
 import { ConsoleLogger } from '../logger';
 import { Hotbar } from './hotbar';
 import { SinglePageCustomHotbar } from './customHotbar';
 import { FoundryHotbar } from './foundryHotbar';
+import { FoundryUiHotbar } from '../foundry';
 export class UiHotbarFactory {
     constructor(private settings: Settings) { }
 
