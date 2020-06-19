@@ -2,5 +2,5 @@ cd `git rev-parse --show-toplevel`
 if [ ! -z "$1" ]; then
     npm run-script $1
 fi
-zip -r ./dist/TokenHotbar.zip module.json TokenHotbar.js
+zip -r ./dist/TokenHotbar.zip module.json TokenHotbar.js lang/
 
