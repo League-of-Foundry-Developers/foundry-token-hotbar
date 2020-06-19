@@ -53,24 +53,24 @@ function createTokenHotbar(tokenId: string): TokenHotbar {
 
 Hooks.on('init', () => {
     game.settings.register(CONSTANTS.moduleName, Settings.keys.hotbarPage, {
-        name: 'Page',
-        hint: 'The hotbar page that will be replaced with the token hotbar. Changing this will wipe existing token bars!',
+        name: 'TokenHotbar.settings.page.name',
+        hint: 'TokenHotbar.settings.page.hint',
         scope: 'world',
         config: true,
         default: 5,
         type: Number,
         choices: {
-            1: 'Page 1',
-            2: 'Page 2',
-            3: 'Page 3',
-            4: 'Page 4',
-            5: 'Page 5'
+            1: '1',
+            2: '2',
+            3: '3',
+            4: '4',
+            5: '5'
         }
     });
 
     game.settings.register(CONSTANTS.moduleName, Settings.keys.linkToLinkedActor, {
-        name: 'Link to linked actor',
-        hint: 'Link the token hotbar to the actor if the token is linked.',
+        name: 'TokenHotbar.settings.linkToActor.name',
+        hint: 'TokenHotbar.settings.linkToActor.hint',
         scope: 'world',
         config: true,
         default: true,
@@ -78,8 +78,8 @@ Hooks.on('init', () => {
     });
 
     game.settings.register(CONSTANTS.moduleName, Settings.keys.alwaysLinkToActor, {
-        name: 'Always link to actor',
-        hint: 'Link the token hotbar to the actor even if the token is unlinked.',
+        name: 'TokenHotbar.settings.alwaysLinkToActor.name',
+        hint: 'TokenHotbar.settings.alwaysLinkToActor.hint',
         scope: 'world',
         config: true,
         default: false,
@@ -87,8 +87,8 @@ Hooks.on('init', () => {
     });
 
     game.settings.register(CONSTANTS.moduleName, Settings.keys.shareHotbar, {
-        name: 'Share the hotbar with other players',
-        hint: 'When set every token will have a single hotbar shared by all players.',
+        name: 'TokenHotbar.settings.shareHotbar.name',
+        hint: 'TokenHotbar.settings.shareHotbar.hint',
         scope: 'world',
         config: true,
         default: false,
@@ -96,8 +96,8 @@ Hooks.on('init', () => {
     });
 
     game.settings.register(CONSTANTS.moduleName, Settings.keys.lockHotbar, {
-        name: 'Lock shared hotbar',
-        hint: 'When set, only a GM can update the token hotbar. Only applies to shared hotbars.',
+        name: 'TokenHotbar.settings.lockHotbar.name',
+        hint: 'TokenHotbar.settings.lockHotbar.hint',
         scope: 'world',
         config: true,
         default: false,
@@ -105,8 +105,8 @@ Hooks.on('init', () => {
     });
 
     game.settings.register(CONSTANTS.moduleName, Settings.keys.useCustomHotbar, {
-        name: 'Use Norc\'s Custom Hotbar',
-        hint: 'When set, Token Hotbar will use a separate hotbar. Requires the Custom Hotbar by Norc.',
+        name: 'TokenHotbar.settings.useCustomHotbar.name',
+        hint: 'TokenHotbar.settings.useCustomHotbar.hint',
         scope: 'world',
         config: true,
         default: true,
@@ -114,8 +114,8 @@ Hooks.on('init', () => {
     });
 
     game.settings.register(CONSTANTS.moduleName, Settings.keys.debugMode, {
-        name: 'Debug Mode',
-        hint: 'When set, Token Hotbar will log verbosely to the console.',
+        name: 'TokenHotbar.settings.debugMode.name',
+        hint: 'TokenHotbar.settings.debugMode.hint',
         scope: 'client',
         config: true,
         default: false,
@@ -167,7 +167,7 @@ function save() {
                 if (game.user.isGM || !settings.lockHotbar)
                     tokenHotbar.setTokenMacros(hotbarPage, macros);
                 else
-                    ui.notifications.warn('The token hotbar is locked for players. Any macros placed on this page will be replaced.');
+                    ui.notifications.warn(game.i18n.localize('TokenHotbar.notifications.lockedWarning'));
             }
         }
 

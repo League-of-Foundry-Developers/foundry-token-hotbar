@@ -1,0 +1,37 @@
+{
+    "TokenHotbar": {
+        "settings": {
+            "page": {
+                "name": "Pagină",
+                "hint": "Pagina scurtăturilor care va fi utilizată pentru Token Hotbar-ul. Când schimbați această setare, Token Hotbar-urile existente nu se vor muta."
+            },
+            "linkToActor": {
+                "name": "Conectați la actorul conectat",
+                "hint": "Conectați Token Hotbar-ul la actor când jetonul este conectat la actorul lui."
+            },
+            "alwaysLinkToActor": {
+                "name": "Conectați la actorul întotdeauna",
+                "hint": "Conectați Token Hotbar-ul la actor chiar dacă jetonul nu este conectat la actorul lui."
+            },
+            "shareHotbar": {
+                "name": "Împarțiți Token Hotbar-ul",
+                "hint": "Fiecare jeton va avea o singură Token Hotbar care este împarțit cu toți jucători."
+            },
+            "lockHotbar": {
+                "name": "Blocați Token Hotbar-ul împarțit",
+                "hint": "Numai un GM poate schimba Token Hotbarul. Funcționează doar împreună cu setarea 'Împarțiți Token Hotbar-ul'. "
+            },
+            "useCustomHotbar": {
+                "name": "Utilisați Custom Hotbar",
+                "hint": "⚠ Această setare necesită modul 'Custom Hotbar' a lui Norc."
+            },
+            "debugMode": {
+                "name": "Mod Debug",
+                "hint": "Token Hotbar va scrie mesaje detaliate în consolă."
+            }
+        },
+        "notifications": {
+            "lockedWarning": "Token Hotbar-ul este blocat pentru jucători. Orice schimbări vor fi anulate."
+        }
+    }
+}

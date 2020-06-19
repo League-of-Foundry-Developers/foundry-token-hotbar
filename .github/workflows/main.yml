@@ -19,9 +19,6 @@ jobs:
       run: node ./.github/workflows/check-download.js
     - run: npm install
     - run: npm test
-    - run: ./build prod
-      env:
-        CI: true
     - name: Extract Version
       shell: bash
       id: extract-version
@@ -30,6 +27,9 @@ jobs:
       shell: bash
       id: transform-package-title
       run: node ./.github/workflows/transform-module-json.js
+    - run: ./build prod
+      env:
+        CI: true
     - name: Create Release
       id: create_release
       uses: ncipollo/release-action@v1

@@ -1,0 +1,37 @@
+{
+    "TokenHotbar": {
+        "settings": {
+            "page": {
+                "name": "Pagina",
+                "hint": "De pagina van de hotbar die vervangen wordt door de Token Hotbar. Bij het veranderen van deze instelling wordt de Token Hotbar niet verplaatst."
+            },
+            "linkToActor": {
+                "name": "Aan gekoppelde acteur koppelen",
+                "hint": "Koppel de Token Hotbar aan de gekoppelde acteur i.p.v. de token."
+            },
+            "alwaysLinkToActor": {
+                "name": "Altijd aan acteur koppelen",
+                "hint": "Koppel de Token Hotbar aan de acteur ook wanneer de token niet gekoppeld is."
+            },
+            "shareHotbar": {
+                "name": "Gedeelde Token Hotbar",
+                "hint": "Ieder token krijgt één Token Hotbar die gedeeld wordt met alle spelers."
+            },
+            "lockHotbar": {
+                "name": "Token Hotbar vastzetten",
+                "hint": "Alleen de GM mag de Token Hotbar wijzigen. Deze optie is enkel van toepassing in combinatie met de instelling 'Gedeelde Token Hotbar'."
+            },
+            "useCustomHotbar": {
+                "name": "Gebruik Custom Hotbar",
+                "hint": "⚠ Vereist dat de module 'Custom Hotbar' van Norc is geïnstalleerd."
+            },
+            "debugMode": {
+                "name": "Debug Modus",
+                "hint": "Schrijf gedetailleerde berichten naar de ontwikkelaarsconsole."
+            }
+        },
+        "notifications": {
+            "lockedWarning": "De Token Hotbar is niet aanpasbaar voor spelers. Alle wijzigingen zullen ongedaan gemaakt worden."
+        }
+    }
+}

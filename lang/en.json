@@ -1,0 +1,37 @@
+{
+    "TokenHotbar": {
+        "settings": {
+            "page": {
+                "name": "Page",
+                "hint": "The hotbar page that will be used for the token hotbar. Changing this won't move existing Token Hotbars!"
+            },
+            "linkToActor": {
+                "name": "Link to linked actor",
+                "hint": "Link the token hotbar to the actor if the token is linked."
+            },
+            "alwaysLinkToActor": {
+                "name": "Always link to actor",
+                "hint": "Link the token hotbar to the actor even if the token is unlinked."
+            },
+            "shareHotbar": {
+                "name": "Shared Token Hotbar",
+                "hint": "Every token will have a single hotbar shared between players."
+            },
+            "lockHotbar": {
+                "name": "Lock shared hotbar",
+                "hint": "When set, only a GM can update the token hotbar. Only applies to shared hotbars."
+            },
+            "useCustomHotbar": {
+                "name": "Use Custom Hotbar",
+                "hint": "⚠ Requires Norc's Custom Hotbar module."
+            },
+            "debugMode": {
+                "name": "Debug Mode",
+                "hint": "Log verbosely to the console."
+            }
+        },
+        "notifications": {
+            "lockedWarning": "The token hotbar is locked for players. Any changes will be reverted."
+        }
+    }
+}
