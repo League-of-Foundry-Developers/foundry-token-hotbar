@@ -13,6 +13,10 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 12.x
+    - name: Verify download channel
+      shell: bash
+      id: check-download
+      run: node ./.github/workflows/check-download.js
     - run: npm install
     - run: npm test
     - run: ./build dev
@@ -22,6 +26,10 @@ jobs:
       shell: bash
       id: extract-version
       run: echo "::set-output name=version::$(node ./.github/workflows/version.js)"
+    - name: Transform Package Title
+      shell: bash
+      id: transform-package-title
+      run: node ./.github/workflows/transform-module-json.js
     - name: Create Release
       id: create_release
       uses: ncipollo/release-action@v1

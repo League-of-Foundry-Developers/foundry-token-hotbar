@@ -1,7 +1,7 @@
 {
     "name": "TokenHotbar",
     "title": "Token Hotbar",
-    "description": "<p>With Token Hotbar you can assign one of the hotbar pages to remember macros per token and/or actor. If the token is a linked token, the hotbar will be linked to the actor by default.</p><br><h4>Updates</h4><p>🎲 Use an additional physical hotbar (requires Norc's Custom Hotbar module).<br> ⚠ Known issue: Hotbar is not cleared when token without hotbar is selected.</p>",
+    "description": "<p>With Token Hotbar you can assign one of the hotbar pages to remember macros per token and/or actor. If the token is a linked token, the hotbar will be linked to the actor by default.</p><br><h4>Updates</h4><p>🎲 Use an additional physical hotbar (requires Norc's Custom Hotbar module).</p>",
     "author": "Stan Janssen",
     "version": "3.0.4-alpha",
     "minimumCoreVersion": "0.6.0",
