@@ -9,7 +9,7 @@ import { Settings } from '../../src/settings';
 import { HotbarSlots } from '../../src/hotbar/hotbar';
 import { calculatePageSlots } from '../../src/hotbar/uiHotbar';
 
-describe('TokenHotbar.save', () => {
+describe('TokenHotbar.setTokenMacros', () => {
     function createEmptyPage(page) {
         return calculatePageSlots(page)
             .reduce<HotbarSlots>((acc, cur) => (acc[cur] = undefined, acc), {});

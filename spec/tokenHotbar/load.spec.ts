@@ -1,109 +1,48 @@
 import 'jasmine';
 import { TokenHotbar } from '../../src/hotbar/tokenHotbar';
-import { TestNotifier } from '../helpers/TestNotifier';
-import { ModuleHotbarFlags, HotbarItem, HotbarData } from '../../src/flags/hotbarFlags';
-import { Macro, IToken, IActor } from '../../src/foundry';
-import { IdentityFlagsStrategy, UserFlagsStrategy, LinkedFlagsStrategy } from '../../src/flags/flagStrategies';
-import { TestFlaggable, TestToken } from '../helpers/TestToken';
+import { ModuleHotbarFlags } from '../../src/flags/hotbarFlags';
+import { IToken, IActor } from '../../src/foundry';
+import { IdentityFlagsStrategy, UserFlagsStrategy } from '../../src/flags/flagStrategies';
+import { TestFlaggable } from '../helpers/TestToken';
 import { ConsoleLogger } from '../../src/logger';
 import { Settings } from '../../src/settings';
 import { HotbarSlots } from '../../src/hotbar/hotbar';
-import { calculatePageSlots } from '../../src/hotbar/uiHotbar';
 
-// describe('TokenHotbar.load', () => {
-//     const tokens = new Map();
-//     const actors = new Map();
-
-//     const actor = new TestFlaggable('actor-1');
-//     const token1 = new TestToken('token-1', actor);
-//     const token2 = new TestToken('token-2', actor);
-//     const unlinkedToken = new TestToken('token-3', actor);
-//     unlinkedToken.data.actorLink = false;
-
-//     [token1, token2, unlinkedToken].map(t => tokens.set(t.id, t));
-//     actors.set(actor.id, actor);
-
-//     it('should return false if there is no token hotbar.', () => {
-//         // Arrange
-//         const flags = new ModuleHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
-//         const tokenHotbar = new TokenHotbar(flags, new TestNotifier(), 5, new IdentityFlagsStrategy(actors, tokens), new ConsoleLogger(new Settings()));
-
-//         // Act
-//         const result = tokenHotbar.load(token1, {}, []);
-
-//         // Assert
-//         expect(result.hasMacros).toBeFalse();
-//     });
-
-//     it('should return an empty hotbar if there is no token hotbar.', () => {
-//         // Arrange
-//         const flags = new ModuleHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
-//         const tokenHotbar = new TokenHotbar(flags, new TestNotifier(), 5, new IdentityFlagsStrategy(actors, tokens), new ConsoleLogger(new Settings()));
-
-//         // Act
-//         const result = tokenHotbar.load(token1, {}, []);
-
-//         // Assert
-//         let values = obj => Object.keys(obj).map(key => obj[key]);
-//         expect(values(result.hotbar).length).toBeGreaterThan(0);
-//         expect(values(result.hotbar).reduce((acc, cur) => acc || cur)).toBeFalsy();
-//     });
-
-//     it('should return false if macros from the token bar no longer exist.', () => {
-//         // Arrange
-//         const flags = new ModuleHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
-//         flags.set(token1.id, {'token-1': [ { id: 'macro-id', slot: 41 }]});
-//         const tokenHotbar = new TokenHotbar(
-//             flags,
-//             new TestNotifier(),
-//             5,
-//             new IdentityFlagsStrategy(actors, tokens),
-//             new ConsoleLogger(new Settings()));
-//         const gameMacros = [{id: 'other-macro-id'}];
-
-//         // Act
-//         const result = tokenHotbar.load(token1, {}, gameMacros);
-
-//         // Assert
-//         expect(result.hasMacros).toBeFalse();
-//     });
-
-//     it('should return true if there is a token hotbar.', async () => {
-//         // Arrange
-//         const flags = new ModuleHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
-//         await flags.set(token1.id, {'token-1': [ { id: 'macro-id', slot: 41 }]});
-//         const tokenHotbar = new TokenHotbar(
-//             flags,
-//             new TestNotifier(),
-//             5,
-//             new IdentityFlagsStrategy(actors, tokens),
-//             new ConsoleLogger(new Settings()));
-//         const gameMacros = [{id: 'macro-id'}];
+describe('TokenHotbar.getMacrosByPage', function() {
+    beforeEach(function () {
+        const user = new TestFlaggable('user-1');
+        const token = { id: 'token-1' };
+        const tokens = new Map<string, IToken>();
+        const actors = new Map<string, IActor>();
+        tokens.set(token.id, <IToken>token);
         
-//         // Act
-//         const result = tokenHotbar.load(token1, {}, gameMacros);
+        const userFlags = new UserFlagsStrategy(user, actors, tokens);
+        const flags = new ModuleHotbarFlags(userFlags);
+        const keyStrategy = new IdentityFlagsStrategy(actors, tokens);
 
-//         // Assert
-//         expect(result.hasMacros).toBeTrue();
-//     });
+        this.page = 5;
+        this.allMacros = [ {id: '1'}, {id: '2'} ];
+        this.tokenHotbar = new TokenHotbar(token.id, this.allMacros, flags, keyStrategy, new ConsoleLogger(new Settings()));
+    });
 
-//     it('should call update on user with intersection of token hotbar and game macros.', async () => {
-//         // Arrange
-//         const flags = new ModuleHotbarFlags(new UserFlagsStrategy(new TestFlaggable('user-1'), actors, tokens));
-//         await flags.set(token1.id, {'token-1': [ { id: 'macro-id', slot: 41 }, { id: 'non-existent-macro', slot: 42}]});
-//         const tokenHotbar = new TokenHotbar(
-//             flags,
-//             new TestNotifier(),
-//             5,
-//             new IdentityFlagsStrategy(actors, tokens),
-//             new ConsoleLogger(new Settings()));
-//         const gameMacros = [{id: 'macro-id'}, {id: 'other-macro-id'}];
+    it('returns an empty page if there is no token hotbar.', function() {
+        const data: { hotbar: HotbarSlots } = this.tokenHotbar.getMacrosByPage(this.page);
+        expect(Object.keys(data.hotbar).length).toEqual(0);
+    });
+
+    it('should return an empty hotbar if macros no longer exists', async function() {
+        await this.tokenHotbar.setTokenMacros(this.page, { hotbar: { 41: 5 } });
+
+        const data: { hotbar: HotbarSlots } = this.tokenHotbar.getMacrosByPage(this.page);
+
+        expect(Object.keys(data.hotbar).length).toEqual(0);
+    });
+
+    it('should return true if there is a token hotbar.', async function() {
+        await this.tokenHotbar.setTokenMacros(this.page, {hotbar: { 41: this.allMacros[0].id } });
         
-//         // Act
-//         const result = tokenHotbar.load(token1, {}, gameMacros);
+        const data: { hotbar: HotbarSlots } = this.tokenHotbar.getMacrosByPage(this.page);
 
-//         // Assert
-//         expect(result.hasMacros).toBeTrue();
-//         expect(result.hotbar).toEqual({'41': 'macro-id', '-=42': null, '-=43': null, '-=44': null, '-=45': null, '-=46': null, '-=47': null, '-=48': null, '-=49': null, '-=50': null });
-//     });
-// });
+        expect(Object.keys(data.hotbar).length).toEqual(1);
+    });
+});
