@@ -1,5 +1,5 @@
-import { CONSTANTS } from '../constants';
-import { Flaggable } from '../foundry';
+import { CONSTANTS } from '../utils/constants';
+import { Flaggable } from '../utils/foundry';
 import { FlagsStrategy } from './flagStrategies';
 import { HotbarSlots } from '../hotbar/hotbar';
 

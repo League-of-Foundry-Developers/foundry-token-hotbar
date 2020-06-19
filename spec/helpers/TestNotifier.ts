@@ -1,4 +1,4 @@
-import { Notifier } from '../../src/foundry';
+import { Notifier } from '../../src/utils/foundry';
 
 export class TestNotifier implements Notifier {
     info: (string: unknown) => void;

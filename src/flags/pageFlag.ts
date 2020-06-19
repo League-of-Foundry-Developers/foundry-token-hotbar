@@ -1,4 +1,4 @@
-import { CONSTANTS } from '../constants';
+import { CONSTANTS } from '../utils/constants';
 
 export class PageFlag {
     public get(): number {

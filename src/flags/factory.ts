@@ -1,7 +1,7 @@
-import { Settings } from '../settings';
+import { Settings } from '../utils/settings';
 import { HotbarFlags, ModuleHotbarFlags } from './hotbarFlags';
 import { IdentityFlagsStrategy, UserFlagsStrategy, LinkedFlagsStrategy, AlwaysLinkedFlagsStrategy, FlagsStrategy } from './flagStrategies';
-import { Game, Canvas } from '../foundry';
+import { Game, Canvas } from '../utils/foundry';
 
 export class HotbarFlagsFactory {
     constructor(private settings: Settings) { }

@@ -1,4 +1,4 @@
-import { Flaggable, IActor, IToken } from '../foundry';
+import { Flaggable, IActor, IToken } from '../utils/foundry';
 
 export abstract class FlagsStrategy {
 
