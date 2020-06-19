@@ -43,9 +43,11 @@ export class Settings {
     /**
      * Helper method to quickly construct Settings from game.settings
      */
-    static _load(): Settings { return new Settings().load(game.settings); }
+    static _load(): Settings {
+        return new Settings().load(game.settings); 
+    }
 
     private getSetting(settings: ClientSettingsReader, key: string) {
-        return settings.get(CONSTANTS.moduleName, key);
+        return settings.get(CONSTANTS.module.name, key);
     }
 }

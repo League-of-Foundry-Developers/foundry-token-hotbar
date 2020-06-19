@@ -28,14 +28,14 @@ export class ModuleHotbarFlags implements HotbarFlags {
 
     get(tokenId: string): HotbarData {
         const flags = this.flagStrategy.get(tokenId);
-        return flags.getFlag(CONSTANTS.moduleName, this.key) || {};
+        return flags.getFlag(CONSTANTS.module.name, this.key) || {};
     }
 
     set(tokenId: string, data: HotbarData): Promise<Flaggable> {
         return this.flagStrategy.get(tokenId)
-            .unsetFlag(CONSTANTS.moduleName, this.key)
+            .unsetFlag(CONSTANTS.module.name, this.key)
             .then(entity => {
-                return entity.setFlag(CONSTANTS.moduleName, this.key, data);
+                return entity.setFlag(CONSTANTS.module.name, this.key, data);
             });
     }
 }

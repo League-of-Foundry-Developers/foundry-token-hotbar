@@ -1,2 +1,1 @@
-🔄 Settings: Do not enable Norc's Custom Hotbar by default (confusing in case you don't have the module)
-🈳 Localizations added: 🇳🇱 Dutch, 🇬🇧 English and 🇷🇴 Romanian
+✅ Bug fix (#16): Shared Token Hotbar does not re-render when already opened  

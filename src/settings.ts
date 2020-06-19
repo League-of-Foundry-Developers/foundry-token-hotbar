@@ -48,6 +48,6 @@ export class Settings {
     }
 
     private getSetting(settings: ClientSettingsReader, key: string) {
-        return settings.get(CONSTANTS.moduleName, key);
+        return settings.get(CONSTANTS.module.name, key);
     }
 }

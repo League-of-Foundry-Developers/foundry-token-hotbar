@@ -29,7 +29,7 @@ describe('migration.translateDataStructure', function () {
 
         const flaggable = <DataFlaggable><unknown>new TestFlaggable('some-token');
         flaggable.data = {
-            flags: { world: { [CONSTANTS.moduleName]: { [flaggable.id]: oldData} } }
+            flags: { world: { [CONSTANTS.module.name]: { [flaggable.id]: oldData} } }
         };
 
         spyOn(flaggable, 'unsetFlag');
@@ -41,11 +41,11 @@ describe('migration.translateDataStructure', function () {
 
         expect(errors.length).toEqual(0);
         expect(flaggable.unsetFlag).toHaveBeenCalledTimes(2);
-        expect(flaggable.unsetFlag).toHaveBeenCalledWith(CONSTANTS.moduleName, flaggable.id);
-        expect(flaggable.unsetFlag).toHaveBeenCalledWith('world', CONSTANTS.moduleName);
+        expect(flaggable.unsetFlag).toHaveBeenCalledWith(CONSTANTS.module.name, flaggable.id);
+        expect(flaggable.unsetFlag).toHaveBeenCalledWith('world', CONSTANTS.module.name);
 
         expect(flaggable.setFlag).toHaveBeenCalledTimes(1);
-        expect(flaggable.setFlag).toHaveBeenCalledWith(CONSTANTS.moduleName, flaggable.id, migrator.translateDataStructure(oldData));
+        expect(flaggable.setFlag).toHaveBeenCalledWith(CONSTANTS.module.name, flaggable.id, migrator.translateDataStructure(oldData));
     });
 
     it('unsets the HotbarData flag on the entity', async function () {
@@ -56,7 +56,7 @@ describe('migration.translateDataStructure', function () {
 
         const flaggable = <DataFlaggable><unknown>new TestFlaggable('some-token');
         flaggable.data = {
-            flags: { [CONSTANTS.moduleName]: { [flaggable.id]: oldData} }
+            flags: { [CONSTANTS.module.name]: { [flaggable.id]: oldData} }
         };
 
         spyOn(flaggable, 'unsetFlag');
@@ -68,10 +68,10 @@ describe('migration.translateDataStructure', function () {
 
         expect(errors.length).toEqual(0);
         expect(flaggable.unsetFlag).toHaveBeenCalledTimes(2);
-        expect(flaggable.unsetFlag).toHaveBeenCalledWith(CONSTANTS.moduleName, flaggable.id);
-        expect(flaggable.unsetFlag).toHaveBeenCalledWith('world', CONSTANTS.moduleName);
+        expect(flaggable.unsetFlag).toHaveBeenCalledWith(CONSTANTS.module.name, flaggable.id);
+        expect(flaggable.unsetFlag).toHaveBeenCalledWith('world', CONSTANTS.module.name);
 
         expect(flaggable.setFlag).toHaveBeenCalledTimes(1);
-        expect(flaggable.setFlag).toHaveBeenCalledWith(CONSTANTS.moduleName, flaggable.id, migrator.translateDataStructure(oldData));
+        expect(flaggable.setFlag).toHaveBeenCalledWith(CONSTANTS.module.name, flaggable.id, migrator.translateDataStructure(oldData));
     });
 });
