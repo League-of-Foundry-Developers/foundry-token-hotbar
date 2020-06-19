@@ -1,3 +1,4 @@
 export const CONSTANTS = {
-    moduleName: 'TokenHotbar',
+    module: { name: 'TokenHotbar' },
+    socket: { redrawSharedHotbar: 'redrawSharedHotbar' }
 };

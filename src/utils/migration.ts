@@ -15,9 +15,9 @@ export class Migration {
         const errors: Error[] = [];
         for (const flaggable of this.flaggables) {
             console.log('Migrating', flaggable);
-            let oldFlags = flaggable.data.flags[CONSTANTS.moduleName];
+            let oldFlags = flaggable.data.flags[CONSTANTS.module.name];
             if (!oldFlags) {
-                oldFlags = flaggable.data.flags.world?.[CONSTANTS.moduleName];
+                oldFlags = flaggable.data.flags.world?.[CONSTANTS.module.name];
             }
 
             if (oldFlags) {
@@ -26,13 +26,13 @@ export class Migration {
                     try {
                         const newData = this.translateDataStructure(oldFlags[key]);
                         await this.delay(50); // prevent race conditions
-                        await flaggable.unsetFlag(CONSTANTS.moduleName, key);
-                        await flaggable.setFlag(CONSTANTS.moduleName, key, newData);
+                        await flaggable.unsetFlag(CONSTANTS.module.name, key);
+                        await flaggable.setFlag(CONSTANTS.module.name, key, newData);
                     } catch (e) {
                         errors.push(e);
                     }
                 }
-                await flaggable.unsetFlag('world', CONSTANTS.moduleName);
+                await flaggable.unsetFlag('world', CONSTANTS.module.name);
             }
         }
         return errors;

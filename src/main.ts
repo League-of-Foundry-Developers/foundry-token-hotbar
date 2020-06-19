@@ -11,7 +11,7 @@ import { Migration, DataFlaggable } from './utils/migration';
 
 // TODO: Remove in v4.0.0
 async function migrateFlags() {
-    if (!game.user.isGM || game.user.getFlag(CONSTANTS.moduleName, 'v3.0.4 migration')) {
+    if (!game.user.isGM || game.user.getFlag(CONSTANTS.module.name, 'v3.0.4 migration')) {
         return;
     }
     const noteText = 'Starting Token Hotbar migration, please wait...';
@@ -31,7 +31,7 @@ async function migrateFlags() {
         ui.notifications.error('Something went wrong during the migration. Please send the errors from console (F12) to @Stan#1549 on Discord.');
     }
     else {
-        game.user.setFlag(CONSTANTS.moduleName, 'v3.0.4 migration', true);
+        game.user.setFlag(CONSTANTS.module.name, 'v3.0.4 migration', true);
         ui.notifications.info('Token Hotbar migration finished.');
     }
     setTimeout(() => { // prevent flickering notifications
@@ -52,7 +52,7 @@ function createTokenHotbar(tokenId: string): TokenHotbar {
 }
 
 Hooks.on('init', () => {
-    game.settings.register(CONSTANTS.moduleName, Settings.keys.hotbarPage, {
+    game.settings.register(CONSTANTS.module.name, Settings.keys.hotbarPage, {
         name: 'TokenHotbar.settings.page.name',
         hint: 'TokenHotbar.settings.page.hint',
         scope: 'world',
@@ -68,7 +68,7 @@ Hooks.on('init', () => {
         }
     });
 
-    game.settings.register(CONSTANTS.moduleName, Settings.keys.linkToLinkedActor, {
+    game.settings.register(CONSTANTS.module.name, Settings.keys.linkToLinkedActor, {
         name: 'TokenHotbar.settings.linkToActor.name',
         hint: 'TokenHotbar.settings.linkToActor.hint',
         scope: 'world',
@@ -77,7 +77,7 @@ Hooks.on('init', () => {
         type: Boolean
     });
 
-    game.settings.register(CONSTANTS.moduleName, Settings.keys.alwaysLinkToActor, {
+    game.settings.register(CONSTANTS.module.name, Settings.keys.alwaysLinkToActor, {
         name: 'TokenHotbar.settings.alwaysLinkToActor.name',
         hint: 'TokenHotbar.settings.alwaysLinkToActor.hint',
         scope: 'world',
@@ -86,7 +86,7 @@ Hooks.on('init', () => {
         type: Boolean
     });
 
-    game.settings.register(CONSTANTS.moduleName, Settings.keys.shareHotbar, {
+    game.settings.register(CONSTANTS.module.name, Settings.keys.shareHotbar, {
         name: 'TokenHotbar.settings.shareHotbar.name',
         hint: 'TokenHotbar.settings.shareHotbar.hint',
         scope: 'world',
@@ -95,7 +95,7 @@ Hooks.on('init', () => {
         type: Boolean
     });
 
-    game.settings.register(CONSTANTS.moduleName, Settings.keys.lockHotbar, {
+    game.settings.register(CONSTANTS.module.name, Settings.keys.lockHotbar, {
         name: 'TokenHotbar.settings.lockHotbar.name',
         hint: 'TokenHotbar.settings.lockHotbar.hint',
         scope: 'world',
@@ -104,7 +104,7 @@ Hooks.on('init', () => {
         type: Boolean
     });
 
-    game.settings.register(CONSTANTS.moduleName, Settings.keys.useCustomHotbar, {
+    game.settings.register(CONSTANTS.module.name, Settings.keys.useCustomHotbar, {
         name: 'TokenHotbar.settings.useCustomHotbar.name',
         hint: 'TokenHotbar.settings.useCustomHotbar.hint',
         scope: 'world',
@@ -113,7 +113,7 @@ Hooks.on('init', () => {
         type: Boolean
     });
 
-    game.settings.register(CONSTANTS.moduleName, Settings.keys.debugMode, {
+    game.settings.register(CONSTANTS.module.name, Settings.keys.debugMode, {
         name: 'TokenHotbar.settings.debugMode.name',
         hint: 'TokenHotbar.settings.debugMode.hint',
         scope: 'client',
@@ -151,7 +151,7 @@ function save() {
     renderHotbarTimeout = window.setTimeout(delayedSave, 35);
 
     // TODO: put this inside a nice class
-    function delayedSave() {
+    async function delayedSave() {
         const settings = Settings._load();
         const factory = new UiHotbarFactory(settings);
         const uiHotbar = factory.create();
@@ -164,9 +164,16 @@ function save() {
             const macros = uiHotbar.getMacrosByPage(hotbarPage);
             const tokenMacros = tokenHotbar.getMacrosByPage(hotbarPage);
             if (slots.some(slot => macros.hotbar[slot] !== tokenMacros.hotbar[slot])) {
-                if (game.user.isGM || !settings.lockHotbar)
-                    tokenHotbar.setTokenMacros(hotbarPage, macros);
-                else
+                if (game.user.isGM || !settings.lockHotbar) {
+                    await tokenHotbar.setTokenMacros(hotbarPage, macros);
+                    if (settings.shareHotbar) {
+                        setTimeout(() => {
+                            (<any>game.socket).emit(`module.${CONSTANTS.module.name}`, {
+                                type: CONSTANTS.socket.redrawSharedHotbar
+                            });
+                        }, 100); // slight delay to ensure flags are synchronized to the other client(s).
+                    }
+                } else
                     ui.notifications.warn(game.i18n.localize('TokenHotbar.notifications.lockedWarning'));
             }
         }
@@ -231,6 +238,15 @@ Hooks.on('preDeleteActor', (actor: any) => {
 
 Hooks.on('ready', () => {
     migrateFlags();
+
+    (<any>game.socket).on(`module.${CONSTANTS.module.name}`, data => {
+        if (data.type === CONSTANTS.socket.redrawSharedHotbar) {
+            const settings = Settings._load();
+            const hotbar = new UiHotbarFactory(settings).create();
+            if (settings.shareHotbar && hotbar.shouldUpdateTokenHotbar())
+                delayedLoad();
+        }
+    });
 });
 
 Hooks.once('renderCustomHotbar', () => {

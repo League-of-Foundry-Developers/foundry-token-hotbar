@@ -16,6 +16,10 @@ Install module and enter this url: https://raw.githubusercontent.com/janssen-io/
 
 _Demo: page 5 dynamically changes based on the chosen token._
 
+![Demo](./img/thb-shared.gif)
+
+_Demo: the token hotbar can be shared between players. As the player on the right makes a change, the hotbar of the player on the left gets reloaded._
+
 ![Demo](./img/thb-locked.gif)
 
 _Demo: the token hotbar page is locked for regular players._
