@@ -1,7 +1,8 @@
-import { Settings } from "../settings";
-import { UiHotbar, calculatePageSlots, pickPageSlots } from "./uiHotbar";
-import { Hotbar, HotbarSlots } from "./hotbar";
-import { FoundryUiHotbar } from "../foundry";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Settings } from '../settings';
+import { UiHotbar, calculatePageSlots, pickPageSlots } from './uiHotbar';
+import { Hotbar, HotbarSlots } from './hotbar';
+import { FoundryUiHotbar } from '../foundry';
 
 export class CustomHotbar implements UiHotbar, Hotbar {
     constructor(protected settings: Settings, private hotbar: FoundryUiHotbar) { }
@@ -14,7 +15,7 @@ export class CustomHotbar implements UiHotbar, Hotbar {
         return this.hotbar.page == this.getTokenHotbarPage();
     }
 
-    getTokenHotbarPage() {
+    getTokenHotbarPage(): number {
         return this.hotbar.page;
     }
 
@@ -35,7 +36,7 @@ export class CustomHotbar implements UiHotbar, Hotbar {
     setTokenMacros(page: number, data: { hotbar: HotbarSlots }): Promise<unknown> {
         const continuousTokenHotbar = pickPageSlots(page, data.hotbar);
         const allSlots = this.getAllHotbarMacros();
-        let combinedMacros = Object.assign({}, allSlots, continuousTokenHotbar);
+        const combinedMacros = Object.assign({}, allSlots, continuousTokenHotbar);
 
         return (<any>window).chbSetMacros(combinedMacros);
     }
@@ -50,18 +51,19 @@ export class SinglePageCustomHotbar extends CustomHotbar {
         return true;
     }
 
-    getTokenHotbarPage() {
+    getTokenHotbarPage(): number {
         // technically the page is 1, but we mimic placing token macros on the core hotbar
         // so that when Norc's Custom Hotbar is turned off, we see the tokens on the core hotbar.
         return this.settings.hotbarPage;
     }
 
     getMacrosByPage(page: number): { hotbar: HotbarSlots } {
-        const data = super.getMacrosByPage(1); //only one page with macros
+        page = 1;
+        const data = super.getMacrosByPage(page); //only one page with macros
         const offset = this.calculatePageOffset();
 
         const offsetSlots = {};
-        for(let slot in data.hotbar) {
+        for(const slot in data.hotbar) {
             offsetSlots[+slot + offset] = data.hotbar[slot];
         }
 
@@ -72,7 +74,7 @@ export class SinglePageCustomHotbar extends CustomHotbar {
         const offset = this.calculatePageOffset();
 
         const offsetSlots = {};
-        for(let slot of calculatePageSlots(1)) {
+        for(const slot of calculatePageSlots(1)) {
             offsetSlots[slot] = data.hotbar[slot + offset];
         }
 

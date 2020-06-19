@@ -54,7 +54,7 @@ export class TokenHotbar implements Hotbar {
         return true;  
     }
 
-    removeTokenMacros(actors: Map<string, IActor>, tokens: Map<string, IToken>) {
+    removeTokenMacros(actors: Map<string, IActor>, tokens: Map<string, IToken>): Promise<unknown> {
         const flagKey = new IdentityFlagsStrategy(actors, tokens).get(this.tokenId);
         const flags = this.hotbarFlags.get(this.tokenId);
         delete flags[flagKey.id];

@@ -1,4 +1,5 @@
-module.export = {
+// eslint-disable-next-line no-undef
+module.exports = {
     'env': {
         'browser': true,
         'es2020': true
@@ -17,21 +18,12 @@ module.export = {
         '@typescript-eslint'
     ],
     'rules': {
-        'indent': [
-            'error',
-            4
-        ],
-        // 'linebreak-style': [
-        //     'error',
-        //     'unix'
-        // ],
-        'quotes': [
-            'error',
-            'single'
-        ],
-        'semi': [
-            'error',
-            'always'
-        ]
+        'indent': [ 'warn', 4 ],
+        'quotes': [ 'warn', 'single' ],
+        'semi': [ 'warn', 'always' ],
+        'array-bracket-spacing': [ 'warn', 'always' ],
+        'brace-style': [ 'warn' ],
+        'computed-property-spacing': [ 'warn', 'never' ],
+        'comma-style': [ 'warn' ]
     }
 };

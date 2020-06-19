@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { UiHotbar } from './uiHotbar';
 import { Settings } from '../settings';
 import { PageFlag } from '../flags/pageFlag';
@@ -20,8 +21,7 @@ export class UiHotbarFactory {
     public create(): UiHotbar & Hotbar {
         if (this.useCustomHotbar()) {
             return new SinglePageCustomHotbar(this.settings, (<any>ui).CustomHotbar);
-        }
-        else {
+        } else {
             return new FoundryHotbar(this.settings, (<any>ui).hotbar, new PageFlag(), new ConsoleLogger(this.settings));
         }
     }
