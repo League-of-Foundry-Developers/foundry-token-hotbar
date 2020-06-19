@@ -1,11 +1,11 @@
 import 'jasmine';
 import { TokenHotbar } from '../../src/hotbar/tokenHotbar';
 import { ModuleHotbarFlags } from '../../src/flags/hotbarFlags';
-import { IToken, IActor } from '../../src/foundry';
+import { IToken, IActor } from '../../src/utils/foundry';
 import { IdentityFlagsStrategy, UserFlagsStrategy } from '../../src/flags/flagStrategies';
 import { TestFlaggable } from '../helpers/TestToken';
-import { ConsoleLogger } from '../../src/logger';
-import { Settings } from '../../src/settings';
+import { ConsoleLogger } from '../../src/utils/logger';
+import { Settings } from '../../src/utils/settings';
 import { HotbarSlots } from '../../src/hotbar/hotbar';
 
 describe('TokenHotbar.getMacrosByPage', function() {

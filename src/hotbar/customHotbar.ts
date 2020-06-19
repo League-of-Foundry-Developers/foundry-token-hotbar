@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Settings } from '../settings';
+import { Settings } from '../utils/settings';
 import { UiHotbar, calculatePageSlots, pickPageSlots } from './uiHotbar';
 import { Hotbar, HotbarSlots } from './hotbar';
-import { FoundryUiHotbar } from '../foundry';
+import { FoundryUiHotbar } from '../utils/foundry';
 
 export class CustomHotbar implements UiHotbar, Hotbar {
     constructor(protected settings: Settings, private hotbar: FoundryUiHotbar) { }

@@ -1,9 +1,9 @@
 import 'jasmine';
-import { Settings } from '../src/settings';
+import { Settings } from '../src/utils/settings';
 import { FlagStrategyFactory } from '../src/flags/factory';
 import { UserFlagsStrategy, IdentityFlagsStrategy, LinkedFlagsStrategy, AlwaysLinkedFlagsStrategy } from '../src/flags/flagStrategies';
 import { TestClientSettings } from './helpers/TestSettings';
-import { Game, Canvas } from '../src/foundry';
+import { Game, Canvas } from '../src/utils/foundry';
 
 // Configuration combinations
 // shared |  link | always |  entity   | key

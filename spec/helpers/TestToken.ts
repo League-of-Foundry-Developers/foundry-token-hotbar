@@ -1,4 +1,4 @@
-import { Flaggable, IToken, IActor } from '../../src/foundry';
+import { Flaggable, IToken, IActor } from '../../src/utils/foundry';
 import { HotbarData } from '../../src/flags/hotbarFlags';
 
 export class TestFlaggable implements Flaggable {

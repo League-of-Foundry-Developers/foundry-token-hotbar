@@ -1,87 +1,45 @@
-import { Settings } from './settings';
+import { Settings } from './utils/settings';
 import { TokenHotbar } from './hotbar/tokenHotbar';
-import { CONSTANTS } from './constants';
+import { CONSTANTS } from './utils/constants';
 import { HotbarFlagsFactory, FlagStrategyFactory } from './flags/factory';
-import { UiHotbar } from './hotbar/uiHotbar';
+import { UiHotbar, calculatePageSlots } from './hotbar/uiHotbar';
 import { UiHotbarFactory } from './hotbar/uiHotbarFactory';
-import { ConsoleLogger, Logger } from './logger';
-import { IToken, Flaggable } from './foundry';
-import { Hotbar, HotbarSlots } from './hotbar/hotbar';
-import { OldHotbarData, HotbarData } from './flags/hotbarFlags';
+import { ConsoleLogger, Logger } from './utils/logger';
+import { IToken } from './utils/foundry';
+import { Hotbar } from './hotbar/hotbar';
+import { Migration, DataFlaggable } from './utils/migration';
 
 // TODO: Remove in v4.0.0
 async function migrateFlags() {
     if (!game.user.isGM || game.user.getFlag(CONSTANTS.moduleName, 'v3.0.4 migration')) {
         return;
     }
-    let success = false;
     const noteText = 'Starting Token Hotbar migration, please wait...';
     ui.notifications.warn(noteText);
-    try {
-        const tokens: Flaggable[] = game.scenes.entities.map(scene => (<any>scene.data).tokens).deepFlatten().map(data => new Token(data));
-        const actors = game.actors.entities;
-        const users  = game.users.entities;
+    const tokens: DataFlaggable[] = game.scenes.entities
+        .map(scene => (<any>scene.data).tokens.map(data => new Token(data, scene)))
+        .deepFlatten();
+    const actors = game.actors.entities;
+    const users = game.users.entities;
 
-        const errors: Error[] = [];
-        for(let flaggable of tokens.concat(actors).concat(users)) {
-            let oldFlags = ((<any>flaggable).data.flags[CONSTANTS.moduleName]);
-            if (!oldFlags) {
-                oldFlags = (<any>flaggable).data.flags.world?.[CONSTANTS.moduleName];
-            }
+    const flaggables = tokens.concat(actors).concat(users);
+    const errors = await new Migration(flaggables).migrate();
 
-            if (oldFlags) {
-                for(let key in oldFlags) {
-                    try {
-                    console.log("Token Hotbar", "Migration", oldFlags[key]);
-                    const newData = translateDataStructure(oldFlags[key]);
-                    console.log("Token Hotbar", "Migration", flaggable.id, key, newData)
-                    await flaggable.setFlag(CONSTANTS.moduleName, key, newData);
-                    await flaggable.unsetFlag('world', CONSTANTS.moduleName);
-                    await delay(50); // prevent race conditions
-                    }
-                    catch(e) {
-                        errors.push(e);
-                    }
-                }
-            }
-        }
-        if (errors.length > 0) {
-            console.error('[Token Hotbar]', '# Migration errors:', errors.length);
-            throw errors[0];
-        }
-
-        success = true;
+    if (errors.length > 0) {
+        console.error('[Token Hotbar]', 'Migration errors:');
+        errors.map(e => console.error(e));
+        ui.notifications.error('Something went wrong during the migration. Please send the errors from console (F12) to @Stan#1549 on Discord.');
     }
-    catch(e) {
-        console.error(e);
-        ui.notifications.error('Something went wrong during the migration. Please check your console and notify @Stan on Discord.');
-    }
-
-    if (success)
+    else {
         game.user.setFlag(CONSTANTS.moduleName, 'v3.0.4 migration', true);
-
+        ui.notifications.info('Token Hotbar migration finished.');
+    }
     setTimeout(() => { // prevent flickering notifications
-        if (success) ui.notifications.info('Token Hotbar migration finished.');
         ui.notifications.active.find(() => ui.notifications.active.find(n => n.text() == noteText)).remove();
     }, 800);
 }
 
-function translateDataStructure(oldData: OldHotbarData) {
-    const newData: HotbarData = {};
-    for(let id in oldData) {
-        console.debug(oldData, id);
-        newData[id] = oldData[id].reduce<HotbarSlots>((acc, cur) => { acc[cur.slot] = cur.id; return acc; }, {});
-    }
-    return newData;
-}
-
-function delay(timeoutMs) {
-    return new Promise(resolve => {
-        setTimeout(resolve, timeoutMs);
-    });
-}
-
-function createTokenHotbar(tokenId: string) {
+function createTokenHotbar(tokenId: string): TokenHotbar {
     const settings = Settings._load();
     const hotbarFlags = new HotbarFlagsFactory(settings);
     const keyStrategy = new FlagStrategyFactory(settings, game, canvas);
@@ -168,7 +126,7 @@ Hooks.on('init', () => {
 });
 
 let renderHotbarTimeout: number;
-Hooks.on('renderCustomHotbar', (data: any) => {
+Hooks.on('renderCustomHotbar', () => {
     const settings = Settings._load();
     if (!settings.useCustomHotbar)
         return true;
@@ -177,7 +135,7 @@ Hooks.on('renderCustomHotbar', (data: any) => {
     return true;
 });
 
-Hooks.on('renderHotbar', (data: any) => {
+Hooks.on('renderHotbar', () => {
     const settings = Settings._load();
     if (settings.useCustomHotbar)
         return true;
@@ -192,6 +150,7 @@ function save() {
 
     renderHotbarTimeout = window.setTimeout(delayedSave, 35);
 
+    // TODO: put this inside a nice class
     function delayedSave() {
         const settings = Settings._load();
         const factory = new UiHotbarFactory(settings);
@@ -199,9 +158,17 @@ function save() {
         const token = canvas.tokens.controlled[0];
 
         if (token && uiHotbar.shouldUpdateTokenHotbar()) {
+            const tokenHotbar = createTokenHotbar(token.id);
             const hotbarPage = uiHotbar.getTokenHotbarPage();
+            const slots = calculatePageSlots(hotbarPage);
             const macros = uiHotbar.getMacrosByPage(hotbarPage);
-            createTokenHotbar(token.id).setTokenMacros(hotbarPage, macros);
+            const tokenMacros = tokenHotbar.getMacrosByPage(hotbarPage);
+            if (slots.some(slot => macros.hotbar[slot] !== tokenMacros.hotbar[slot])) {
+                if (game.user.isGM || !settings.lockHotbar)
+                    tokenHotbar.setTokenMacros(hotbarPage, macros);
+                else
+                    ui.notifications.warn('The token hotbar is locked for players. Any macros placed on this page will be replaced.');
+            }
         }
 
         return true;
@@ -216,6 +183,7 @@ Hooks.on('controlToken', () => {
     controlTokenTimeout = window.setTimeout(delayedLoad, 35);
 });
 
+// TODO: put this inside a nice class
 async function delayedLoad() {
     const token = canvas.tokens.controlled[0];
 
@@ -249,11 +217,13 @@ function hideTokenHotbar(logger: Logger, uiHotbar: UiHotbar & Hotbar) {
     logger.debug('[Token Hotbar]', 'No or multiple controlled tokens');
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 Hooks.on('preDeleteToken', (_: Scene, token: any) => {
     createTokenHotbar(token._id).removeTokenMacros(game.actors, canvas.tokens);
     return true;
 });
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 Hooks.on('preDeleteActor', (actor: any) => {
     createTokenHotbar(actor._id).removeTokenMacros(game.actors, canvas.tokens);
     return true;

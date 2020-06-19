@@ -1,7 +1,7 @@
 
 import 'jasmine';
 import { UserFlagsStrategy, IdentityFlagsStrategy, LinkedFlagsStrategy, AlwaysLinkedFlagsStrategy } from '../src/flags/flagStrategies';
-import { IActor, IToken } from '../src/foundry';
+import { IActor, IToken } from '../src/utils/foundry';
 import { TestFlaggable, TestToken } from './helpers/TestToken';
 
 describe('SharedFlagsStrategy', () => {

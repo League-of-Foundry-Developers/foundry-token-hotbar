@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { UiHotbar } from './uiHotbar';
-import { Settings } from '../settings';
+import { Settings } from '../utils/settings';
 import { PageFlag } from '../flags/pageFlag';
-import { ConsoleLogger } from '../logger';
+import { ConsoleLogger } from '../utils/logger';
 import { Hotbar } from './hotbar';
 import { SinglePageCustomHotbar } from './customHotbar';
 import { FoundryHotbar } from './foundryHotbar';
-import { FoundryUiHotbar } from '../foundry';
+import { FoundryUiHotbar } from '../utils/foundry';
 export class UiHotbarFactory {
     constructor(private settings: Settings) { }
 

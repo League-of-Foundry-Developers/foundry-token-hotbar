@@ -2,12 +2,17 @@
 import { UiHotbar, pickPageSlots } from './uiHotbar';
 import { Hotbar, HotbarSlots } from './hotbar';
 import { PageFlag } from '../flags/pageFlag';
-import { Settings } from '../settings';
-import { Logger } from '../logger';
-import { FoundryUiHotbar } from '../foundry';
+import { Settings } from '../utils/settings';
+import { Logger } from '../utils/logger';
+import { FoundryUiHotbar } from '../utils/foundry';
 
 export class FoundryHotbar implements UiHotbar, Hotbar {
-    constructor(private settings: Settings, private hotbar: FoundryUiHotbar, private pageFlag: PageFlag, private logger: Logger = console) { }
+    constructor(
+        private settings: Settings,
+        private hotbar: FoundryUiHotbar,
+        private pageFlag: PageFlag,
+        private logger: Logger = console) { }
+        
     public toggleHotbar(showTokenBar: boolean): Promise<unknown> {
         if (showTokenBar) {
             return this.showTokenHotbar();
@@ -38,7 +43,7 @@ export class FoundryHotbar implements UiHotbar, Hotbar {
         return this.render(this.pageFlag.get());
     }
 
-    public getMacrosByPage(page: number) : { hotbar: HotbarSlots } {
+    public getMacrosByPage(page: number): { hotbar: HotbarSlots } {
         const allSlots = this.getAllHotbarMacros();
         const pageSlots = pickPageSlots(page, allSlots);
         return { hotbar: pageSlots };
@@ -46,7 +51,7 @@ export class FoundryHotbar implements UiHotbar, Hotbar {
 
     setTokenMacros(page: number, data: { hotbar: HotbarSlots }): Promise<unknown> {
         const continuousTokenHotbar = pickPageSlots(page, data.hotbar);
-        for(const slot in continuousTokenHotbar) {
+        for (const slot in continuousTokenHotbar) {
             if (!continuousTokenHotbar[slot]) {
                 this.unset(continuousTokenHotbar, +slot);
             }
@@ -61,7 +66,7 @@ export class FoundryHotbar implements UiHotbar, Hotbar {
     private render(page: number): Promise<unknown> {
         this.hotbar.page = page;
         return new Promise((resolve) => {
-        // FIXME: Render does not always work without the timeout.
+            // FIXME: Render does not always work without the timeout.
             setTimeout(() => {
                 this.hotbar.render();
                 this.logger.debug('[Token Hotbar]', 'Rendered page', page);

@@ -1,4 +1,4 @@
-import { HotbarData } from './flags/hotbarFlags';
+import { HotbarData } from '../flags/hotbarFlags';
 
 /**
  * This module contains only interfaces as they occur in Foundry

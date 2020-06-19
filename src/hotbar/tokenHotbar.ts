@@ -1,6 +1,6 @@
 import { HotbarFlags, } from '../flags/hotbarFlags';
-import { Identifiable, IToken, IActor, } from '../foundry';
-import { Logger } from '../logger';
+import { Identifiable, IToken, IActor, } from '../utils/foundry';
+import { Logger } from '../utils/logger';
 import { FlagsStrategy, IdentityFlagsStrategy } from '../flags/flagStrategies';
 import { HotbarSlots, Hotbar } from './hotbar';
 import { calculatePageSlots, pickPageSlots } from './uiHotbar';
@@ -40,9 +40,6 @@ export class TokenHotbar implements Hotbar {
         const tokenHotbars = this.hotbarFlags.get(this.tokenId);
         const tokenHotbar = tokenHotbars[flagKey] || {};
 
-        if (!this.hasChanges(data.hotbar, tokenHotbar, calculatePageSlots(page)))
-            return false;
-
         this.logger.debug('[Token Hotbar]', 'preSave', flagKey, tokenHotbars);
 
         const newTokenHotbar = Object.assign({}, tokenHotbar, pickPageSlots(page, data.hotbar));
@@ -59,9 +56,5 @@ export class TokenHotbar implements Hotbar {
         const flags = this.hotbarFlags.get(this.tokenId);
         delete flags[flagKey.id];
         return this.hotbarFlags.set(this.tokenId, flags);
-    }
-
-    private hasChanges(newMacros: HotbarSlots, oldMacros: HotbarSlots, slots: number[]) {
-        return slots.some(slot => newMacros[slot] !== oldMacros[slot]);
     }
 }

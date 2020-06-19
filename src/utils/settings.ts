@@ -1,4 +1,4 @@
-import { CONSTANTS } from './utils/constants';
+import { CONSTANTS } from './constants';
 
 export interface ClientSettingsReader {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -43,9 +43,7 @@ export class Settings {
     /**
      * Helper method to quickly construct Settings from game.settings
      */
-    static _load(): Settings {
-        return new Settings().load(game.settings);
-    }
+    static _load(): Settings { return new Settings().load(game.settings); }
 
     private getSetting(settings: ClientSettingsReader, key: string) {
         return settings.get(CONSTANTS.moduleName, key);

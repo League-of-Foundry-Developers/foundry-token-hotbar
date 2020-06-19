@@ -1,5 +1,5 @@
 import 'jasmine';
-import { Settings }  from '../src/settings';
+import { Settings }  from '../src/utils/settings';
 import { TestClientSettings } from './helpers/TestSettings';
 
 describe('Settings.linkToLinkedActor', () => {
