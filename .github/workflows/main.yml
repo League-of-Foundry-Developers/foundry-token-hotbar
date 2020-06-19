@@ -19,7 +19,7 @@ jobs:
       run: node ./.github/workflows/check-download.js
     - run: npm install
     - run: npm test
-    - run: ./build dev
+    - run: ./build prod
       env:
         CI: true
     - name: Extract Version

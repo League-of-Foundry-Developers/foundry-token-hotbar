@@ -15,12 +15,14 @@ async function migrateFlags() {
         return;
     }
     let success = false;
-    ui.notifications.warn('Starting Token Hotbar migration, please wait...');
+    const noteText = 'Starting Token Hotbar migration, please wait...';
+    ui.notifications.warn(noteText);
     try {
         const tokens: Flaggable[] = game.scenes.entities.map(scene => (<any>scene.data).tokens).deepFlatten().map(data => new Token(data));
         const actors = game.actors.entities;
         const users  = game.users.entities;
 
+        const errors: Error[] = [];
         for(let flaggable of tokens.concat(actors).concat(users)) {
             let oldFlags = ((<any>flaggable).data.flags[CONSTANTS.moduleName]);
             if (!oldFlags) {
@@ -28,17 +30,26 @@ async function migrateFlags() {
             }
 
             if (oldFlags) {
-                debugger;
                 for(let key in oldFlags) {
+                    try {
                     console.log("Token Hotbar", "Migration", oldFlags[key]);
                     const newData = translateDataStructure(oldFlags[key]);
                     console.log("Token Hotbar", "Migration", flaggable.id, key, newData)
                     await flaggable.setFlag(CONSTANTS.moduleName, key, newData);
                     await flaggable.unsetFlag('world', CONSTANTS.moduleName);
                     await delay(50); // prevent race conditions
+                    }
+                    catch(e) {
+                        errors.push(e);
+                    }
                 }
             }
         }
+        if (errors.length > 0) {
+            console.error('[Token Hotbar]', '# Migration errors:', errors.length);
+            throw errors[0];
+        }
+
         success = true;
     }
     catch(e) {
@@ -46,13 +57,19 @@ async function migrateFlags() {
         ui.notifications.error('Something went wrong during the migration. Please check your console and notify @Stan on Discord.');
     }
 
-    game.user.setFlag(CONSTANTS.moduleName, 'v3.0.4 migration', success)
-    if (success) ui.notifications.info('Token Hotbar migration finished.');
+    if (success)
+        game.user.setFlag(CONSTANTS.moduleName, 'v3.0.4 migration', true);
+
+    setTimeout(() => { // prevent flickering notifications
+        if (success) ui.notifications.info('Token Hotbar migration finished.');
+        ui.notifications.active.find(() => ui.notifications.active.find(n => n.text() == noteText)).remove();
+    }, 800);
 }
 
 function translateDataStructure(oldData: OldHotbarData) {
     const newData: HotbarData = {};
     for(let id in oldData) {
+        console.debug(oldData, id);
         newData[id] = oldData[id].reduce<HotbarSlots>((acc, cur) => { acc[cur.slot] = cur.id; return acc; }, {});
     }
     return newData;

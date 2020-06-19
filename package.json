@@ -26,7 +26,7 @@
   },
   "scripts": {
     "test": "ts-node node_modules/jasmine/bin/jasmine",
-    "dev": "npx webpack --config webpack.dev.js",
+    "dev": "npx webpack --config webpack.dev.js --progress",
     "prod": "npx webpack --config webpack.prod.js"
   },
   "repository": {
