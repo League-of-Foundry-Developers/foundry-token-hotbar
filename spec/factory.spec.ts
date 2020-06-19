@@ -15,7 +15,7 @@ import { Game, Canvas } from '../src/foundry';
 //    0   |   -   |    1   |  user     | actor
 
 describe('FlagKeyStrategyFactory', () => {
-    [true, false].forEach(isShared => {
+    [ true, false ].forEach(isShared => {
         it('should return LinkedFlagKeyStrategy if hotbar is not linked to linked actor.', () => {
             const clientSettings = {};
             clientSettings[Settings.keys.shareHotbar] = isShared;

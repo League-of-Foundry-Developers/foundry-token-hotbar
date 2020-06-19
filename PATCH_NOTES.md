@@ -1,0 +1,1 @@
+✅ Bug fix: hotbar is cleared when token without hotbar is selected.
