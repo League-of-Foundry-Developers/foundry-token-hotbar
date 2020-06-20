@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Flaggable, IActor, IToken } from '../utils/foundry';
 
 export abstract class FlagsStrategy {
@@ -46,7 +47,7 @@ export class LinkedFlagsStrategy extends FlagsStrategy {
     get(entityId: string): Flaggable {
         const entity = this.getEntity(entityId);
         return this.isToken(entity) && entity.data.actorLink && entity.actor
-            ? entity.actor
+            ? this.actors.get(entity.actor.id)!
             : entity;
     }
 }
@@ -55,7 +56,7 @@ export class AlwaysLinkedFlagsStrategy extends FlagsStrategy {
     get(entityId: string): Flaggable {
         const entity = this.getEntity(entityId);
         if (this.isToken(entity) && entity.actor)
-            return entity.actor;
+            return this.actors.get(entity.actor.id)!;
 
         return entity;
     }

@@ -2,6 +2,7 @@ import { CONSTANTS } from '../utils/constants';
 import { Flaggable } from '../utils/foundry';
 import { FlagsStrategy } from './flagStrategies';
 import { HotbarSlots } from '../hotbar/hotbar';
+import { Logger } from '../utils/logger';
 
 export interface HotbarItem {
     id: string,
@@ -24,7 +25,7 @@ export interface HotbarFlags {
 
 export class ModuleHotbarFlags implements HotbarFlags {
     private readonly key = 'hotbar-data';
-    constructor(protected flagStrategy: FlagsStrategy) { }
+    constructor(protected flagStrategy: FlagsStrategy, protected logger: Logger) { }
 
     get(tokenId: string): HotbarData {
         const flags = this.flagStrategy.get(tokenId);
@@ -32,8 +33,9 @@ export class ModuleHotbarFlags implements HotbarFlags {
     }
 
     set(tokenId: string, data: HotbarData): Promise<Flaggable> {
-        return this.flagStrategy.get(tokenId)
-            .unsetFlag(CONSTANTS.module.name, this.key)
+        const entity = this.flagStrategy.get(tokenId); 
+        this.logger.debug('[Token Hotbar]', 'Storing data for token', tokenId, entity, this.key, data);
+        return entity.unsetFlag(CONSTANTS.module.name, this.key)
             .then(entity => {
                 return entity.setFlag(CONSTANTS.module.name, this.key, data);
             });

@@ -2,13 +2,14 @@ import { Settings } from '../utils/settings';
 import { HotbarFlags, ModuleHotbarFlags } from './hotbarFlags';
 import { IdentityFlagsStrategy, UserFlagsStrategy, LinkedFlagsStrategy, AlwaysLinkedFlagsStrategy, FlagsStrategy } from './flagStrategies';
 import { Game, Canvas } from '../utils/foundry';
+import { ConsoleLogger } from '../utils/logger';
 
 export class HotbarFlagsFactory {
     constructor(private settings: Settings) { }
 
     public create(): HotbarFlags {
         const factory = new FlagStrategyFactory(this.settings, game, canvas);
-        return new ModuleHotbarFlags(factory.createFlagStrategy());
+        return new ModuleHotbarFlags(factory.createFlagStrategy(), new ConsoleLogger(this.settings));
     }
 }
 

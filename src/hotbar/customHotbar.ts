@@ -3,9 +3,13 @@ import { Settings } from '../utils/settings';
 import { UiHotbar, calculatePageSlots, pickPageSlots } from './uiHotbar';
 import { Hotbar, HotbarSlots } from './hotbar';
 import { FoundryUiHotbar } from '../utils/foundry';
+import { Logger } from '../utils/logger';
 
 export class CustomHotbar implements UiHotbar, Hotbar {
-    constructor(protected settings: Settings, private hotbar: FoundryUiHotbar) { }
+    constructor(
+        protected settings: Settings,
+        private hotbar: FoundryUiHotbar,
+        protected logger: Logger) { }
 
     toggleHotbar(showTokenBar: boolean): Promise<unknown> {
         return showTokenBar || canvas.tokens.controlled.length === 1 ? this.showTokenHotbar() : this.hideTokenHotbar();
@@ -34,11 +38,16 @@ export class CustomHotbar implements UiHotbar, Hotbar {
     }
 
     setTokenMacros(page: number, data: { hotbar: HotbarSlots }): Promise<unknown> {
+        this.logger.debug('[Token Hotbar]', 'Updating Custom Hotbar', page, data);
         const continuousTokenHotbar = pickPageSlots(page, data.hotbar);
         const allSlots = this.getAllHotbarMacros();
         const combinedMacros = Object.assign({}, allSlots, continuousTokenHotbar);
 
         return (<any>window).chbSetMacros(combinedMacros);
+    }
+
+    currentPage(): number {
+        return this.hotbar.page;
     }
 
     private getAllHotbarMacros(): HotbarSlots {
@@ -71,6 +80,7 @@ export class SinglePageCustomHotbar extends CustomHotbar {
     }
 
     setTokenMacros(page: number, data: { hotbar: HotbarSlots }): Promise<unknown> {
+        this.logger.debug('[Token Hotbar]', 'Updating Custom Hotbar', page, data);
         const offset = this.calculatePageOffset();
 
         const offsetSlots = {};
@@ -79,6 +89,10 @@ export class SinglePageCustomHotbar extends CustomHotbar {
         }
 
         return (<any>window).chbSetMacros(offsetSlots);
+    }
+
+    currentPage(): number {
+        return this.getTokenHotbarPage(); // single page, mimicking the token hotbar page
     }
 
     /**

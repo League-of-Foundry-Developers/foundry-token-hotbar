@@ -11,7 +11,7 @@ export class FoundryHotbar implements UiHotbar, Hotbar {
         private settings: Settings,
         private hotbar: FoundryUiHotbar,
         private pageFlag: PageFlag,
-        private logger: Logger = console) { }
+        private logger: Logger) {}
         
     public toggleHotbar(showTokenBar: boolean): Promise<unknown> {
         if (showTokenBar) {
@@ -50,6 +50,7 @@ export class FoundryHotbar implements UiHotbar, Hotbar {
     }
 
     setTokenMacros(page: number, data: { hotbar: HotbarSlots }): Promise<unknown> {
+        this.logger.debug('[Token Hotbar]', 'Updating Foundry Hotbar', page, data);
         const continuousTokenHotbar = pickPageSlots(page, data.hotbar);
         for (const slot in continuousTokenHotbar) {
             if (!continuousTokenHotbar[slot]) {
@@ -63,13 +64,16 @@ export class FoundryHotbar implements UiHotbar, Hotbar {
         return game.user.update({ hotbar: combinedMacros });
     }
 
+    currentPage(): number {
+        return this.hotbar.page;
+    }
+
     private render(page: number): Promise<unknown> {
         this.hotbar.page = page;
         return new Promise((resolve) => {
             // FIXME: Render does not always work without the timeout.
             setTimeout(() => {
                 this.hotbar.render();
-                this.logger.debug('[Token Hotbar]', 'Rendered page', page);
                 resolve();
             }, 5);
         });

@@ -6,6 +6,7 @@ export interface UiHotbar {
     hideTokenHotbar(): Promise<unknown>;
     getTokenHotbarPage(): number;
     shouldUpdateTokenHotbar(): boolean;
+    currentPage(): number;
 }
 
 export const calculatePageSlots = (page: number): number[] => {

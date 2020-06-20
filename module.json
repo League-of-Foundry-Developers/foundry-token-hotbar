@@ -3,7 +3,7 @@
     "title": "Token Hotbar",
     "description": "<p>With Token Hotbar you can assign one of the hotbar pages to remember macros per token and/or actor. If the token is a linked token, the hotbar will be linked to the actor by default.</p><br><h4>Updates</h4><p>🎲 Use an additional physical hotbar (requires Norc's Custom Hotbar module).</p>",
     "author": "Stan Janssen",
-    "version": "3.0.7-beta",
+    "version": "3.0.8-beta",
     "minimumCoreVersion": "0.6.0",
     "compatibleCoreVersion":"0.6.2",
     "scripts": ["TokenHotbar.js"],
@@ -15,6 +15,5 @@
         { "lang": "en", "name": "English", "path": "lang/en.json" },
         { "lang": "nl", "name": "Nederlands (Dutch)", "path": "lang/nl.json" },
         { "lang": "ro", "name": "Romănă (Romanian)", "path": "lang/ro.json" }
-    ],
-    "socket": true
+    ]
 }

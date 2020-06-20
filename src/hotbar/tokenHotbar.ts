@@ -19,8 +19,6 @@ export class TokenHotbar implements Hotbar {
         const flagKey = this.flagKeyStrategy.get(this.tokenId).id;
         const tokenHotbar = tokenHotbars[flagKey] || {};
 
-        this.logger.debug('[Token Hotbar]', 'Loading', flagKey, tokenHotbar);
-        
         const tokenHotbarPage = {};
         const pageSlots = calculatePageSlots(page);
         for(const slot in tokenHotbar) {
@@ -40,13 +38,11 @@ export class TokenHotbar implements Hotbar {
         const tokenHotbars = this.hotbarFlags.get(this.tokenId);
         const tokenHotbar = tokenHotbars[flagKey] || {};
 
-        this.logger.debug('[Token Hotbar]', 'preSave', flagKey, tokenHotbars);
-
+        this.logger.debug('[Token Hotbar]', 'Updating Token Hotbar', page, this.tokenId, flagKey, data);
         const newTokenHotbar = Object.assign({}, tokenHotbar, pickPageSlots(page, data.hotbar));
         tokenHotbars[flagKey] = newTokenHotbar;
 
         await this.hotbarFlags.set(this.tokenId, tokenHotbars);
-        this.logger.debug('[Token Hotbar]', 'Saved', flagKey, tokenHotbars);
 
         return true;  
     }
