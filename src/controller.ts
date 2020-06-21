@@ -3,7 +3,9 @@ import { UiHotbar, calculatePageSlots } from './hotbar/uiHotbar';
 import { Hotbar, HotbarSlots } from './hotbar/hotbar';
 import { Settings } from './utils/settings';
 import { IToken, User } from './utils/foundry';
-import { Logger } from './utils/logger';
+import { Logger, ConsoleLogger } from './utils/logger';
+import { UiHotbarFactory } from './hotbar/uiHotbarFactory';
+import { TokenHotbarFactory } from './hotbar/tokenHotbarFactory';
 
 export class TokenHotbarController {
     constructor(private settings: Settings, private uiHotbar: UiHotbar & Hotbar, private tokenHotbar: TokenHotbar, private logger: Logger) { }
@@ -51,11 +53,6 @@ export class TokenHotbarController {
         this.uiHotbar.toggleHotbar(macros.length > 0 && macros.every(macro => !!macro));
     }
 
-    hide(): void {
-        this.uiHotbar.toggleHotbar(false);
-        this.logger.debug('[Token Hotbar]', 'No or multiple controlled tokens');
-    }
-
     private hasChanges(page: number, macros: HotbarSlots, tokenMacros: HotbarSlots) {
         const slots = calculatePageSlots(page);
         return slots.some(slot => macros[slot] != tokenMacros[slot]);
@@ -74,5 +71,17 @@ export class TokenHotbarController {
             }
             return update;
         }, {});
+    }
+}
+
+export class ControllerFactory {
+    constructor(private settings: Settings) {}
+    
+    create(token: IToken): TokenHotbarController {
+        return new TokenHotbarController(
+            this.settings,
+            new UiHotbarFactory(this.settings).create(),
+            new TokenHotbarFactory().create(this.settings, token.id),
+            new ConsoleLogger(this.settings));
     }
 }

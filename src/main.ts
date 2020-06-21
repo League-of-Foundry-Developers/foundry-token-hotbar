@@ -1,14 +1,13 @@
 import { Settings } from './utils/settings';
-import { TokenHotbar } from './hotbar/tokenHotbar';
 import { CONSTANTS } from './utils/constants';
-import { HotbarFlagsFactory, FlagStrategyFactory } from './flags/factory';
 import { UiHotbar, calculatePageSlots } from './hotbar/uiHotbar';
 import { UiHotbarFactory } from './hotbar/uiHotbarFactory';
 import { ConsoleLogger, Logger } from './utils/logger';
 import { IToken, FoundryUiHotbar } from './utils/foundry';
 import { Hotbar, HotbarSlots } from './hotbar/hotbar';
 import { Migration, DataFlaggable } from './utils/migration';
-import { TokenHotbarController } from './controller';
+import { TokenHotbarController, ControllerFactory } from './controller';
+import { TokenHotbarFactory } from './hotbar/tokenHotbarFactory';
 
 // TODO: Remove in v4.0.0
 async function migrateFlags() {
@@ -108,18 +107,6 @@ Hooks.on('init', () => {
     console.log('[Token Hotbar]', 'Initialized Token Hotbar');
 });
 
-function createTokenHotbar(tokenId: string): TokenHotbar {
-    const settings = Settings._load();
-    const hotbarFlags = new HotbarFlagsFactory(settings);
-    const keyStrategy = new FlagStrategyFactory(settings, game, canvas);
-    return new TokenHotbar(
-        tokenId,
-        game.macros.entities,
-        hotbarFlags.create(),
-        keyStrategy.createFlagKeyStrategy(),
-        new ConsoleLogger(settings));
-}
-
 let renderHotbarTimeout: number;
 // Hooks.on('renderCustomHotbar', () => {
 //     const settings = Settings._load();
@@ -130,7 +117,7 @@ let renderHotbarTimeout: number;
 //     return true;
 // });
 
-Hooks.on('preUpdateUser', (user, updateData) => {
+Hooks.on('preUpdateUser', (_, updateData) => {
     const settings = Settings._load();
     if (settings.useCustomHotbar)
         return true;
@@ -149,20 +136,14 @@ function save(hotbarUpdate: HotbarSlots) {
     renderHotbarTimeout = window.setTimeout(() => delayedSave(hotbarUpdate), 100);
 }
 
-async function delayedSave(hotbarUpdate) {
+function delayedSave(hotbarUpdate) {
     const token = canvas.tokens.controlled[0];
     if (!token)
         return;
     
-    const settings = Settings._load();
-    const uiFactory = new UiHotbarFactory(settings);
-    const controller = new TokenHotbarController(
-        settings,
-        uiFactory.create(),
-        createTokenHotbar(token.id),
-        new ConsoleLogger(settings)
-    );
-    controller.save(game.user, token, hotbarUpdate);
+    return new ControllerFactory(Settings._load())
+        .create(token)
+        .save(game.user, token, hotbarUpdate);
 }
 
 let controlTokenTimeout: number;
@@ -177,18 +158,13 @@ async function delayedLoad() {
     const token = canvas.tokens.controlled[0];
 
     const settings = Settings._load();
-    const factory = new UiHotbarFactory(settings);
-    const uiHotbar = factory.create();
 
     if (token && canvas.tokens.controlled.length == 1)
-        await new TokenHotbarController(
-            settings,
-            uiHotbar,
-            createTokenHotbar(token.id),
-            new ConsoleLogger(settings)
-        ).load();
+        await new ControllerFactory(settings)
+            .create(token.id)
+            .load();
     else {
-        hideTokenHotbar(token, uiHotbar);
+        hideTokenHotbar();
     }
 
     return true;
@@ -197,49 +173,42 @@ async function delayedLoad() {
 async function delayedReload() {
     const token = canvas.tokens.controlled[0];
 
-    const settings = Settings._load();
-    const factory = new UiHotbarFactory(settings);
-    const uiHotbar = factory.create();
-
     if (token && canvas.tokens.controlled.length == 1)
-        await new TokenHotbarController(
-            settings,
-            uiHotbar,
-            createTokenHotbar(token.id),
-            new ConsoleLogger(settings)
-        ).reload();
+        await new ControllerFactory(Settings._load())
+            .create(token.id)
+            .reload();
 
     return true;
 }
 
-Hooks.on('renderHotbar', (hotbar, html, { page }) => {
+Hooks.on('renderHotbar', () => {
     if (controlTokenTimeout)
         clearTimeout(controlTokenTimeout);
 
     controlTokenTimeout = window.setTimeout(delayedReload, 500);
 });
 
-function hideTokenHotbar(token: IToken, uiHotbar: UiHotbar & Hotbar) {
-    const settings = Settings._load();
-    // const uiFactory = new UiHotbarFactory(settings);
-    const controller = new TokenHotbarController(
-        settings,
-        uiHotbar,
-        <TokenHotbar>{}, // TODO: forbidden!
-        new ConsoleLogger(settings)
-    );
-    controller.hide();
+function hideTokenHotbar() {
+    new UiHotbarFactory(Settings._load())
+        .create()
+        .toggleHotbar(false);
+
+    this.logger.debug('[Token Hotbar]', 'No or multiple controlled tokens');
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 Hooks.on('preDeleteToken', (_: Scene, token: any) => {
-    createTokenHotbar(token._id).removeTokenMacros(game.actors, canvas.tokens);
+    new TokenHotbarFactory()
+        .create(Settings._load(), token._id)
+        .removeTokenMacros(game.actors, canvas.tokens);
     return true;
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 Hooks.on('preDeleteActor', (actor: any) => {
-    createTokenHotbar(actor._id).removeTokenMacros(game.actors, canvas.tokens);
+    new TokenHotbarFactory()
+        .create(Settings._load(), actor._id)
+        .removeTokenMacros(game.actors, canvas.tokens);
     return true;
 });
 
