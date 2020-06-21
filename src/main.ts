@@ -8,6 +8,7 @@ import { ConsoleLogger, Logger } from './utils/logger';
 import { IToken, FoundryUiHotbar } from './utils/foundry';
 import { Hotbar, HotbarSlots } from './hotbar/hotbar';
 import { Migration, DataFlaggable } from './utils/migration';
+import { TokenHotbarController } from './controller';
 
 // TODO: Remove in v4.0.0
 async function migrateFlags() {
@@ -119,11 +120,6 @@ function createTokenHotbar(tokenId: string): TokenHotbar {
         new ConsoleLogger(settings));
 }
 
-interface SharedRedrawData {
-    type: string,
-    tokenId: string
-}
-
 let renderHotbarTimeout: number;
 // Hooks.on('renderCustomHotbar', () => {
 //     const settings = Settings._load();
@@ -150,41 +146,23 @@ function save(hotbarUpdate: HotbarSlots) {
     if (renderHotbarTimeout)
         clearTimeout(renderHotbarTimeout);
 
-    renderHotbarTimeout = window.setTimeout(delayedSave, 100);
+    renderHotbarTimeout = window.setTimeout(() => delayedSave(hotbarUpdate), 100);
+}
 
-    // TODO: put this inside a nice class
-    async function delayedSave() {
-        const settings = Settings._load();
-        const factory = new UiHotbarFactory(settings);
-        const uiHotbar = factory.create();
-        const token = canvas.tokens.controlled[0];
-        // fold update onto current hotbar changing -=<slot> into <slot>
-        if (token && uiHotbar.shouldUpdateTokenHotbar()) {
-            const updates = Object.keys(hotbarUpdate).reduce<HotbarSlots>((update, key) => {
-                if (isNaN(+key)) {
-                    update[key.substring(2)] = hotbarUpdate[key];
-                } else {
-                    update[key] = hotbarUpdate[key];
-                }
-                return update;
-            }, {});
-
-            const tokenHotbar = createTokenHotbar(token.id);
-            const hotbarPage = uiHotbar.getTokenHotbarPage();
-            const slots = calculatePageSlots(hotbarPage);
-            const oldHotbarMacros = uiHotbar.getMacrosByPage(hotbarPage);
-            const macros = Object.assign({}, oldHotbarMacros, updates);
-            const tokenMacros = tokenHotbar.getMacrosByPage(hotbarPage);
-            if (slots.some(slot => macros.hotbar[slot] !== tokenMacros.hotbar[slot])) {
-                if (game.user.isGM || !settings.lockHotbar) {
-                    await tokenHotbar.setTokenMacros(hotbarPage, macros);
-                } else
-                    ui.notifications.warn(game.i18n.localize('TokenHotbar.notifications.lockedWarning'));
-            }
-        }
-
-        return true;
-    }
+async function delayedSave(hotbarUpdate) {
+    const token = canvas.tokens.controlled[0];
+    if (!token)
+        return;
+    
+    const settings = Settings._load();
+    const uiFactory = new UiHotbarFactory(settings);
+    const controller = new TokenHotbarController(
+        settings,
+        uiFactory.create(),
+        createTokenHotbar(token.id),
+        new ConsoleLogger(settings)
+    );
+    controller.save(game.user, token, hotbarUpdate);
 }
 
 let controlTokenTimeout: number;
@@ -195,53 +173,62 @@ Hooks.on('controlToken', () => {
     controlTokenTimeout = window.setTimeout(delayedLoad, 100);
 });
 
-// TODO: put this inside a nice class
 async function delayedLoad() {
     const token = canvas.tokens.controlled[0];
 
     const settings = Settings._load();
-    const logger = new ConsoleLogger(settings);
     const factory = new UiHotbarFactory(settings);
     const uiHotbar = factory.create();
 
     if (token && canvas.tokens.controlled.length == 1)
-        await loadTokenHotbar(logger, token, uiHotbar);
+        await new TokenHotbarController(
+            settings,
+            uiHotbar,
+            createTokenHotbar(token.id),
+            new ConsoleLogger(settings)
+        ).load();
     else {
-        hideTokenHotbar(logger, uiHotbar);
+        hideTokenHotbar(token, uiHotbar);
     }
 
     return true;
 }
 
-Hooks.on('renderHotbar', (hotbar, html, { page }) => {
-    if (page === Settings._load().hotbarPage)
-        return true;
+async function delayedReload() {
+    const token = canvas.tokens.controlled[0];
 
+    const settings = Settings._load();
+    const factory = new UiHotbarFactory(settings);
+    const uiHotbar = factory.create();
+
+    if (token && canvas.tokens.controlled.length == 1)
+        await new TokenHotbarController(
+            settings,
+            uiHotbar,
+            createTokenHotbar(token.id),
+            new ConsoleLogger(settings)
+        ).reload();
+
+    return true;
+}
+
+Hooks.on('renderHotbar', (hotbar, html, { page }) => {
     if (controlTokenTimeout)
         clearTimeout(controlTokenTimeout);
 
-    controlTokenTimeout = window.setTimeout(delayedLoad, 500);
+    controlTokenTimeout = window.setTimeout(delayedReload, 500);
 });
 
-async function loadTokenHotbar(logger: Logger, token: IToken, uiHotbar: UiHotbar & Hotbar) {
-    const hotbarPage = uiHotbar.getTokenHotbarPage();
-    const result = createTokenHotbar(token.id).getMacrosByPage(hotbarPage);
-    const currentMacros = uiHotbar.getMacrosByPage(hotbarPage);
-    // TODO: this is not correct; it doesn't always switch like this
-    if (uiHotbar.currentPage() !== hotbarPage && calculatePageSlots(hotbarPage).every(slot => result.hotbar[slot] === currentMacros.hotbar[slot]))
-        return;
-
-    await uiHotbar.setTokenMacros(hotbarPage, result);
-
-    logger.debug('[Token Hotbar]', 'Rendering Hotbar', hotbarPage, result.hotbar);
-
-    const macros = Object.values(result.hotbar);
-    uiHotbar.toggleHotbar(macros.length > 0 && macros.every(macro => !!macro));
-}
-
-function hideTokenHotbar(logger: Logger, uiHotbar: UiHotbar & Hotbar) {
-    uiHotbar.toggleHotbar(false);
-    logger.debug('[Token Hotbar]', 'No or multiple controlled tokens');
+function hideTokenHotbar(token: IToken, uiHotbar: UiHotbar & Hotbar) {
+    const settings = Settings._load();
+    // const uiFactory = new UiHotbarFactory(settings);
+    const controller = new TokenHotbarController(
+        settings,
+        uiHotbar,
+        <TokenHotbar>{}, // TODO: forbidden!
+        new ConsoleLogger(settings)
+    );
+    controller.hide();
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
