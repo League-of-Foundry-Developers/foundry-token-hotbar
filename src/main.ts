@@ -1,12 +1,9 @@
 import { Settings } from './utils/settings';
 import { CONSTANTS } from './utils/constants';
-import { UiHotbar, calculatePageSlots } from './hotbar/uiHotbar';
 import { UiHotbarFactory } from './hotbar/uiHotbarFactory';
-import { ConsoleLogger, Logger } from './utils/logger';
-import { IToken, FoundryUiHotbar } from './utils/foundry';
-import { Hotbar, HotbarSlots } from './hotbar/hotbar';
+import { HotbarSlots } from './hotbar/hotbar';
 import { Migration, DataFlaggable } from './utils/migration';
-import { TokenHotbarController, ControllerFactory } from './controller';
+import { ControllerFactory } from './controller';
 import { TokenHotbarFactory } from './hotbar/tokenHotbarFactory';
 
 // TODO: Remove in v4.0.0
@@ -133,17 +130,16 @@ function save(hotbarUpdate: HotbarSlots) {
     if (renderHotbarTimeout)
         clearTimeout(renderHotbarTimeout);
 
-    renderHotbarTimeout = window.setTimeout(() => delayedSave(hotbarUpdate), 100);
-}
-
-function delayedSave(hotbarUpdate) {
-    const token = canvas.tokens.controlled[0];
-    if (!token)
-        return;
+    renderHotbarTimeout = window.setTimeout(() => {
+        const token = canvas.tokens.controlled[0];
+        if (!token)
+            return;
     
-    return new ControllerFactory(Settings._load())
-        .create(token)
-        .save(game.user, token, hotbarUpdate);
+        return new ControllerFactory(Settings._load())
+            .create(token)
+            .save(game.user, token, hotbarUpdate);
+
+    }, 100);
 }
 
 let controlTokenTimeout: number;
@@ -151,41 +147,33 @@ Hooks.on('controlToken', () => {
     if (controlTokenTimeout)
         clearTimeout(controlTokenTimeout);
 
-    controlTokenTimeout = window.setTimeout(delayedLoad, 100);
+    controlTokenTimeout = window.setTimeout(() => {
+        const token = canvas.tokens.controlled[0];
+
+        const settings = Settings._load();
+
+        if (token && canvas.tokens.controlled.length == 1)
+            new ControllerFactory(settings)
+                .create(token.id)
+                .load();
+        else {
+            hideTokenHotbar();
+        }
+    }, 100);
 });
-
-async function delayedLoad() {
-    const token = canvas.tokens.controlled[0];
-
-    const settings = Settings._load();
-
-    if (token && canvas.tokens.controlled.length == 1)
-        await new ControllerFactory(settings)
-            .create(token.id)
-            .load();
-    else {
-        hideTokenHotbar();
-    }
-
-    return true;
-}
-
-async function delayedReload() {
-    const token = canvas.tokens.controlled[0];
-
-    if (token && canvas.tokens.controlled.length == 1)
-        await new ControllerFactory(Settings._load())
-            .create(token.id)
-            .reload();
-
-    return true;
-}
 
 Hooks.on('renderHotbar', () => {
     if (controlTokenTimeout)
         clearTimeout(controlTokenTimeout);
 
-    controlTokenTimeout = window.setTimeout(delayedReload, 500);
+    controlTokenTimeout = window.setTimeout(() => {
+        const token = canvas.tokens.controlled[0];
+
+        if (token && canvas.tokens.controlled.length == 1)
+            new ControllerFactory(Settings._load())
+                .create(token.id)
+                .reload();
+    }, 500);
 });
 
 function hideTokenHotbar() {
