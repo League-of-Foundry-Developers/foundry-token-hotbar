@@ -47,7 +47,7 @@ export class TokenHotbarController {
 
         await this.uiHotbar.setTokenMacros(hotbarPage, result);
 
-        this.logger.debug('[Token Hotbar]', 'Rendering Hotbar', hotbarPage, result.hotbar);
+        this.logger.debug('[Token Hotbar]', 'Rendering Hotbar', result.hotbar);
 
         const macros = Object.values(result.hotbar);
         this.uiHotbar.toggleHotbar(macros.length > 0 && macros.every(macro => !!macro));
@@ -81,7 +81,7 @@ export class ControllerFactory {
         return new TokenHotbarController(
             this.settings,
             new UiHotbarFactory(this.settings).create(),
-            new TokenHotbarFactory().create(this.settings, token.id),
+            new TokenHotbarFactory(this.settings).create(token.id),
             new ConsoleLogger(this.settings));
     }
 }

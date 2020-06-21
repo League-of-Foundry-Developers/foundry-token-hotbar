@@ -4,14 +4,16 @@ import { HotbarFlagsFactory, FlagStrategyFactory } from '../flags/factory';
 import { ConsoleLogger } from '../utils/logger';
 
 export class TokenHotbarFactory {
-    create(settings: Settings, tokenId: string): TokenHotbar {
-        const hotbarFlags = new HotbarFlagsFactory(settings);
-        const keyStrategy = new FlagStrategyFactory(settings, game, canvas);
+    constructor(private settings: Settings) {}
+
+    create(tokenId: string): TokenHotbar {
+        const hotbarFlags = new HotbarFlagsFactory(this.settings);
+        const keyStrategy = new FlagStrategyFactory(this.settings, game, canvas);
         return new TokenHotbar(
             tokenId,
             game.macros.entities,
             hotbarFlags.create(),
             keyStrategy.createFlagKeyStrategy(),
-            new ConsoleLogger(settings));
+            new ConsoleLogger(this.settings));
     }
 } 

@@ -5,6 +5,8 @@ import { HotbarSlots } from './hotbar/hotbar';
 import { Migration, DataFlaggable } from './utils/migration';
 import { ControllerFactory } from './controller';
 import { TokenHotbarFactory } from './hotbar/tokenHotbarFactory';
+import { ConsoleLogger } from './utils/logger';
+import { IToken } from './utils/foundry';
 
 // TODO: Remove in v4.0.0
 async function migrateFlags() {
@@ -105,42 +107,35 @@ Hooks.on('init', () => {
 });
 
 let renderHotbarTimeout: number;
-// Hooks.on('renderCustomHotbar', () => {
-//     const settings = Settings._load();
-//     if (!settings.useCustomHotbar)
-//         return true;
 
-//     save();
-//     return true;
-// });
-
-Hooks.on('preUpdateUser', (_, updateData) => {
+Hooks.on('preUpdateUser', (_, updateData: { hotbar?: HotbarSlots, flags?: { 'custom-hotbar': { 'chbMacroMap': HotbarSlots } } }) => {
+    const chbFlag = 'custom-hotbar';
+    const chbKey = 'chbMacroMap';
     const settings = Settings._load();
-    if (settings.useCustomHotbar)
+    // TODO: move this logic to its own class?
+    if (!settings.useCustomHotbar && !updateData.hotbar)
         return true;
 
-    if (!updateData.hotbar)
+    if (settings.useCustomHotbar && (!updateData.flags || !updateData.flags['custom-hotbar']))
         return true;
 
-    save(updateData.hotbar);
-    return true;
-});
-
-function save(hotbarUpdate: HotbarSlots) {
     if (renderHotbarTimeout)
         clearTimeout(renderHotbarTimeout);
 
     renderHotbarTimeout = window.setTimeout(() => {
-        const token = canvas.tokens.controlled[0];
+        const token: IToken | undefined = canvas.tokens.controlled[0];
         if (!token)
             return;
     
         return new ControllerFactory(Settings._load())
             .create(token)
-            .save(game.user, token, hotbarUpdate);
+            // `updateData` is already checked to be contain the appropriate data
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            .save(game.user, token, settings.useCustomHotbar ? updateData.flags![chbFlag][chbKey] : updateData.hotbar!);
 
-    }, 100);
-}
+    }, 30);
+    return true;
+});
 
 let controlTokenTimeout: number;
 Hooks.on('controlToken', () => {
@@ -148,54 +143,65 @@ Hooks.on('controlToken', () => {
         clearTimeout(controlTokenTimeout);
 
     controlTokenTimeout = window.setTimeout(() => {
-        const token = canvas.tokens.controlled[0];
+        const token: IToken | undefined = canvas.tokens.controlled[0];
 
         const settings = Settings._load();
 
         if (token && canvas.tokens.controlled.length == 1)
             new ControllerFactory(settings)
-                .create(token.id)
+                .create(token)
                 .load();
         else {
-            hideTokenHotbar();
+            new UiHotbarFactory(settings)
+                .create()
+                .toggleHotbar(false);
+
+            new ConsoleLogger(settings).debug('[Token Hotbar]', 'No or multiple controlled tokens');
         }
-    }, 100);
+    }, 30);
 });
 
+let sharedRenderTimeout: number;
 Hooks.on('renderHotbar', () => {
-    if (controlTokenTimeout)
-        clearTimeout(controlTokenTimeout);
+    reload();
+    return true;
+});
 
-    controlTokenTimeout = window.setTimeout(() => {
-        const token = canvas.tokens.controlled[0];
+Hooks.on('renderCustomHotbar', () => {
+    reload();
+    return true;
+});
+
+function reload() {
+    const settings = Settings._load();
+    if (!settings.shareHotbar)
+        return true;
+
+    if (sharedRenderTimeout)
+        clearTimeout(sharedRenderTimeout);
+
+    sharedRenderTimeout = window.setTimeout(() => {
+        const token: IToken | undefined = canvas.tokens.controlled[0];
 
         if (token && canvas.tokens.controlled.length == 1)
             new ControllerFactory(Settings._load())
-                .create(token.id)
+                .create(token)
                 .reload();
-    }, 500);
-});
-
-function hideTokenHotbar() {
-    new UiHotbarFactory(Settings._load())
-        .create()
-        .toggleHotbar(false);
-
-    this.logger.debug('[Token Hotbar]', 'No or multiple controlled tokens');
-}
+    }, 350);
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 Hooks.on('preDeleteToken', (_: Scene, token: any) => {
-    new TokenHotbarFactory()
-        .create(Settings._load(), token._id)
+    new TokenHotbarFactory(Settings._load())
+        .create(token._id)
         .removeTokenMacros(game.actors, canvas.tokens);
     return true;
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 Hooks.on('preDeleteActor', (actor: any) => {
-    new TokenHotbarFactory()
-        .create(Settings._load(), actor._id)
+    new TokenHotbarFactory(Settings._load())
+        .create(actor._id)
         .removeTokenMacros(game.actors, canvas.tokens);
     return true;
 });
