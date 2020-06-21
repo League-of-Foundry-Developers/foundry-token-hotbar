@@ -131,7 +131,7 @@ Hooks.on('preUpdateUser', (_, updateData: { hotbar?: HotbarSlots, flags?: { 'cus
             .create(token)
             // `updateData` is already checked to be contain the appropriate data
             // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            .save(game.user, token, settings.useCustomHotbar ? updateData.flags![chbFlag][chbKey] : updateData.hotbar!);
+            .save(game.user, settings.useCustomHotbar ? updateData.flags![chbFlag][chbKey] : updateData.hotbar!);
 
     }, 30);
     return true;

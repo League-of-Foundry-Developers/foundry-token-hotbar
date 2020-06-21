@@ -15,7 +15,7 @@ export class CustomHotbar implements UiHotbar, Hotbar {
         return showTokenBar || canvas.tokens.controlled.length === 1 ? this.showTokenHotbar() : this.hideTokenHotbar();
     }
 
-    shouldUpdateTokenHotbar(): boolean {
+    onTokenHotbarPage(): boolean {
         return this.hotbar.page == this.getTokenHotbarPage();
     }
 
@@ -56,7 +56,7 @@ export class CustomHotbar implements UiHotbar, Hotbar {
 }
 
 export class SinglePageCustomHotbar extends CustomHotbar {
-    shouldUpdateTokenHotbar(): boolean {
+    onTokenHotbarPage(): boolean {
         return true;
     }
 

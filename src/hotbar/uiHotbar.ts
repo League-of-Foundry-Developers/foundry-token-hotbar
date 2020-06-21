@@ -5,7 +5,7 @@ export interface UiHotbar {
     showTokenHotbar(): Promise<unknown>;
     hideTokenHotbar(): Promise<unknown>;
     getTokenHotbarPage(): number;
-    shouldUpdateTokenHotbar(): boolean;
+    onTokenHotbarPage(): boolean;
     currentPage(): number;
 }
 

@@ -21,7 +21,7 @@ export class FoundryHotbar implements UiHotbar, Hotbar {
         }
     }
 
-    shouldUpdateTokenHotbar(): boolean {
+    onTokenHotbarPage(): boolean {
         return this.hotbar.page == this.getTokenHotbarPage();
     }
 

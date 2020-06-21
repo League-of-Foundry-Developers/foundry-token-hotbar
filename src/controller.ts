@@ -10,21 +10,24 @@ import { TokenHotbarFactory } from './hotbar/tokenHotbarFactory';
 export class TokenHotbarController {
     constructor(private settings: Settings, private uiHotbar: UiHotbar & Hotbar, private tokenHotbar: TokenHotbar, private logger: Logger) { }
 
-    async save(user: User, token: IToken, hotbarUpdate: HotbarSlots): Promise<void> { 
-        if (this.uiHotbar.shouldUpdateTokenHotbar()) {
-            const hotbarPage = this.uiHotbar.getTokenHotbarPage();
-            const oldHotbarMacros = this.uiHotbar.getMacrosByPage(hotbarPage);
-            const updates = this.transformHotbarUpdate(hotbarUpdate);
-            const macros = Object.assign({}, oldHotbarMacros.hotbar, updates);
-            const tokenMacros = this.tokenHotbar.getMacrosByPage(hotbarPage);
+    async save(user: User, hotbarUpdate: HotbarSlots): Promise<void> { 
+        if (!this.uiHotbar.onTokenHotbarPage())
+            return;
 
-            if (this.hasChanges(hotbarPage, macros, tokenMacros.hotbar)) {
-                if (!this.settings.lockHotbar || user.isGM) {
-                    this.logger.debug('[Token Hotbar]', 'Applying update', hotbarPage, hotbarUpdate, updates);
-                    await this.tokenHotbar.setTokenMacros(hotbarPage, { hotbar: macros });
-                } else
-                    ui.notifications.warn(game.i18n.localize('TokenHotbar.notifications.lockedWarning'));
-            }
+        const updates = this.transformHotbarUpdate(hotbarUpdate);
+        const hotbarPage = this.uiHotbar.getTokenHotbarPage();
+
+        const oldHotbarMacros = this.uiHotbar.getMacrosByPage(hotbarPage);
+        const combinedMacros = Object.assign({}, oldHotbarMacros.hotbar, updates);
+
+        const tokenMacros = this.tokenHotbar.getMacrosByPage(hotbarPage);
+
+        if (this.hasChanges(hotbarPage, combinedMacros, tokenMacros.hotbar)) {
+            if (!this.settings.lockHotbar || user.isGM) {
+                this.logger.debug('[Token Hotbar]', 'Applying update', hotbarPage, hotbarUpdate, updates);
+                await this.tokenHotbar.setTokenMacros(hotbarPage, { hotbar: combinedMacros });
+            } else
+                ui.notifications.warn(game.i18n.localize('TokenHotbar.notifications.lockedWarning'));
         }
     }
 
@@ -43,13 +46,13 @@ export class TokenHotbarController {
 
     async load(): Promise<void> {
         const hotbarPage = this.uiHotbar.getTokenHotbarPage();
-        const result = this.tokenHotbar.getMacrosByPage(hotbarPage);
+        const tokenMacros = this.tokenHotbar.getMacrosByPage(hotbarPage);
 
-        await this.uiHotbar.setTokenMacros(hotbarPage, result);
+        await this.uiHotbar.setTokenMacros(hotbarPage, tokenMacros);
 
-        this.logger.debug('[Token Hotbar]', 'Rendering Hotbar', result.hotbar);
+        this.logger.debug('[Token Hotbar]', 'Rendering Hotbar', tokenMacros.hotbar);
 
-        const macros = Object.values(result.hotbar);
+        const macros = Object.values(tokenMacros.hotbar);
         this.uiHotbar.toggleHotbar(macros.length > 0 && macros.every(macro => !!macro));
     }
 
