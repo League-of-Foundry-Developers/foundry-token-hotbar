@@ -21,13 +21,14 @@ describe('TokenHotbar.remove', () => {
 
         this.page = 5;
 
+        const logger = new ConsoleLogger(new Settings());
         const userFlags = new UserFlagsStrategy(this.user, this.actors, this.tokens);
-        this.flags = new ModuleHotbarFlags(userFlags);
+        this.flags = new ModuleHotbarFlags(userFlags, logger);
         this.keyStrategy = new IdentityFlagsStrategy(this.actors, this.tokens);
         this.key = this.keyStrategy.get(this.token.id).id;
         this.allMacros = [ {id: '1'}, {id: '2'} ];
 
-        this.tokenHotbar = new TokenHotbar(this.token.id, this.allMacros, this.flags, this.keyStrategy, new ConsoleLogger(new Settings()));
+        this.tokenHotbar = new TokenHotbar(this.token.id, this.allMacros, this.flags, this.keyStrategy, logger);
     });
 
     it('updates the flags with the specific key removed', async function () {

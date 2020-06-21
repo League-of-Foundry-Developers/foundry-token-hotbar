@@ -16,13 +16,14 @@ describe('TokenHotbar.getMacrosByPage', function() {
         const actors = new Map<string, IActor>();
         tokens.set(token.id, <IToken>token);
         
+        const logger = new ConsoleLogger(new Settings());
         const userFlags = new UserFlagsStrategy(user, actors, tokens);
-        const flags = new ModuleHotbarFlags(userFlags);
+        const flags = new ModuleHotbarFlags(userFlags, logger);
         const keyStrategy = new IdentityFlagsStrategy(actors, tokens);
 
         this.page = 5;
         this.allMacros = [ {id: '1'}, {id: '2'} ];
-        this.tokenHotbar = new TokenHotbar(token.id, this.allMacros, flags, keyStrategy, new ConsoleLogger(new Settings()));
+        this.tokenHotbar = new TokenHotbar(token.id, this.allMacros, flags, keyStrategy, logger);
     });
 
     it('returns an empty page if there is no token hotbar.', function() {

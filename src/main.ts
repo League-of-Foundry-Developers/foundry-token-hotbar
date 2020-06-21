@@ -116,7 +116,7 @@ Hooks.on('preUpdateUser', (_, updateData: { hotbar?: HotbarSlots, flags?: { 'cus
     if (!settings.useCustomHotbar && !updateData.hotbar)
         return true;
 
-    if (settings.useCustomHotbar && (!updateData.flags || !updateData.flags['custom-hotbar']))
+    if (settings.useCustomHotbar && (!updateData.flags || !updateData.flags[chbFlag] || !updateData.flags[chbFlag][chbKey]))
         return true;
 
     if (renderHotbarTimeout)
