@@ -16,6 +16,7 @@ async function migrateFlags() {
     const noteText = 'Starting Token Hotbar migration, please wait...';
     ui.notifications.warn(noteText);
     const tokens: DataFlaggable[] = game.scenes.entities
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .map(scene => (<any>scene.data).tokens.map(data => new Token(data, scene)))
         .deepFlatten();
     const actors = game.actors.entities;
@@ -28,8 +29,7 @@ async function migrateFlags() {
         console.error('[Token Hotbar]', 'Migration errors:');
         errors.map(e => console.error(e));
         ui.notifications.error('Something went wrong during the migration. Please send the errors from console (F12) to @Stan#1549 on Discord.');
-    }
-    else {
+    } else {
         game.user.setFlag(CONSTANTS.module.name, 'v3.0.4 migration', true);
         ui.notifications.info('Token Hotbar migration finished.');
     }
@@ -188,7 +188,7 @@ function reload() {
                 .create(token)
                 .reload();
     }, 350);
-};
+}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 Hooks.on('preDeleteToken', (_: Scene, token: any) => {
