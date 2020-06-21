@@ -1,0 +1,37 @@
+{
+    "TokenHotbar": {
+        "settings": {
+            "page": {
+                "name": "Page",
+                "hint": "La page d’accès rapide qui va être utilisée pour les tokens. La modifier ne déplacera pas les tokens des barres d’accès !"
+            },
+            "linkToActor": {
+                "name": "Lien vers l’acteur lié",
+                "hint": "Lie la barre d’accès à l’acteur si le token est lié."
+            },
+            "alwaysLinkToActor": {
+                "name": "Toujours lier à l’acteur",
+                "hint": "Lie la barre d’accès rapide à l’acteur même si le token est délié."
+            },
+            "shareHotbar": {
+                "name": "Barre d’accès partagée",
+                "hint": "Chaque token aura une unique barre d’accès partagée entre les joueurs."
+            },
+            "lockHotbar": {
+                "name": "Verrouiller la barre d’accès rapide partagée",
+                "hint": "Si vous utilisez cette option, seul le MJ pourra mettre à jour la barre d’accès. S’applique seulement aux barres d’accès partagées."
+            },
+            "useCustomHotbar": {
+                "name": "Utiliser une barre d’accès custom",
+                "hint": ":warning: Nécessite l’utilisation du Module Norc's Custom Hotbar."
+            },
+            "debugMode": {
+                "name": "Mode débugage",
+                "hint": "Ouvrir la console pour voir le code."
+            }
+        },
+        "notifications": {
+            "lockedWarning": "La barre d’accès des token est verrouillée pour les joueurs. Les changements ne seront pas pris en compte."
+        }
+    }
+}

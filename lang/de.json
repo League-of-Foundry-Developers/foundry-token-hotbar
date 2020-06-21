@@ -1,0 +1,37 @@
+{
+    "TokenHotbar": {
+        "settings": {
+            "page": {
+                "name": "Leiste",
+                "hint": "Die Hotbar Leiste, die für die Token Hotbar genutzt werden wird. Diese zu ändern wird nicht vorhandene Hotbars verschieben!"
+            },
+            "linkToActor": {
+                "name": "Verknüpfung zum verknüpften Charakter",
+                "hint": "Verknüpfe die Token Hotbar mit dem Charakter, wenn dieser mit dem Token verknüpft ist."
+            },
+            "alwaysLinkToActor": {
+                "name": "Immer mit dem Charakter verknüpfen",
+                "hint": "Verknüpfe die Token Hotbar mit dem Charakter, auch wenn dieser nicht mit dem Token verknüpft ist."
+            },
+            "shareHotbar": {
+                "name": "Gemeinsame Token Hotbar",
+                "hint": "Alle Token haben die gleiche Hotbar, die sich die Spieler gemeinsam teilen."
+            },
+            "lockHotbar": {
+                "name": "Gemeinsamme Hotbar sperren",
+                "hint": "Wenn gesetzt, kann nur der GM die Token Hotbar aktualisieren. Dies wird sich nur aus, wenn eine Gemeinsamme Token Hotbar gesetzt ist."
+            },
+            "useCustomHotbar": {
+                "name": "Benutze Custom Hotbar",
+                "hint": "⚠ Erfordert Norc's Custom Hotbar Module."
+            },
+            "debugMode": {
+                "name": "Debug Mode",
+                "hint": "Ausführlich(verbosse) in das log der console schreiben."
+            }
+        },
+        "notifications": {
+            "lockedWarning": "This Token Hotbar is für Spieler gesperrt. Alle Änderungen werden Rückgängig gemacht."
+        }
+    }
+}

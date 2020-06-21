@@ -14,6 +14,8 @@
     "languages": [
         { "lang": "en", "name": "English", "path": "lang/en.json" },
         { "lang": "nl", "name": "Nederlands (Dutch)", "path": "lang/nl.json" },
-        { "lang": "ro", "name": "Romănă (Romanian)", "path": "lang/ro.json" }
+        { "lang": "ro", "name": "Romănă (Romanian)", "path": "lang/ro.json" },
+        { "lang": "fr", "name": "Français (French)", "path": "lang/fr.json" },
+        { "lang": "de", "name": "Deutsch (German)", "path": "lang/de.json" }
     ]
 }
