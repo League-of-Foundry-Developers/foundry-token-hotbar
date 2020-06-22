@@ -22,7 +22,7 @@
                 "hint": "When set, only a GM can update the token hotbar. Only applies to shared hotbars."
             },
             "useCustomHotbar": {
-                "name": "Use Custom Hotbar",
+                "name": "Use Custom Hotbar (beta)",
                 "hint": "⚠ Requires Norc's Custom Hotbar module."
             },
             "debugMode": {

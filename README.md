@@ -3,7 +3,12 @@ Using this Foundry VTT module, you can assign one of the hotbar pages to remembe
 If the token is a linked token, the hotbar will be linked to the actor.
 
 ## Installation
-Install module and enter this url: https://raw.githubusercontent.com/janssen-io/foundry-token-hotbar/master/module.json
+You can install the stable version of the module via the Foundry UI.
+If you'd like to test the latest beta, you van use this manifest url:
+
+```
+https://fvtt.janssen.io/tokenhotbar/beta/module.json
+```
 
 ## Usage
 1. Set your desired page in the module settings (default: 5)

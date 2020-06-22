@@ -22,8 +22,8 @@
                 "hint": "Si vous utilisez cette option, seul le MJ pourra mettre à jour la barre d’accès. S’applique seulement aux barres d’accès partagées."
             },
             "useCustomHotbar": {
-                "name": "Utiliser une barre d’accès custom",
-                "hint": ":warning: Nécessite l’utilisation du Module Norc's Custom Hotbar."
+                "name": "Utiliser une barre d’accès custom (beta)",
+                "hint": "⚠ Nécessite l’utilisation du Module Norc's Custom Hotbar."
             },
             "debugMode": {
                 "name": "Mode débugage",

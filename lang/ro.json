@@ -22,7 +22,7 @@
                 "hint": "Numai un GM poate schimba Token Hotbarul. Funcționează doar împreună cu setarea 'Împarțiți Token Hotbar-ul'. "
             },
             "useCustomHotbar": {
-                "name": "Utilisați Custom Hotbar",
+                "name": "Utilisați Custom Hotbar (beta)",
                 "hint": "⚠ Această setare necesită modul 'Custom Hotbar' a lui Norc."
             },
             "debugMode": {
