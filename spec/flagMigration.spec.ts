@@ -6,7 +6,23 @@ import { CONSTANTS } from '../src/utils/constants';
 
 describe('migration.translateDataStructure', function () {
 
-    it('migrates', async function () {
+    it('does not try to migrate new data (#21)', async function () {
+        const user = new TestFlaggable('user-1');
+        const newHotbarData: HotbarData = {
+            '36CpODC5K9FprGth': { 41:'qVDGuGXCAXCOYw7R',43:'S4P0BBEvbdELIjwU',45:'CLX1soaLSxFDAAV8' },
+            'jUsZENMpwCBFw2Z1': { 41:'qVDGuGXCAXCOYw7R',43:'S4P0BBEvbdELIjwU',45:'CLX1soaLSxFDAAV8' },
+            'bAlcTgzHf0YlnlMz': { 41:'qVDGuGXCAXCOYw7R',43:'S4P0BBEvbdELIjwU',45:'CLX1soaLSxFDAAV8' }
+        };
+        user.setFlag('TokenHotbar', 'hotbar-data', newHotbarData);
+        spyOn(user, 'setFlag');
+        spyOn(user, 'unsetFlag');
+
+        await new Migration([ user ]).migrate();
+        expect(user.setFlag).not.toHaveBeenCalled();
+        expect(user.unsetFlag).not.toHaveBeenCalled();
+    });
+
+    it('handles old data properly (#20)', async function () {
         const user = new TestFlaggable('user-1');
         const oldHotbarData: OldHotbarData = {'jUsZENMpwCBFw2Z1':[ {'slot':41,'id':'qVDGuGXCAXCOYw7R'},{'slot':43,'id':'S4P0BBEvbdELIjwU'},{'slot':45,'id':'CLX1soaLSxFDAAV8'} ],'36CpODC5K9FprGth':[ {'slot':41,'id':'qVDGuGXCAXCOYw7R'},{'slot':43,'id':'S4P0BBEvbdELIjwU'},{'slot':45,'id':'CLX1soaLSxFDAAV8'} ],'bAlcTgzHf0YlnlMz':[ {'slot':41,'id':'qVDGuGXCAXCOYw7R'},{'slot':43,'id':'S4P0BBEvbdELIjwU'},{'slot':45,'id':'CLX1soaLSxFDAAV8'} ]};
         user.setFlag('world', 'TokenHotbar', <any>oldHotbarData);
