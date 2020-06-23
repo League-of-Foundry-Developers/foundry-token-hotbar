@@ -15,10 +15,7 @@ export class Migration {
         const errors: Error[] = [];
         const flagKey = 'hotbar-data';
         for (const flaggable of this.flaggables) {
-            let oldFlags: OldHotbarData = flaggable.data.flags[CONSTANTS.module.name];
-            if (!oldFlags) {
-                oldFlags = flaggable.data.flags.world?.[CONSTANTS.module.name];
-            }
+            const oldFlags = this.getOldFlags(flaggable);
 
             if (oldFlags) {
                 console.debug('[Token Hotbar] Migrating', flaggable.id, flaggable.data.flags);
@@ -43,6 +40,19 @@ export class Migration {
 
     public translateDataStructure(oldData: HotbarItem[] ): HotbarSlots {
         return oldData.reduce<HotbarSlots>((acc, cur) => (acc[cur.slot] = cur.id, acc), {});
+    }
+
+    private getOldFlags(flaggable: DataFlaggable): OldHotbarData | undefined {
+        let oldFlags: OldHotbarData = flaggable.data.flags[CONSTANTS.module.name];
+        if (!oldFlags) {
+            oldFlags = flaggable.data.flags.world?.[CONSTANTS.module.name];
+        }
+
+        // if 'old data' is already in the new format, return undefined
+        if (oldFlags && oldFlags['hotbar-data'] && Object.keys(oldFlags['hotbar-data']).some(id => Object.keys(oldFlags['hotbar-data'][id]).some(key => !isNaN(+key)))) {
+            return undefined;
+        }
+        return oldFlags;
     }
 
     private delay(timeoutMs) {
