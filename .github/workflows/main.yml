@@ -1,4 +1,4 @@
-name: Node.js CI
+name: TokenHotbar CI
 
 on: [push]
 
