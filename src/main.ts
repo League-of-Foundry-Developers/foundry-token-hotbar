@@ -14,7 +14,7 @@ async function migrateFlags() {
         return;
     }
     const noteText = 'Starting Token Hotbar migration, please wait...';
-    ui.notifications.warn(noteText);
+    (<any>ui.notifications).warn(noteText, { permanent: true });
     const tokens: DataFlaggable[] = game.scenes.entities
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         .map(scene => (<any>scene.data).tokens.map(data => new Token(data, scene)))

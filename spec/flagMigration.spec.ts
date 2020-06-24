@@ -37,6 +37,16 @@ describe('migration.translateDataStructure', function () {
         expect(user.getFlag('TokenHotbar', 'hotbar-data')).toEqual(expectedData);
     });
 
+    it('handles empty old data properly (#22)', async function () {
+        const user = new TestFlaggable('user-1');
+        const oldHotbarData = {'jUsZENMpwCBFw2Z1': {}};
+        user.setFlag('world', 'TokenHotbar', <any>oldHotbarData);
+
+        await new Migration([ user ]).migrate();
+        console.log(user.getFlag('TokenHotbar', 'hotbar-data'));
+        expect(user.getFlag('TokenHotbar', 'hotbar-data')).toEqual({});
+    });
+
     it('changes OldHotbarData into HotbarData', function () {
         const migration = new Migration([]);
         const oldData: OldHotbarData = {
@@ -92,7 +102,7 @@ describe('migration.translateDataStructure', function () {
 
         const flaggable = <DataFlaggable><unknown>new TestFlaggable('some-token');
         flaggable.data = {
-            flags: { [CONSTANTS.module.name]: oldData }
+            flags: { [CONSTANTS.module.name]: { ['hotbar-data']: oldData }  }
         };
 
         spyOn(flaggable, 'unsetFlag');
