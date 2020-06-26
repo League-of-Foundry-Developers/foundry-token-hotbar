@@ -44,7 +44,7 @@ export class Settings {
      * Helper method to quickly construct Settings from game.settings
      */
     static _load(): Settings {
-        return new Settings().load(game.settings, game.modules.get('custom-hotbar').active); 
+        return new Settings().load(game.settings, game.modules.get('custom-hotbar')?.active); 
     }
 
     private getSetting(settings: ClientSettingsReader, key: string) {
