@@ -20,7 +20,7 @@ describe('FlagKeyStrategyFactory', () => {
             const clientSettings = {};
             clientSettings[Settings.keys.shareHotbar] = isShared;
             clientSettings[Settings.keys.linkToLinkedActor] = false;
-            const settings = new Settings().load(new TestClientSettings(clientSettings));
+            const settings = new Settings().load(new TestClientSettings(clientSettings), false);
 
             expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagKeyStrategy()).toBeInstanceOf(IdentityFlagsStrategy);
         });
@@ -29,7 +29,7 @@ describe('FlagKeyStrategyFactory', () => {
             const clientSettings = {};
             clientSettings[Settings.keys.shareHotbar] = isShared;
             clientSettings[Settings.keys.linkToLinkedActor] = true;
-            const settings = new Settings().load(new TestClientSettings(clientSettings));
+            const settings = new Settings().load(new TestClientSettings(clientSettings), false);
 
             expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagKeyStrategy()).toBeInstanceOf(LinkedFlagsStrategy);
         });
@@ -39,7 +39,7 @@ describe('FlagKeyStrategyFactory', () => {
             clientSettings[Settings.keys.shareHotbar] = isShared;
             clientSettings[Settings.keys.linkToLinkedActor] = true;
             clientSettings[Settings.keys.alwaysLinkToActor] = true;
-            const settings = new Settings().load(new TestClientSettings(clientSettings));
+            const settings = new Settings().load(new TestClientSettings(clientSettings), false);
 
             expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagKeyStrategy()).toBeInstanceOf(AlwaysLinkedFlagsStrategy);
         });
@@ -51,7 +51,7 @@ describe('FlagStrategyFactory', () => {
         const clientSettings = {};
         clientSettings[Settings.keys.linkToLinkedActor] = true;
         clientSettings[Settings.keys.shareHotbar] = true;
-        const settings = new Settings().load(new TestClientSettings(clientSettings));
+        const settings = new Settings().load(new TestClientSettings(clientSettings), false);
 
         expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagStrategy()).toBeInstanceOf(LinkedFlagsStrategy);
     });
@@ -61,7 +61,7 @@ describe('FlagStrategyFactory', () => {
         clientSettings[Settings.keys.shareHotbar] = true;
         clientSettings[Settings.keys.linkToLinkedActor] = true;
         clientSettings[Settings.keys.alwaysLinkToActor] = true;
-        const settings = new Settings().load(new TestClientSettings(clientSettings));
+        const settings = new Settings().load(new TestClientSettings(clientSettings), false);
 
         expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagStrategy()).toBeInstanceOf(AlwaysLinkedFlagsStrategy);
     });
@@ -71,7 +71,7 @@ describe('FlagStrategyFactory', () => {
         clientSettings[Settings.keys.shareHotbar] = true;
         clientSettings[Settings.keys.linkToLinkedActor] = false;
         clientSettings[Settings.keys.alwaysLinkToActor] = false;
-        const settings = new Settings().load(new TestClientSettings(clientSettings));
+        const settings = new Settings().load(new TestClientSettings(clientSettings), false);
 
         expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagStrategy()).toBeInstanceOf(IdentityFlagsStrategy);
     });
@@ -81,7 +81,7 @@ describe('FlagStrategyFactory', () => {
         clientSettings[Settings.keys.shareHotbar] = false;
         clientSettings[Settings.keys.linkToLinkedActor] = true;
         clientSettings[Settings.keys.alwaysLinkToActor] = true;
-        const settings = new Settings().load(new TestClientSettings(clientSettings));
+        const settings = new Settings().load(new TestClientSettings(clientSettings), false);
 
         expect(new FlagStrategyFactory(settings, <Game>{}, <Canvas>{}).createFlagStrategy()).toBeInstanceOf(UserFlagsStrategy);
     });

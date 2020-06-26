@@ -24,7 +24,7 @@ export class Settings {
         useCustomHotbar: 'customHotbar'
     }
 
-    public load(s: ClientSettingsReader) : Settings {
+    public load(s: ClientSettingsReader, isCustomHotbarEnabled: boolean) : Settings {
         this.hotbarPage = this.getSetting(s, Settings.keys.hotbarPage);
 
         this.alwaysLinkToActor = this.getSetting(s, Settings.keys.alwaysLinkToActor);
@@ -35,7 +35,7 @@ export class Settings {
 
         this.debugMode = this.getSetting(s, Settings.keys.debugMode);
 
-        this.useCustomHotbar = this.getSetting(s, Settings.keys.useCustomHotbar);
+        this.useCustomHotbar = this.getSetting(s, Settings.keys.useCustomHotbar) && isCustomHotbarEnabled;
 
         return this;
     }
@@ -44,7 +44,7 @@ export class Settings {
      * Helper method to quickly construct Settings from game.settings
      */
     static _load(): Settings {
-        return new Settings().load(game.settings); 
+        return new Settings().load(game.settings, game.modules.get('custom-hotbar').active); 
     }
 
     private getSetting(settings: ClientSettingsReader, key: string) {

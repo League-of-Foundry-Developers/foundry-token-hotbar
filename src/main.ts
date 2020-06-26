@@ -85,14 +85,20 @@ Hooks.on('init', () => {
         type: Boolean
     });
 
+    const hasCustomHotbar = game.modules.get('custom-hotbar').active; 
     game.settings.register(CONSTANTS.module.name, Settings.keys.useCustomHotbar, {
         name: 'TokenHotbar.settings.useCustomHotbar.name',
         hint: 'TokenHotbar.settings.useCustomHotbar.hint',
         scope: 'world',
-        config: true,
-        default: true,
+        config: hasCustomHotbar,
+        default: false,
         type: Boolean
     });
+    if (!hasCustomHotbar) {
+        // ensure useCustomHotbar is unchecked when module is disabled.
+        // even though the settings also should fall back!
+        game.settings.set(CONSTANTS.module.name, Settings.keys.useCustomHotbar, false);
+    }
 
     game.settings.register(CONSTANTS.module.name, Settings.keys.debugMode, {
         name: 'TokenHotbar.settings.debugMode.name',

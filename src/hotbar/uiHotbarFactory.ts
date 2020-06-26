@@ -11,7 +11,7 @@ export class UiHotbarFactory {
     constructor(private settings: Settings) { }
 
     public getFoundryUiObject(): FoundryUiHotbar {
-        if (this.useCustomHotbar()) {
+        if (this.settings.useCustomHotbar) {
             return (<any>ui).CustomHotbar;
         }
 
@@ -20,16 +20,10 @@ export class UiHotbarFactory {
 
     public create(): UiHotbar & Hotbar {
         const logger = new ConsoleLogger(this.settings);
-        if (this.useCustomHotbar()) {
+        if (this.settings.useCustomHotbar) {
             return new SinglePageCustomHotbar(this.settings, (<any>ui).CustomHotbar, logger);
         } else {
             return new FoundryHotbar(this.settings, (<any>ui).hotbar, new PageFlag(), logger);
         }
-    }
-
-    private useCustomHotbar() {
-        const hasModule = Boolean((<any>game).modules.get('custom-hotbar'));
-        const hasHotbar = Boolean((<any>ui).CustomHotbar);
-        return hasModule && hasHotbar && this.settings.useCustomHotbar;
     }
 }
