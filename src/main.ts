@@ -162,32 +162,36 @@ Hooks.on('controlToken', () => {
 });
 
 let sharedRenderTimeout: number;
-Hooks.on('renderHotbar', () => {
-    reload();
+Hooks.on('updateActor', (actor, data) => {
+    reload(actor.id, data);
     return true;
 });
 
-Hooks.on('renderCustomHotbar', () => {
-    reload();
+Hooks.on('updateToken', (token, data) => {
+    reload(token.id, data);
     return true;
 });
 
-function reload() {
+function reload(entityId: string, flags: any) {
     const settings = Settings._load();
-    if (!settings.shareHotbar)
+    const token: IToken | undefined = canvas.tokens.controlled[0];
+
+    // check if we should reload anything
+    if (canvas.tokens.controlled.length != 1 || !settings.shareHotbar || !flags[CONSTANTS.module.name])
+        return true;
+
+    // check if selected token is equal to the updated token
+    if (token?.id != entityId && token?.actor?.id != entityId)
         return true;
 
     if (sharedRenderTimeout)
         clearTimeout(sharedRenderTimeout);
 
     sharedRenderTimeout = window.setTimeout(() => {
-        const token: IToken | undefined = canvas.tokens.controlled[0];
-
-        if (token && canvas.tokens.controlled.length == 1)
-            new ControllerFactory(Settings._load())
-                .create(token)
-                .reload();
-    }, 350);
+        new ControllerFactory(Settings._load())
+            .create(token)
+            .reload();
+    }, 30);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
