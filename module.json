@@ -3,7 +3,7 @@
     "title": "Token Hotbar",
     "description": "<p>With Token Hotbar you can assign one of the hotbar pages to remember macros per token and/or actor. If the token is a linked token, the hotbar will be linked to the actor by default.</p><br><h4>Latest Updates</h4><p>🎲 Translated in Dutch, French, German, Japanese and Romanian.<br>🎲 Shared hotbar refreshes across clients.<br>🎲 Use an additional physical hotbar (requires Norc's Custom Hotbar module).<br>🎲 Several <a href='https://github.com/janssen-io/foundry-token-hotbar/projects/2'>bugs</a> fixed.</p>",
     "author": "Stan Janssen",
-    "version": "3.1.1-beta",
+    "version": "3.1.2-beta",
     "minimumCoreVersion": "0.6.0",
     "compatibleCoreVersion":"0.6.4",
     "scripts": ["TokenHotbar.js"],

@@ -85,7 +85,7 @@ Hooks.on('init', () => {
         type: Boolean
     });
 
-    const hasCustomHotbar = game.modules.get('custom-hotbar').active; 
+    const hasCustomHotbar = game.modules.get('custom-hotbar')?.active; 
     game.settings.register(CONSTANTS.module.name, Settings.keys.useCustomHotbar, {
         name: 'TokenHotbar.settings.useCustomHotbar.name',
         hint: 'TokenHotbar.settings.useCustomHotbar.hint',
