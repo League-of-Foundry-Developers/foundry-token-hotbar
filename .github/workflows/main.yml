@@ -19,15 +19,11 @@ jobs:
     - name: Update Version
       shell: bash
       id: set-version
-      run: echo "::set-output name=version::$(node ./.github/workflows/set-version.js ${{ github.ref }})"
-    - name: Transform Package Title
+      run: echo "::set-output name=version::$(node .github/workflows/set-version.js ${{ github.ref }})"
+    - name: Transform Manifest
       shell: bash
-      id: transform-package-title
-      run: node ./.github/workflows/transform-module-json.js
-    - name: Verify download channel
-      shell: bash
-      id: check-download
-      run: node ./.github/workflows/check-download.js
+      id: transform-manifest
+      run: node .github/workflows/transform-manifest.js
     - run: npm install
     - run: npm test
     - run: ./build prod

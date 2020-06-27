@@ -7,8 +7,8 @@
     "minimumCoreVersion": "0.6.0",
     "compatibleCoreVersion":"0.6.4",
     "scripts": ["TokenHotbar.js"],
-    "manifest": "https://fvtt.janssen.io/tokenhotbar/stable/module.json",
-    "download": "https://fvtt.janssen.io/tokenhotbar/stable/TokenHotbar.zip",
+    "manifest": "https://fvtt.janssen.io/tokenhotbar/{{ channel }}/module.json",
+    "download": "https://fvtt.janssen.io/tokenhotbar/{{ channel }}/TokenHotbar.zip",
     "url": "https://github.com/janssen-io/foundry-token-hotbar",
     "bugs": "https://github.com/janssen-io/foundry-token-hotbar/issues",
     "languages": [
