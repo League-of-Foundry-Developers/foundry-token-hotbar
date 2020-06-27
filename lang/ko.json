@@ -1,0 +1,37 @@
+{
+    "TokenHotbar": {
+        "settings": {
+            "page": {
+                "name": "페이지",
+                "hint": "토큰 단축바에 사용할 단축바 페이지. 이 설정을 변경해도 기존 토큰 단축바는 이동하지 않는다."
+            },
+            "linkToActor": {
+                "name": "연동된 액터와 연결",
+                "hint": "토큰이 액터와 연동된 경우 단축바를 토큰에 연결한다."
+            },
+            "alwaysLinkToActor": {
+                "name": "항상 액터와 연결",
+                "hint": "토큰이 액터와 연동되지 않아도 단축바를 토큰에 연결한다."
+            },
+            "shareHotbar": {
+                "name": "토큰 단축바 공유",
+                "hint": "모든 토큰은 플레이어간 공유되는 하나의 단축바를 사용한다."
+            },
+            "lockHotbar": {
+                "name": "단축바 공유 잠금",
+                "hint": "설정될 경우 GM만이 토큰 단축바를 업데이트 할 수 있다. 공유 단축바에만 적용된다."
+            },
+            "useCustomHotbar": {
+                "name": "커스텀 단축바 사용 (beta)",
+                "hint": "⚠ Norc의 Custom Hotbar 모듈을 필요로 함."
+            },
+            "debugMode": {
+                "name": "디버그 모드",
+                "hint": "콘솔에 자세하게 기록된다."
+            }
+        },
+        "notifications": {
+            "lockedWarning": "토큰 단축바는 플레이어에게 잠겨져 있으며 편집을 적용하지 않습니다."
+        }
+    }
+}
