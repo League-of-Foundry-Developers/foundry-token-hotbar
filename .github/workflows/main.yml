@@ -1,6 +1,9 @@
 name: TokenHotbar CI
 
-on: [push]
+on:
+  push:
+    tags:
+        - v*
 
 jobs:
   build:
@@ -13,33 +16,29 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: 12.x
+    - name: Update Version
+      shell: bash
+      id: set-version
+      run: echo "::set-output name=version::$(node ./.github/workflows/set-version.js ${{ github.ref }})"
+    - name: Transform Package Title
+      shell: bash
+      id: transform-package-title
+      run: node ./.github/workflows/transform-module-json.js
     - name: Verify download channel
       shell: bash
       id: check-download
       run: node ./.github/workflows/check-download.js
     - run: npm install
     - run: npm test
-    - name: Extract Version
-      shell: bash
-      id: extract-version
-      run: echo "::set-output name=version::$(node ./.github/workflows/version.js)"
-    - name: Transform Package Title
-      shell: bash
-      id: transform-package-title
-      run: node ./.github/workflows/transform-module-json.js
     - run: ./build prod
-      env:
-        CI: true
     - name: Create Release
       id: create_release
       uses: ncipollo/release-action@v1
       with:
-        allowUpdates: true
-        name: Release ${{ steps.extract-version.outputs.version}}
+        allowUpdates: false
+        name: Release ${{ steps.set-version.outputs.version}}
         draft: false
-        prerelease: ${{ endsWith(steps.extract-version.outputs.version, 'a') }}
+        prerelease: ${{ endsWith(steps.set-version.outputs.version, 'a') }}
         bodyFile: './PATCH_NOTES.md'
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: './dist/TokenHotbar.zip,./module.json'
-        commit: ${{ github.sha }}
-        tag: ${{ steps.extract-version.outputs.version }}
