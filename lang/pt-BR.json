@@ -1,0 +1,37 @@
+{
+    "TokenHotbar": {
+        "settings": {
+            "page": {
+                "name": "Página",
+                "hint": "A página da Barra de Atalho que será usada pelo token. Alternar este não move a barra existente na Barra de Atalho do Token!"
+            },
+            "linkToActor": {
+                "name": "Vincular à um Ator",
+                "hint": "Vincule a barra de atalho à um token já vinculado a um Ator."
+            },
+            "alwaysLinkToActor": {
+                "name": "Sempre vincular à um Ator",
+                "hint": "Vincule a barra de atalho à um token mesmo desvinculádo a um Ator."
+            },
+            "shareHotbar": {
+                "name": "Compartilhar a Barra de Atalho",
+                "hint": "Cada token terá sua barra de átalho unica compartilhada entre os jogadores."
+            },
+            "lockHotbar": {
+                "name": "Travar o Compartilhamente da Barra de Atalho",
+                "hint": "Quando ativado, somente o MJ pode atualizar a barra de atalho compartilhada dos jogadores."
+            },
+            "useCustomHotbar": {
+                "name": "Usar Barra de atalho personalizada (beta)",
+                "hint": "⚠ Necessário o módulo Norc's Custom Hotbar."
+            },
+            "debugMode": {
+                "name": "Modo Debug",
+                "hint": "envia mensagens para o console de Debug."
+            }
+        },
+        "notifications": {
+            "lockedWarning": "A barra de atalho está bloqueada para jogadores, qualquer mudança será revertida."
+        }
+    }
+}
