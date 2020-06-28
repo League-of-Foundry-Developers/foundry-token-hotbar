@@ -1,0 +1,38 @@
+{
+  "TokenHotbar": {
+    "settings": {
+      "page": {
+        "name": "Strona",
+        "hint": "Strona paska szybkiego dostępu, wykorzystywana przez moduł „Token Hotbar”. Zmiana tego ustawienia nie przeniesie istniejących pasków Tokenów!"
+      },
+      "linkToActor": {
+        "name": "Połącz z aktorem",
+        "hint": "Połącz pasek tokenu z aktorem, jeśli token jest z nim połączony."
+      },
+      "alwaysLinkToActor": {
+        "name": "Zawsze łącz z aktorem",
+        "hint": "Połącz pasek tokenu z aktorem zawsze, nawet jeśli token i aktor nie są połączeni."
+      },
+      "shareHotbar": {
+        "name": "Współdzielony Pasek Tokenu",
+        "hint": "Każdy token będzie posiadać jeden pasek tokenu współdzielony między graczami."
+      },
+      "lockHotbar": {
+        "name": "Zablokuj wspólny pasek",
+        "hint": "Kiedy zaznaczone, tylko MG może edytować pasek tokenu. Wpływa wyłącznie na paski współdzielone."
+      },
+      "useCustomHotbar": {
+        "name": "Użyj „Custom Hotbar” (beta)",
+        "hint": "⚠ Wymaga modułu „Custom Hotbar” autorstwa Norc."
+      },
+      "debugMode": {
+        "name": "Tryb debugowania",
+        "hint": "Wysyłaj więcej zapisów do konsoli."
+      }
+    },
+    "notifications": {
+      "lockedWarning": "Ten pasek tokenu jest zablokowany dla graczy. Wszelkie zmiany nie zostaną zapisane."
+    }
+  }
+}
+
