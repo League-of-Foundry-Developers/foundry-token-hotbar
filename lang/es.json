@@ -1,0 +1,37 @@
+{
+    "TokenHotbar": {
+        "settings": {
+            "page": {
+                "name": "Página",
+                "hint": "Página de la barra que será utilizada por la nueva Barra de Tokens. Si se cambia, ¡no se moverá la Barra de Tokens actual!"
+            },
+            "linkToActor": {
+                "name": "Enlace al actor asociado",
+                "hint": "Enlazar la barra al actor si el token esta asociado."
+            },
+            "alwaysLinkToActor": {
+                "name": "Siempre enlazar al actor",
+                "hint": "Enlazar la Barra de Tokens al actor incluso si el token no esta asociado."
+            },
+            "shareHotbar": {
+                "name": "Barra de Tokens compartida",
+                "hint": "Cada token tendrá una única barra compartida entre los jugadores."
+            },
+            "lockHotbar": {
+                "name": "Bloqueo de la barra compartida",
+                "hint": "Cuando se active, solo el DJ podrá actualizar la Barra de Tokens. Sólo aplica a la barra compartida."
+            },
+            "useCustomHotbar": {
+                "name": "Utilizar barra customizable (beta)",
+                "hint": "⚠ Requiere el módulo Norc's Custom Hotbar."
+            },
+            "debugMode": {
+                "name": "Modo depuración",
+                "hint": "Registro detallado en consola."
+            }
+        },
+        "notifications": {
+            "lockedWarning": "La barra de tokens esta bloqueada para los jugadores. Cualquier modificación será olvidada."
+        }
+    }
+}
