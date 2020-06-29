@@ -32,7 +32,7 @@ export class CustomHotbar implements UiHotbar, Hotbar {
     }
 
     getMacrosByPage(page: number): { hotbar: HotbarSlots } {
-        const allSlots =  (<any>window).chbGetMacros();
+        const allSlots =  (<any>window).chbGetMacros() || {};
         const pageSlots = pickPageSlots(page, allSlots);
         return { hotbar: pageSlots };
     }
