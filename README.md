@@ -55,10 +55,13 @@ When selecting a token with macros on its hotbar, it will automatically switch t
 ## Available Languages
 * 🇩🇪 Deutsch
 * 🇬🇧 English
+* 🇪🇸 Español
 * 🇫🇷 Français
 * 🇯🇵 日本語
 * 🇰🇷 한국어
 * 🇳🇱 Nederlands
+* 🇵🇱 Polski
+* 🇧🇷 Português (Brazil)
 * 🇷🇴 Română
 
 
