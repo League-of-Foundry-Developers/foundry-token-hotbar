@@ -53,6 +53,7 @@ When selecting a token with macros on its hotbar, it will automatically switch t
 * **Debug Mode:** Show detailed messages in the console (F12).
 
 ## Available Languages
+* 🇨🇳 中文（简体）
 * 🇩🇪 Deutsch
 * 🇬🇧 English
 * 🇪🇸 Español
@@ -63,7 +64,6 @@ When selecting a token with macros on its hotbar, it will automatically switch t
 * 🇵🇱 Polski
 * 🇧🇷 Português (Brazil)
 * 🇷🇴 Română
-
 
 ## Contributing
 Feel free to test out the latest beta using the following manifest link:

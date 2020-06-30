@@ -1,0 +1,37 @@
+{
+    "TokenHotbar": {
+        "settings": {
+            "page": {
+                "Page": "快捷栏页",
+                "hint": "该快捷栏页会被应用到此token。更改此设定不会影响已存在的token快捷栏！"
+            },
+            "linkToActor": {
+                "name": "链接快捷栏到对应的actor上",
+                "hint": "如果token与快捷栏链接，则快捷栏同样与该token对应的actor相连。"
+            },
+            "alwaysLinkToActor": {
+                "name": "总是链接到actor。",
+                "hint": "即使token没有被快捷栏链接，依旧将快捷栏链接到token对应的actor上。"
+            },
+            "shareHotbar": {
+                "name": "共享Token快捷栏",
+                "hint": "每个token都会拥有一个被玩家们共享的快捷栏页。"
+            },
+            "lockHotbar": {
+                "name": "锁定共享快捷栏。",
+                "hint": "当锁定时，只有GM可以改动token的快捷栏。仅对共享快捷栏生效。"
+            },
+            "useCustomHotbar": {
+                "name": "使用自定义快捷栏（beta)",
+                "hint": "⚠ 需要开启Norc's Custom Hotbar模组。"
+            },
+            "debugMode": {
+                "name": "Debug模式",
+                "hint": "完整日志见控制台。"
+            }
+        },
+        "notifications": {
+            "lockedWarning": "Token快捷栏对玩家锁定。将放弃所有改动。"
+        }
+    }
+}
