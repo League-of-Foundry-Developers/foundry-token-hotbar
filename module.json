@@ -27,7 +27,7 @@
     "dependencies": [
         {
             "name": "custom-hotbar",
-            "version": "1.0.1",
+            "version": "1.0.3",
             "manifest": "https://raw.githubusercontent.com/Norc/foundry-custom-hotbar/master/module.json",
             "optional": true
         }

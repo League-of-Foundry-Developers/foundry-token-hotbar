@@ -32,7 +32,7 @@ export class CustomHotbar implements UiHotbar, Hotbar {
     }
 
     getMacrosByPage(page: number): { hotbar: HotbarSlots } {
-        const allSlots =  (<any>window).chbGetMacros() || {};
+        const allSlots =  (<any>window).CustomHotbar.chbGetMacros() || {};
         const pageSlots = pickPageSlots(page, allSlots);
         return { hotbar: pageSlots };
     }
@@ -43,7 +43,7 @@ export class CustomHotbar implements UiHotbar, Hotbar {
         const allSlots = this.getAllHotbarMacros();
         const combinedMacros = Object.assign({}, allSlots, continuousTokenHotbar);
 
-        return (<any>window).chbSetMacros(combinedMacros);
+        return (<any>window).CustomHotbar.chbSetMacros(combinedMacros);
     }
 
     currentPage(): number {
@@ -51,7 +51,7 @@ export class CustomHotbar implements UiHotbar, Hotbar {
     }
 
     private getAllHotbarMacros(): HotbarSlots {
-        return (<any>window).chbGetMacros();
+        return (<any>window).CustomHotbar.chbGetMacros();
     }
 }
 
@@ -88,7 +88,7 @@ export class SinglePageCustomHotbar extends CustomHotbar {
             offsetSlots[slot] = data.hotbar[slot + offset];
         }
 
-        return (<any>window).chbSetMacros(offsetSlots);
+        return (<any>window).CustomHotbar.chbSetMacros(offsetSlots);
     }
 
     currentPage(): number {
