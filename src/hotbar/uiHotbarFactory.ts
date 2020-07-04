@@ -21,7 +21,7 @@ export class UiHotbarFactory {
     public create(): UiHotbar & Hotbar {
         const logger = new ConsoleLogger(this.settings);
         if (this.settings.useCustomHotbar) {
-            return new SinglePageCustomHotbar(this.settings, (<any>ui).CustomHotbar, logger);
+            return new SinglePageCustomHotbar(this.settings, (<any>ui).customHotbar, logger);
         } else {
             return new FoundryHotbar(this.settings, (<any>ui).hotbar, new PageFlag(), logger);
         }

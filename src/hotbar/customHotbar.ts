@@ -4,11 +4,12 @@ import { UiHotbar, calculatePageSlots, pickPageSlots } from './uiHotbar';
 import { Hotbar, HotbarSlots } from './hotbar';
 import { FoundryUiHotbar } from '../utils/foundry';
 import { Logger } from '../utils/logger';
+import { UiCustomHotbar } from '../utils/norc';
 
 export class CustomHotbar implements UiHotbar, Hotbar {
     constructor(
         protected settings: Settings,
-        private hotbar: FoundryUiHotbar,
+        protected hotbar: FoundryUiHotbar & UiCustomHotbar,
         protected logger: Logger) { }
 
     toggleHotbar(showTokenBar: boolean): Promise<unknown> {
@@ -32,7 +33,7 @@ export class CustomHotbar implements UiHotbar, Hotbar {
     }
 
     getMacrosByPage(page: number): { hotbar: HotbarSlots } {
-        const allSlots =  (<any>window).CustomHotbar.chbGetMacros() || {};
+        const allSlots =  this.hotbar.populator.chbGetMacros() || {};
         const pageSlots = pickPageSlots(page, allSlots);
         return { hotbar: pageSlots };
     }
@@ -43,7 +44,7 @@ export class CustomHotbar implements UiHotbar, Hotbar {
         const allSlots = this.getAllHotbarMacros();
         const combinedMacros = Object.assign({}, allSlots, continuousTokenHotbar);
 
-        return (<any>window).CustomHotbar.chbSetMacros(combinedMacros);
+        return this.hotbar.populator.chbSetMacros(combinedMacros);
     }
 
     currentPage(): number {
@@ -51,7 +52,7 @@ export class CustomHotbar implements UiHotbar, Hotbar {
     }
 
     private getAllHotbarMacros(): HotbarSlots {
-        return (<any>window).CustomHotbar.chbGetMacros();
+        return this.hotbar.populator.chbGetMacros();
     }
 }
 
@@ -88,7 +89,7 @@ export class SinglePageCustomHotbar extends CustomHotbar {
             offsetSlots[slot] = data.hotbar[slot + offset];
         }
 
-        return (<any>window).CustomHotbar.chbSetMacros(offsetSlots);
+        return this.hotbar.populator.chbSetMacros(offsetSlots);
     }
 
     currentPage(): number {

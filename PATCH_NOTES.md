@@ -1,1 +1,1 @@
-- Adapt interaction with Custom Hotbar v1.0.2
+- Adapt interaction with Custom Hotbar pre-release
