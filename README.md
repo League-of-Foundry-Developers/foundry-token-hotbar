@@ -16,7 +16,7 @@ Based on your settings, one page of the macro hotbar will be used to dynamically
 </p>
 
 ### Use an additional hotbar
-Token Hotbar integrates with Norc's Custom Hotbar, keeping the original 5 hotbar pages free and giving you a dedicated Token Hotbar.
+Token Hotbar integrates with Norc's [Custom Hotbar](https://foundryvtt.com/packages/custom-hotbar/), keeping the original 5 hotbar pages free and giving you a dedicated Token Hotbar.
 
 <p align="center">
 <img src="./img/thb-custom-hotbar.gif" width="500px">
