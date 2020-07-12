@@ -1,1 +1,1 @@
-- Adapt interaction with Custom Hotbar pre-release
+- Removed unnecessary time out and fixed shared hotbar reloading

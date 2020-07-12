@@ -112,8 +112,6 @@ Hooks.on('init', () => {
     console.log('[Token Hotbar]', 'Initialized Token Hotbar');
 });
 
-let renderHotbarTimeout: number;
-
 Hooks.on('preUpdateUser', (_, updateData: { hotbar?: HotbarSlots, flags?: { 'custom-hotbar': { 'chbMacroMap': HotbarSlots } } }) => {
     const chbFlag = 'custom-hotbar';
     const chbKey = 'chbMacroMap';
@@ -125,21 +123,17 @@ Hooks.on('preUpdateUser', (_, updateData: { hotbar?: HotbarSlots, flags?: { 'cus
     if (settings.useCustomHotbar && (!updateData.flags || !updateData.flags[chbFlag] || !updateData.flags[chbFlag][chbKey]))
         return true;
 
-    if (renderHotbarTimeout)
-        clearTimeout(renderHotbarTimeout);
 
-    renderHotbarTimeout = window.setTimeout(() => {
-        const token: IToken | undefined = canvas.tokens.controlled[0];
-        if (!token)
-            return;
-    
-        return new ControllerFactory(Settings._load())
-            .create(token)
-            // `updateData` is already checked to be contain the appropriate data
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            .save(game.user, settings.useCustomHotbar ? updateData.flags![chbFlag][chbKey] : updateData.hotbar!);
+    const token: IToken | undefined = canvas.tokens.controlled[0];
+    if (!token)
+        return;
 
-    }, 30);
+    new ControllerFactory(Settings._load())
+        .create(token)
+        // `updateData` is already checked to be contain the appropriate data
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        .save(game.user, settings.useCustomHotbar ? updateData.flags![chbFlag][chbKey] : updateData.hotbar!);
+
     return true;
 });
 
@@ -164,7 +158,7 @@ Hooks.on('controlToken', () => {
 
             new ConsoleLogger(settings).debug('[Token Hotbar]', 'No or multiple controlled tokens');
         }
-    }, 30);
+    }, 100);
 });
 
 let sharedRenderTimeout: number;
@@ -178,12 +172,12 @@ Hooks.on('updateToken', (token, data) => {
     return true;
 });
 
-function reload(entityId: string, flags: any) {
+function reload(entityId: string, { flags }) {
     const settings = Settings._load();
     const token: IToken | undefined = canvas.tokens.controlled[0];
 
     // check if we should reload anything
-    if (canvas.tokens.controlled.length != 1 || !settings.shareHotbar || !flags[CONSTANTS.module.name])
+    if (canvas.tokens.controlled.length != 1 || !settings.shareHotbar || !flags?.[CONSTANTS.module.name])
         return true;
 
     // check if selected token is equal to the updated token
@@ -197,7 +191,7 @@ function reload(entityId: string, flags: any) {
         new ControllerFactory(Settings._load())
             .create(token)
             .reload();
-    }, 30);
+    }, 100);
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
