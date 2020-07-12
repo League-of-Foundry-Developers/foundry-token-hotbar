@@ -2,15 +2,21 @@ import { TokenHotbar } from './hotbar/tokenHotbar';
 import { UiHotbar, calculatePageSlots } from './hotbar/uiHotbar';
 import { Hotbar, HotbarSlots } from './hotbar/hotbar';
 import { Settings } from './utils/settings';
-import { IToken, User } from './utils/foundry';
+import { IToken, User, Socket } from './utils/foundry';
 import { Logger, ConsoleLogger } from './utils/logger';
 import { UiHotbarFactory } from './hotbar/uiHotbarFactory';
 import { TokenHotbarFactory } from './hotbar/tokenHotbarFactory';
 
-export class TokenHotbarController {
-    constructor(private settings: Settings, private uiHotbar: UiHotbar & Hotbar, private tokenHotbar: TokenHotbar, private logger: Logger) { }
+export interface UpdateMsg {
+    userId: string;
+    tokenId: string;
+    type: 'updateTokenHotbar'
+}
 
-    async save(user: User, hotbarUpdate: HotbarSlots): Promise<void> { 
+export class TokenHotbarController {
+    constructor(private settings: Settings, private uiHotbar: UiHotbar & Hotbar, private socket: Socket, private tokenHotbar: TokenHotbar, private logger: Logger) { }
+
+    async save(user: User, tokenId: string, hotbarUpdate: HotbarSlots): Promise<void> { 
         if (!this.uiHotbar.onTokenHotbarPage())
             return;
 
@@ -26,6 +32,12 @@ export class TokenHotbarController {
             if (!this.settings.lockHotbar || user.isGM) {
                 this.logger.debug('[Token Hotbar]', 'Applying update', hotbarPage, hotbarUpdate, updates);
                 await this.tokenHotbar.setTokenMacros(hotbarPage, { hotbar: combinedMacros });
+                const msg: UpdateMsg = {
+                    type: 'updateTokenHotbar',
+                    userId: user.id,
+                    tokenId: tokenId
+                };
+                this.socket.emit('module.TokenHotbar', msg);
             } else
                 ui.notifications.warn(game.i18n.localize('TokenHotbar.notifications.lockedWarning'));
         }
@@ -84,6 +96,7 @@ export class ControllerFactory {
         return new TokenHotbarController(
             this.settings,
             new UiHotbarFactory(this.settings).create(),
+            <Socket><unknown>game.socket,
             new TokenHotbarFactory(this.settings).create(token.id),
             new ConsoleLogger(this.settings));
     }

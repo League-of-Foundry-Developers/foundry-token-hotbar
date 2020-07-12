@@ -2,9 +2,12 @@ import 'jasmine';
 import { Settings } from '../src/utils/settings';
 import { TokenHotbarController } from '../src/controller';
 import { ConsoleLogger } from '../src/utils/logger';
-import { User } from '../src/utils/foundry';
+import { User, Socket } from '../src/utils/foundry';
+import { TestSocket } from './helpers/TestSocket';
 
 // TODO: use something like a builder pattern or default mock setup to reduce the duplication of mock setup.
+
+const socket = new TestSocket();
 
 describe('controller.load', function () {
     it('sets the token hotbar macros on the ui hotbar', async function() {
@@ -21,6 +24,7 @@ describe('controller.load', function () {
         const controller = new TokenHotbarController(
             settings,
             uiHotbar,
+            socket,
             tokenHotbar,
             new ConsoleLogger(settings));
 
@@ -42,6 +46,7 @@ describe('controller.load', function () {
         const controller = new TokenHotbarController(
             settings,
             uiHotbar,
+            socket,
             tokenHotbar,
             new ConsoleLogger(settings));
 
@@ -63,6 +68,7 @@ describe('controller.load', function () {
         const controller = new TokenHotbarController(
             settings,
             uiHotbar,
+            socket,
             tokenHotbar,
             new ConsoleLogger(settings));
 
@@ -84,6 +90,7 @@ describe('controller.load', function () {
         const controller = new TokenHotbarController(
             settings,
             uiHotbar,
+            socket,
             tokenHotbar,
             new ConsoleLogger(settings));
 
@@ -114,6 +121,7 @@ describe('controller.reload', function () {
         const controller = new TokenHotbarController(
             settings,
             uiHotbar,
+            socket,
             tokenHotbar,
             new ConsoleLogger(settings));
 
@@ -140,6 +148,7 @@ describe('controller.reload', function () {
         const controller = new TokenHotbarController(
             settings,
             uiHotbar,
+            socket,
             tokenHotbar,
             new ConsoleLogger(settings));
 
@@ -169,6 +178,7 @@ describe('controller.reload', function () {
         const controller = new TokenHotbarController(
             settings,
             uiHotbar,
+            socket,
             tokenHotbar,
             new ConsoleLogger(settings));
 
@@ -205,13 +215,14 @@ describe('controller.save', function () {
         const controller = new TokenHotbarController(
             settings,
             uiHotbar,
+            socket,
             tokenHotbar,
             new ConsoleLogger(settings));
 
         spyOn(controller, 'load');
 
         // Act
-        await controller.save(<User>{ isGM: false }, updates);
+        await controller.save(<User>{ isGM: false }, 'token-id', updates);
 
         // Assert
         expect(tokenHotbar.setTokenMacros).toHaveBeenCalled();
@@ -239,16 +250,59 @@ describe('controller.save', function () {
         const controller = new TokenHotbarController(
             settings,
             uiHotbar,
+            socket,
             tokenHotbar,
             new ConsoleLogger(settings));
 
         spyOn(controller, 'load');
 
         // Act
-        await controller.save(<User>{ isGM: true }, updates);
+        await controller.save(<User>{ isGM: true }, 'token-id', updates);
 
         // Assert
         expect(tokenHotbar.setTokenMacros).toHaveBeenCalled();
+    });
+
+    it('calls socket.emit if on token hotbar page, has changes and user is GM', async function() {
+        const settings = new Settings();
+        settings.lockHotbar = true;
+
+        const page = 5;
+
+        const uiMacros = { hotbar: { } };
+        const uiHotbar = jasmine.createSpyObj(
+            'UiHotbar', [ 'getTokenHotbarPage', 'onTokenHotbarPage', 'getMacrosByPage' ]);
+        uiHotbar.getTokenHotbarPage.and.returnValue(page);
+        uiHotbar.getMacrosByPage.and.returnValue(uiMacros);
+        uiHotbar.onTokenHotbarPage.and.returnValue(true);
+
+        spyOn(socket, 'emit');
+        
+        const tokenMacros = { hotbar: { } };
+        const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage', 'setTokenMacros' ]);
+        tokenHotbar.getMacrosByPage.and.returnValue(tokenMacros);
+
+        const updates = { 41: 'some-macro' };
+
+        const controller = new TokenHotbarController(
+            settings,
+            uiHotbar,
+            socket,
+            tokenHotbar,
+            new ConsoleLogger(settings));
+
+        spyOn(controller, 'load');
+
+        // Act
+        await controller.save(<User>{ isGM: true, id: 'user-id' }, 'token-id', updates);
+
+        // Assert
+        expect(socket.emit).toHaveBeenCalledTimes(1);
+        expect(socket.emit).toHaveBeenCalledWith('module.TokenHotbar', {
+            type: 'updateTokenHotbar',
+            tokenId: 'token-id',
+            userId: 'user-id'
+        });
     });
 
     it('does not call TokenHotbar.setTokenMacros if on token hotbar page, has changes, is locked user is not GM', async function() {
@@ -273,6 +327,7 @@ describe('controller.save', function () {
         const controller = new TokenHotbarController(
             settings,
             uiHotbar,
+            socket,
             tokenHotbar,
             new ConsoleLogger(settings));
 
@@ -281,7 +336,7 @@ describe('controller.save', function () {
         // Act
         // await controller.save(<User>{ isGM: false }, updates);
         // TODO: inject ui
-        await expectAsync(controller.save(<User>{ isGM: false }, updates)).toBeRejected();
+        await expectAsync(controller.save(<User>{ isGM: false }, 'token-id', updates)).toBeRejected();
 
         // Assert
         // expect(tokenHotbar.setTokenMacros).toHaveBeenCalled();
@@ -309,13 +364,14 @@ describe('controller.save', function () {
         const controller = new TokenHotbarController(
             settings,
             uiHotbar,
+            socket,
             tokenHotbar,
             new ConsoleLogger(settings));
 
         spyOn(controller, 'load');
 
         // Act
-        await controller.save(<User>{ isGM: false }, updates.hotbar);
+        await controller.save(<User>{ isGM: false }, 'token-id', updates.hotbar);
 
         // Assert
         expect(tokenHotbar.setTokenMacros).not.toHaveBeenCalled();
@@ -343,13 +399,14 @@ describe('controller.save', function () {
         const controller = new TokenHotbarController(
             settings,
             uiHotbar,
+            socket,
             tokenHotbar,
             new ConsoleLogger(settings));
 
         spyOn(controller, 'load');
 
         // Act
-        await controller.save(<User>{ isGM: false }, updates);
+        await controller.save(<User>{ isGM: false }, 'token-id', updates);
 
         // Assert
         expect(tokenHotbar.setTokenMacros).not.toHaveBeenCalled();

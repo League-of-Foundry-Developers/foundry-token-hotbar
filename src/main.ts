@@ -6,7 +6,8 @@ import { Migration, DataFlaggable } from './utils/migration';
 import { ControllerFactory } from './controller';
 import { TokenHotbarFactory } from './hotbar/tokenHotbarFactory';
 import { ConsoleLogger } from './utils/logger';
-import { IToken } from './utils/foundry';
+import { IToken, Socket } from './utils/foundry';
+import { FlagStrategyFactory } from './flags/factory';
 
 // TODO: Remove in v4.0.0
 async function migrateFlags() {
@@ -116,23 +117,19 @@ Hooks.on('preUpdateUser', (_, updateData: { hotbar?: HotbarSlots, flags?: { 'cus
     const chbFlag = 'custom-hotbar';
     const chbKey = 'chbMacroMap';
     const settings = Settings._load();
-    // TODO: move this logic to its own class?
-    if (!settings.useCustomHotbar && !updateData.hotbar)
-        return true;
-
-    if (settings.useCustomHotbar && (!updateData.flags || !updateData.flags[chbFlag] || !updateData.flags[chbFlag][chbKey]))
-        return true;
-
 
     const token: IToken | undefined = canvas.tokens.controlled[0];
     if (!token)
         return;
 
-    new ControllerFactory(Settings._load())
-        .create(token)
-        // `updateData` is already checked to be contain the appropriate data
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        .save(game.user, settings.useCustomHotbar ? updateData.flags![chbFlag][chbKey] : updateData.hotbar!);
+    const controller = new ControllerFactory(Settings._load()).create(token);
+
+    // TODO: move this logic to its own class?
+    if (!settings.useCustomHotbar && updateData.hotbar)
+        controller.save(game.user, token.id, updateData.hotbar);
+
+    if (settings.useCustomHotbar && (updateData.flags?.[chbFlag]?.[chbKey]))
+        controller.save(game.user, token.id, updateData.flags[chbFlag][chbKey]);
 
     return true;
 });
@@ -162,26 +159,22 @@ Hooks.on('controlToken', () => {
 });
 
 let sharedRenderTimeout: number;
-Hooks.on('updateActor', (actor, data) => {
-    reload(actor.id, data);
-    return true;
-});
-
-Hooks.on('updateToken', (token, data) => {
-    reload(token.id, data);
-    return true;
-});
-
-function reload(entityId: string, { flags }) {
-    const settings = Settings._load();
+function reload(tokenId: string) {
     const token: IToken | undefined = canvas.tokens.controlled[0];
 
+    if (!token)
+        return;
+
+    const settings = Settings._load();
+    const strategy = new FlagStrategyFactory(settings, game, canvas)
+        .createFlagStrategy();
+
     // check if we should reload anything
-    if (canvas.tokens.controlled.length != 1 || !settings.shareHotbar || !flags?.[CONSTANTS.module.name])
+    if (canvas.tokens.controlled.length != 1 || !settings.shareHotbar)
         return true;
 
     // check if selected token is equal to the updated token
-    if (token?.id != entityId && token?.actor?.id != entityId)
+    if(strategy.get(tokenId).id !== strategy.get(token.id).id)
         return true;
 
     if (sharedRenderTimeout)
@@ -196,6 +189,7 @@ function reload(entityId: string, { flags }) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 Hooks.on('preDeleteToken', (_: Scene, token: any) => {
+    // TODO: reload on socket, but make sure you don't respond to your own socket message (singleton + messageIds)
     new TokenHotbarFactory(Settings._load())
         .create(token._id)
         .removeTokenMacros(game.actors, canvas.tokens);
@@ -212,6 +206,12 @@ Hooks.on('preDeleteActor', (actor: any) => {
 
 Hooks.on('ready', () => {
     migrateFlags();
+
+    (<Socket><unknown>game.socket).on('module.TokenHotbar', msg => {
+        new ConsoleLogger(Settings._load()).debug('Token Hotbar | Message received', msg);
+        if (msg.type === 'updateTokenHotbar')
+            reload(msg.tokenId);
+    });
 });
 
 Hooks.once('renderCustomHotbar', () => {

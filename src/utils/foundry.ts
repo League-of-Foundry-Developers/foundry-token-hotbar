@@ -1,4 +1,5 @@
 import { HotbarData } from '../flags/hotbarFlags';
+import { UpdateMsg } from '../controller';
 
 /**
  * This module contains only interfaces as they occur in Foundry
@@ -9,7 +10,7 @@ export interface Notifier {
     error: (string) => void;
 }
 
-export interface User {
+export interface User extends Identifiable {
     update(data: unknown): unknown;
     isGM: boolean;
 }
@@ -53,3 +54,7 @@ export interface FoundryUiHotbar {
     collapse: () => Promise<unknown>;
 }
 
+export interface Socket {
+    emit: (scope: 'module.TokenHotbar', msg: UpdateMsg) => void;
+    on: (scope: 'module.TokenHotbar', callback: ((msg: UpdateMsg) => void)) => void;
+}

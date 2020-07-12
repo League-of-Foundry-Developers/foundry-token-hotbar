@@ -31,5 +31,6 @@
             "manifest": "https://raw.githubusercontent.com/Norc/foundry-custom-hotbar/master/module.json",
             "optional": true
         }
-    ]
+    ],
+    "socket": true
 }

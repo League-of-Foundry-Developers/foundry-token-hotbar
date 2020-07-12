@@ -4,7 +4,7 @@ const merge = require('webpack-merge');
 module.exports = merge(common, {
   devtool: "eval-cheap-module-source-map",
   mode: 'development',
-  watch: true,
+  watch: false,
   watchOptions: {
     aggregateTimeout: 200,
     poll: 1000,

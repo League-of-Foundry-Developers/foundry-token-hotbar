@@ -1,4 +1,4 @@
 export const CONSTANTS = {
     module: { name: 'TokenHotbar' },
-    socket: { redrawSharedHotbar: 'redrawSharedHotbar' }
+    socket: { scope: 'module.TokenHotbar' }
 };
