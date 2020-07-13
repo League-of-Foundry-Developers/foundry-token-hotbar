@@ -24,7 +24,7 @@ export class TokenHotbarController {
         const hotbarPage = this.uiHotbar.getTokenHotbarPage();
 
         const oldHotbarMacros = this.uiHotbar.getMacrosByPage(hotbarPage);
-        const combinedMacros = Object.assign({}, oldHotbarMacros.hotbar, updates);
+        const combinedMacros = Object.assign({}, oldHotbarMacros.hotbar, this.uiHotbar.offset(updates));
 
         const tokenMacros = this.tokenHotbar.getMacrosByPage(hotbarPage);
 

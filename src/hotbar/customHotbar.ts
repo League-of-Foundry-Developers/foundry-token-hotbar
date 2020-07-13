@@ -51,6 +51,10 @@ export class CustomHotbar implements UiHotbar, Hotbar {
         return this.hotbar.page;
     }
 
+    offset(data: HotbarSlots): HotbarSlots {
+        return data;
+    }
+
     private getAllHotbarMacros(): HotbarSlots {
         return this.hotbar.populator.chbGetMacros();
     }
@@ -94,6 +98,16 @@ export class SinglePageCustomHotbar extends CustomHotbar {
 
     currentPage(): number {
         return this.getTokenHotbarPage(); // single page, mimicking the token hotbar page
+    }
+
+    offset(data: HotbarSlots): HotbarSlots {
+        const offset = this.calculatePageOffset();
+        const offsetData: HotbarSlots = {};
+        for(const key in data) {
+            offsetData[+key + offset] = data[key];
+        }
+
+        return offsetData;
     }
 
     /**

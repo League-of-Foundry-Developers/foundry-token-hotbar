@@ -40,15 +40,31 @@ async function migrateFlags() {
 }
 
 Hooks.on('init', () => {
-    game.settings.register(CONSTANTS.module.name, Settings.keys.hotbarPage, {
-        name: 'TokenHotbar.settings.page.name',
-        hint: 'TokenHotbar.settings.page.hint',
+    const hasCustomHotbar = game.modules.get('custom-hotbar')?.active; 
+    game.settings.register(CONSTANTS.module.name, Settings.keys.useCustomHotbar, {
+        name: 'TokenHotbar.settings.useCustomHotbar.name',
+        hint: 'TokenHotbar.settings.useCustomHotbar.hint',
         scope: 'world',
-        config: true,
-        default: 5,
-        type: Number,
-        range: { min: 1, max: 5, step: 1 }
+        config: hasCustomHotbar,
+        default: false,
+        type: Boolean
     });
+    if (!hasCustomHotbar) {
+        // ensure useCustomHotbar is unchecked when module is disabled.
+        // even though the settings also should fall back!
+        game.settings.set(CONSTANTS.module.name, Settings.keys.useCustomHotbar, false);
+    }
+
+    if (!game.settings.get(CONSTANTS.module.name, Settings.keys.useCustomHotbar))
+        game.settings.register(CONSTANTS.module.name, Settings.keys.hotbarPage, {
+            name: 'TokenHotbar.settings.page.name',
+            hint: 'TokenHotbar.settings.page.hint',
+            scope: 'world',
+            config: true,
+            default: 5,
+            type: Number,
+            range: { min: 1, max: 5, step: 1 }
+        });
 
     game.settings.register(CONSTANTS.module.name, Settings.keys.linkToLinkedActor, {
         name: 'TokenHotbar.settings.linkToActor.name',
@@ -85,21 +101,6 @@ Hooks.on('init', () => {
         default: false,
         type: Boolean
     });
-
-    const hasCustomHotbar = game.modules.get('custom-hotbar')?.active; 
-    game.settings.register(CONSTANTS.module.name, Settings.keys.useCustomHotbar, {
-        name: 'TokenHotbar.settings.useCustomHotbar.name',
-        hint: 'TokenHotbar.settings.useCustomHotbar.hint',
-        scope: 'world',
-        config: hasCustomHotbar,
-        default: false,
-        type: Boolean
-    });
-    if (!hasCustomHotbar) {
-        // ensure useCustomHotbar is unchecked when module is disabled.
-        // even though the settings also should fall back!
-        game.settings.set(CONSTANTS.module.name, Settings.keys.useCustomHotbar, false);
-    }
 
     game.settings.register(CONSTANTS.module.name, Settings.keys.debugMode, {
         name: 'TokenHotbar.settings.debugMode.name',

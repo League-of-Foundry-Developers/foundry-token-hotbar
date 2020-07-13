@@ -53,4 +53,8 @@ export class TokenHotbar implements Hotbar {
         delete flags[flagKey.id];
         return this.hotbarFlags.set(this.tokenId, flags);
     }
+
+    offset(data: HotbarSlots): HotbarSlots {
+        return data;
+    }
 }

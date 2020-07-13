@@ -68,6 +68,10 @@ export class FoundryHotbar implements UiHotbar, Hotbar {
         return this.hotbar.page;
     }
 
+    offset(data: HotbarSlots): HotbarSlots {
+        return data;
+    }
+
     private render(page: number): Promise<unknown> {
         this.hotbar.page = page;
         return new Promise((resolve) => {

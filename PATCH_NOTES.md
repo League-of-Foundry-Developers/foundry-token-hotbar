@@ -1,1 +1,1 @@
-- Removed unnecessary time out and fixed shared hotbar reloading
+- Bug fix: Macros disappear from Custom Hotbar

@@ -14,4 +14,9 @@ export interface Hotbar {
      * @param data 
      */
     setTokenMacros(page: number, data: { hotbar: HotbarSlots }): Promise<unknown>;
+
+    /**
+     * 
+     */
+    offset(data: HotbarSlots): HotbarSlots;
 }
