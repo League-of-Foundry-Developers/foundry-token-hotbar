@@ -1,1 +1,1 @@
-- Bug fix: Macros disappear from Custom Hotbar
+- Always register all settings, but toggle visibility using `config`

@@ -55,16 +55,15 @@ Hooks.on('init', () => {
         game.settings.set(CONSTANTS.module.name, Settings.keys.useCustomHotbar, false);
     }
 
-    if (!game.settings.get(CONSTANTS.module.name, Settings.keys.useCustomHotbar))
-        game.settings.register(CONSTANTS.module.name, Settings.keys.hotbarPage, {
-            name: 'TokenHotbar.settings.page.name',
-            hint: 'TokenHotbar.settings.page.hint',
-            scope: 'world',
-            config: true,
-            default: 5,
-            type: Number,
-            range: { min: 1, max: 5, step: 1 }
-        });
+    game.settings.register(CONSTANTS.module.name, Settings.keys.hotbarPage, {
+        name: 'TokenHotbar.settings.page.name',
+        hint: 'TokenHotbar.settings.page.hint',
+        scope: 'world',
+        config: !game.settings.get(CONSTANTS.module.name, Settings.keys.useCustomHotbar),
+        default: 5,
+        type: Number,
+        range: { min: 1, max: 5, step: 1 }
+    });
 
     game.settings.register(CONSTANTS.module.name, Settings.keys.linkToLinkedActor, {
         name: 'TokenHotbar.settings.linkToActor.name',
