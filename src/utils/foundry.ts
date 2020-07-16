@@ -1,6 +1,10 @@
 import { HotbarData } from '../flags/hotbarFlags';
 import { UpdateMsg } from '../controller';
 
+export function duplicate<T>(data: T): T {
+    return JSON.parse(JSON.stringify(data));
+}
+
 /**
  * This module contains only interfaces as they occur in Foundry
  */

@@ -5,7 +5,7 @@
     "author": "Stan Janssen",
     "version": "{{ version }}",
     "minimumCoreVersion": "0.6.0",
-    "compatibleCoreVersion":"0.6.5",
+    "compatibleCoreVersion":"0.7.0",
     "scripts": ["TokenHotbar.js"],
     "manifest": "https://fvtt.janssen.io/tokenhotbar/{{ channel }}/module.json",
     "download": "https://fvtt.janssen.io/tokenhotbar/{{ channel }}/TokenHotbar.zip",
