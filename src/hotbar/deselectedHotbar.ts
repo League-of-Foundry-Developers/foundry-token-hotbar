@@ -5,7 +5,7 @@ import { Hotbar, HotbarSlots } from './hotbar';
 import { calculatePageSlots, pickPageSlots } from './uiHotbar';
 
 export class DeselectedHotbar implements Hotbar {
-    private readonly flagKey: 'noTokenControlled';
+    private readonly flagKey = 'noTokenControlled';
 
     constructor(
         private existingMacroIds: Identifiable[],
