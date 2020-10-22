@@ -1,4 +1,3 @@
-import { TokenHotbar } from './hotbar/tokenHotbar';
 import { UiHotbar, calculatePageSlots } from './hotbar/uiHotbar';
 import { Hotbar, HotbarSlots } from './hotbar/hotbar';
 import { Settings } from './utils/settings';
@@ -14,9 +13,9 @@ export interface UpdateMsg {
 }
 
 export class TokenHotbarController {
-    constructor(private settings: Settings, private uiHotbar: UiHotbar & Hotbar, private socket: Socket, private tokenHotbar: TokenHotbar, private logger: Logger) { }
+    constructor(private settings: Settings, private uiHotbar: UiHotbar & Hotbar, private socket: Socket, private tokenHotbar: Hotbar, private logger: Logger) { }
 
-    async save(user: User, tokenId: string, hotbarUpdate: HotbarSlots): Promise<void> { 
+    async save(user: User, tokenId: string | undefined, hotbarUpdate: HotbarSlots): Promise<void> {
         if (!this.uiHotbar.onTokenHotbarPage())
             return;
 
@@ -32,15 +31,19 @@ export class TokenHotbarController {
             if (!this.settings.lockHotbar || user.isGM) {
                 this.logger.debug('[Token Hotbar]', 'Applying update', hotbarPage, hotbarUpdate, updates);
                 await this.tokenHotbar.setTokenMacros(hotbarPage, { hotbar: combinedMacros });
-                const msg: UpdateMsg = {
-                    type: 'updateTokenHotbar',
-                    userId: user.id,
-                    tokenId: tokenId
-                };
-                this.socket.emit('module.TokenHotbar', msg);
+                if (tokenId) this.triggerReload(user, tokenId);
             } else
                 ui.notifications.warn(game.i18n.localize('TokenHotbar.notifications.lockedWarning'));
         }
+    }
+
+    private triggerReload(user: User, tokenId: string) {
+        const msg: UpdateMsg = {
+            type: 'updateTokenHotbar',
+            userId: user.id,
+            tokenId: tokenId
+        };
+        this.socket.emit('module.TokenHotbar', msg);
     }
 
     async reload(): Promise<void> {
@@ -75,7 +78,7 @@ export class TokenHotbarController {
 
     /**
      * Transforms `-=<slot>` keys into `<slot>`
-     * @param hotbarUpdate 
+     * @param hotbarUpdate
      */
     private transformHotbarUpdate(hotbarUpdate: HotbarSlots) {
         return Object.keys(hotbarUpdate).reduce<HotbarSlots>((update, key) => {
@@ -91,13 +94,13 @@ export class TokenHotbarController {
 
 export class ControllerFactory {
     constructor(private settings: Settings) {}
-    
-    create(token: IToken): TokenHotbarController {
+
+    create(token?: IToken): TokenHotbarController {
         return new TokenHotbarController(
             this.settings,
             new UiHotbarFactory(this.settings).create(),
             <Socket><unknown>game.socket,
-            new TokenHotbarFactory(this.settings).create(token.id),
+            new TokenHotbarFactory(this.settings).create(token?.id),
             new ConsoleLogger(this.settings));
     }
 }

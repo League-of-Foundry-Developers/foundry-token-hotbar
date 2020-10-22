@@ -1,1 +1,1 @@
-- Always register all settings, but toggle visibility using `config`
+- Added deselectedHotbar to prevent hotbar from being wiped when no token is selected.

@@ -2,10 +2,10 @@ import { HotbarFlags, } from '../flags/hotbarFlags';
 import { Identifiable, IToken, IActor, } from '../utils/foundry';
 import { Logger } from '../utils/logger';
 import { FlagsStrategy, IdentityFlagsStrategy } from '../flags/flagStrategies';
-import { HotbarSlots, Hotbar } from './hotbar';
+import { HotbarSlots, Hotbar, TokenBarRemover } from './hotbar';
 import { calculatePageSlots, pickPageSlots } from './uiHotbar';
 
-export class TokenHotbar implements Hotbar {
+export class TokenHotbar implements Hotbar, TokenBarRemover {
     constructor(
         private tokenId: string,
         private existingMacroIds: Identifiable[],
@@ -44,7 +44,7 @@ export class TokenHotbar implements Hotbar {
 
         await this.hotbarFlags.set(this.tokenId, tokenHotbars);
 
-        return true;  
+        return true;
     }
 
     removeTokenMacros(actors: Map<string, IActor>, tokens: Map<string, IToken>): Promise<unknown> {

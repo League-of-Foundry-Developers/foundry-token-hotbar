@@ -1,3 +1,5 @@
+import { IActor, IToken } from "../utils/foundry";
+
 /**
  * slot is usually a number, but in order to unset it it sometimes has to be `-=<slot>`
  */
@@ -11,12 +13,16 @@ export interface Hotbar {
 
     /**
      * Update the list of visible token macros.
-     * @param data 
+     * @param data
      */
     setTokenMacros(page: number, data: { hotbar: HotbarSlots }): Promise<unknown>;
 
     /**
-     * 
+     *
      */
     offset(data: HotbarSlots): HotbarSlots;
+}
+
+export interface TokenBarRemover {
+    removeTokenMacros(actors: Map<string, IActor>, tokens: Map<string, IToken>): Promise<unknown>;
 }

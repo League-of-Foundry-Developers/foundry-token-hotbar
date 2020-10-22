@@ -16,7 +16,7 @@ describe('controller.load', function () {
             'UiHotbar', [ 'getTokenHotbarPage', 'toggleHotbar', 'setTokenMacros' ]);
         const page = 5;
         uiHotbar.getTokenHotbarPage.and.returnValue(page);
-        
+
         const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage' ]);
         const tokenMacros = { hotbar: { 41: 'some-macro' } };
         tokenHotbar.getMacrosByPage.and.returnValue(tokenMacros);
@@ -39,7 +39,7 @@ describe('controller.load', function () {
         const settings = new Settings();
         const uiHotbar = jasmine.createSpyObj(
             'UiHotbar', [ 'getTokenHotbarPage', 'toggleHotbar', 'setTokenMacros' ]);
-        
+
         const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage' ]);
         tokenHotbar.getMacrosByPage.and.returnValue({ hotbar: { 41: 'some-macro' } });
 
@@ -61,7 +61,7 @@ describe('controller.load', function () {
         const settings = new Settings();
         const uiHotbar = jasmine.createSpyObj(
             'UiHotbar', [ 'getTokenHotbarPage', 'toggleHotbar', 'setTokenMacros' ]);
-        
+
         const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage' ]);
         tokenHotbar.getMacrosByPage.and.returnValue({ hotbar: {} });
 
@@ -83,7 +83,7 @@ describe('controller.load', function () {
         const settings = new Settings();
         const uiHotbar = jasmine.createSpyObj(
             'UiHotbar', [ 'getTokenHotbarPage', 'toggleHotbar', 'setTokenMacros' ]);
-        
+
         const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage' ]);
         tokenHotbar.getMacrosByPage.and.returnValue({ hotbar: { 41: undefined, 42: null } });
 
@@ -113,7 +113,7 @@ describe('controller.reload', function () {
         uiHotbar.getTokenHotbarPage.and.returnValue(page);
         uiHotbar.currentPage.and.returnValue(page);
         uiHotbar.getMacrosByPage.and.returnValue(uiMacros);
-        
+
         const tokenMacros = { hotbar: { 41: 'some-macro' } };
         const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage' ]);
         tokenHotbar.getMacrosByPage.and.returnValue(tokenMacros);
@@ -142,7 +142,7 @@ describe('controller.reload', function () {
             'UiHotbar', [ 'getTokenHotbarPage', 'currentPage', 'getMacrosByPage' ]);
         uiHotbar.getTokenHotbarPage.and.returnValue(page);
         uiHotbar.currentPage.and.returnValue(page - 1);
-        
+
         const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage' ]);
 
         const controller = new TokenHotbarController(
@@ -171,7 +171,7 @@ describe('controller.reload', function () {
         uiHotbar.getTokenHotbarPage.and.returnValue(page);
         uiHotbar.currentPage.and.returnValue(page);
         uiHotbar.getMacrosByPage.and.returnValue(macros);
-        
+
         const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage' ]);
         tokenHotbar.getMacrosByPage.and.returnValue(macros);
 
@@ -205,7 +205,7 @@ describe('controller.save', function () {
         uiHotbar.getTokenHotbarPage.and.returnValue(page);
         uiHotbar.getMacrosByPage.and.returnValue(uiMacros);
         uiHotbar.onTokenHotbarPage.and.returnValue(true);
-        
+
         const tokenMacros = { hotbar: { } };
         const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage', 'setTokenMacros' ]);
         tokenHotbar.getMacrosByPage.and.returnValue(tokenMacros);
@@ -241,7 +241,7 @@ describe('controller.save', function () {
         uiHotbar.getTokenHotbarPage.and.returnValue(page);
         uiHotbar.getMacrosByPage.and.returnValue(uiMacros);
         uiHotbar.onTokenHotbarPage.and.returnValue(true);
-        
+
         const tokenMacros = { hotbar: { } };
         const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage', 'setTokenMacros' ]);
         tokenHotbar.getMacrosByPage.and.returnValue(tokenMacros);
@@ -279,7 +279,7 @@ describe('controller.save', function () {
         uiHotbar.onTokenHotbarPage.and.returnValue(true);
 
         spyOn(socket, 'emit');
-        
+
         const tokenMacros = { hotbar: { } };
         const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage', 'setTokenMacros' ]);
         tokenHotbar.getMacrosByPage.and.returnValue(tokenMacros);
@@ -320,7 +320,7 @@ describe('controller.save', function () {
         uiHotbar.getTokenHotbarPage.and.returnValue(page);
         uiHotbar.getMacrosByPage.and.returnValue(uiMacros);
         uiHotbar.onTokenHotbarPage.and.returnValue(true);
-        
+
         const tokenMacros = { hotbar: { } };
         const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage', 'setTokenMacros' ]);
         tokenHotbar.getMacrosByPage.and.returnValue(tokenMacros);
@@ -346,7 +346,7 @@ describe('controller.save', function () {
         // expect(tokenHotbar.setTokenMacros).toHaveBeenCalled();
     });
 
-    it('does not call TokenHotbar.setTokenMacros if on token hotbar page, but has not changes', async function() {
+    it('does not call TokenHotbar.setTokenMacros if on token hotbar page, but it has no changes', async function() {
         const settings = new Settings();
         settings.lockHotbar = false;
 
@@ -358,7 +358,7 @@ describe('controller.save', function () {
         uiHotbar.getTokenHotbarPage.and.returnValue(page);
         uiHotbar.getMacrosByPage.and.returnValue(uiMacros);
         uiHotbar.onTokenHotbarPage.and.returnValue(true);
-        
+
         const tokenMacros = { hotbar: { 41: 'some-macro' } };
         const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage', 'setTokenMacros' ]);
         tokenHotbar.getMacrosByPage.and.returnValue(tokenMacros);
@@ -382,7 +382,7 @@ describe('controller.save', function () {
         expect(tokenHotbar.setTokenMacros).not.toHaveBeenCalled();
     });
 
-    it('does not call TokenHotbar.setTokenMacros if on not on the token hotbar page', async function() {
+    it('does not call TokenHotbar.setTokenMacros if not on the token hotbar page', async function() {
         const settings = new Settings();
         settings.lockHotbar = false;
 
@@ -394,7 +394,7 @@ describe('controller.save', function () {
         uiHotbar.getTokenHotbarPage.and.returnValue(page);
         uiHotbar.getMacrosByPage.and.returnValue(uiMacros);
         uiHotbar.onTokenHotbarPage.and.returnValue(false);
-        
+
         const tokenMacros = { hotbar: {} };
         const tokenHotbar = jasmine.createSpyObj('TokenHotbar', [ 'getMacrosByPage', 'setTokenMacros' ]);
         tokenHotbar.getMacrosByPage.and.returnValue(tokenMacros);
