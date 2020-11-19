@@ -1,5 +1,5 @@
 import { UiHotbar, calculatePageSlots } from './hotbar/uiHotbar';
-import { Hotbar, HotbarSlots } from './hotbar/hotbar';
+import { Hotbar, HotbarSlots, HotbarSlot } from './hotbar/hotbar';
 import { Settings } from './utils/settings';
 import { IToken, User, Socket } from './utils/foundry';
 import { Logger, ConsoleLogger } from './utils/logger';

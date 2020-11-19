@@ -5,7 +5,7 @@ import { HotbarSlots } from './hotbar/hotbar';
 import { ControllerFactory } from './controller';
 import { TokenHotbarFactory } from './hotbar/tokenHotbarFactory';
 import { ConsoleLogger } from './utils/logger';
-import { IToken, Socket } from './utils/foundry';
+import { IToken, Socket, Macro } from './utils/foundry';
 import { FlagStrategyFactory } from './flags/factory';
 
 Hooks.on('init', () => {
@@ -82,7 +82,7 @@ Hooks.on('init', () => {
     console.log('[Token Hotbar]', 'Initialized Token Hotbar');
 });
 
-Hooks.on('preUpdateUser', (_, updateData: { hotbar?: HotbarSlots, flags?: { 'custom-hotbar': { 'chbMacroMap': HotbarSlots } } }) => {
+Hooks.on('updateUser', (_, updateData: { hotbar?: HotbarSlots, flags?: { 'custom-hotbar': { 'chbMacroMap': HotbarSlots } } }) => {
     const chbFlag = 'custom-hotbar';
     const chbKey = 'chbMacroMap';
     const settings = Settings._load();

@@ -15,6 +15,17 @@ describe('TokenHotbar.setTokenMacros', () => {
             .reduce<HotbarSlots>((acc, cur) => (acc[cur] = undefined, acc), {});
     }
 
+    function convertUndefinedToDelete(data) {
+        for (const id in data)
+            for (const slot in data[id])
+                if (!data[id][slot]) {
+                    delete data[id][slot];
+                    data[id][`-=${slot}`] = null;
+                }
+
+        return data;
+    }
+
     beforeEach(function () {
         this.user = new TestFlaggable('user-1');
         this.tokens = new Map<string, IToken>();
@@ -46,7 +57,7 @@ describe('TokenHotbar.setTokenMacros', () => {
         const key = this.keyStrategy.get(this.token.id);
         const data: HotbarData = { [key.id]: createEmptyPage(this.page)};
         data[key.id][42] = this.macrosToSave[42];
-        expect(this.flags.set).toHaveBeenCalledWith(this.token.id, data);
+        expect(this.flags.set).toHaveBeenCalledWith(this.token.id, convertUndefinedToDelete(data));
     });
 
     it('it saves existing macros on other pages', async function() {
@@ -61,7 +72,7 @@ describe('TokenHotbar.setTokenMacros', () => {
         const data: HotbarData = { [this.key]: createEmptyPage(this.page)};
         data[this.key][3] = 'existing-macro';
         data[this.key][42] = this.macrosToSave[42];
-        expect(this.flags.set).toHaveBeenCalledWith(this.token.id, data);
+        expect(this.flags.set).toHaveBeenCalledWith(this.token.id, convertUndefinedToDelete(data));
     });
 
     it('it overwrites existing macros on the given page.', async function() {
@@ -75,6 +86,6 @@ describe('TokenHotbar.setTokenMacros', () => {
         // Assert
         const data: HotbarData = { [this.key]: createEmptyPage(this.page)};
         data[this.key][42] = this.macrosToSave[42];
-        expect(this.flags.set).toHaveBeenCalledWith(this.token.id, data);
+        expect(this.flags.set).toHaveBeenCalledWith(this.token.id, convertUndefinedToDelete(data));
     });
 });

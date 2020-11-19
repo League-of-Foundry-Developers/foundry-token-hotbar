@@ -38,6 +38,18 @@ export class ModuleHotbarFlags implements HotbarFlags {
     set(tokenId: string, data: HotbarData): Promise<Flaggable> {
         const entity = this.flagStrategy.get(tokenId);
         this.logger.debug('[Token Hotbar]', 'Storing data for token', tokenId, entity, this.key, data);
+        this.updateKeysOfEmptySlots(data);
         return entity.setFlag(CONSTANTS.module.name, this.key, data);
+    }
+
+    private updateKeysOfEmptySlots(data: HotbarData) {
+        for (const tokenId in data) {
+            for (const slot in data[tokenId]) {
+                if (!data[tokenId][slot]) {
+                    delete data[tokenId][slot];
+                    data[tokenId][`-=${slot}`] = null;
+                }
+            }
+        }
     }
 }
