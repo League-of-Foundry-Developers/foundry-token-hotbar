@@ -1,6 +1,6 @@
 <h1 align="center">Token Hotbar</h1>
 <p align="center">
-<img src="https://github.com/janssen-io/foundry-token-hotbar/workflows/TokenHotbar%20CI/badge.svg" alt="build status" /> <img src="https://img.shields.io/github/downloads-pre/janssen-io/foundry-token-hotbar/v4.0.7/TokenHotbar.zip?label=v4.0.7" alt="v4.0.7 downloads" />
+<img src="https://github.com/janssen-io/foundry-token-hotbar/workflows/TokenHotbar%20CI/badge.svg" alt="build status" /> <img src="https://img.shields.io/github/downloads-pre/janssen-io/foundry-token-hotbar/v4.2.0/TokenHotbar.zip?label=v4.2.0" alt="v4.2.0 downloads" />
 </p>
 
 Using this Foundry VTT module, you can assign one of the hotbar pages to remember macros per token.
@@ -73,6 +73,6 @@ https://fvtt.janssen.io/tokenhotbar/beta/module.json
 
 ___
 
-If you wish to help out with development, then clone the repo and start digging in!  
+If you wish to help out with development, then clone the repo and start digging in!
 Unit tests are much appreciated. :)
 
