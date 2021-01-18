@@ -1,6 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Flaggable, IActor, IToken } from '../utils/foundry';
 
+/**
+ * Provides the entity where to save the Token Hotbar on.
+ * @see FlagStrategyFactory for usage.
+ */
 export abstract class FlagsStrategy {
 
     constructor(protected actors: Map<string, IActor>, protected tokens: Map<string, IToken>) { }
@@ -10,10 +14,10 @@ export abstract class FlagsStrategy {
     abstract get(entityId: string): Flaggable;
 
     protected getEntity(entityId: string) : IActor | IToken {
-        const entity = this.actors.get(entityId) || this.tokens.get(entityId); 
+        const entity = this.actors.get(entityId) || this.tokens.get(entityId);
         if (!entity) {
             throw new Error(`No actor or token exists with id '${entityId}'`);
-        } 
+        }
         return entity;
     }
 
@@ -22,8 +26,11 @@ export abstract class FlagsStrategy {
     }
 }
 
+/**
+ * Used to save the Token Hotbar on the user.
+ */
 export class UserFlagsStrategy extends FlagsStrategy {
-    constructor(private user: Flaggable, actors: Map<string, IActor>, tokens: Map<string, IToken>) { 
+    constructor(private user: Flaggable, actors: Map<string, IActor>, tokens: Map<string, IToken>) {
         super(actors, tokens);
     }
 
@@ -33,8 +40,11 @@ export class UserFlagsStrategy extends FlagsStrategy {
     }
 }
 
+/**
+ * Use to save the Token Hotbar on the given entity.
+ */
 export class IdentityFlagsStrategy extends FlagsStrategy {
-    constructor(actors: Map<string, IActor>, tokens: Map<string, IToken>) { 
+    constructor(actors: Map<string, IActor>, tokens: Map<string, IToken>) {
         super(actors, tokens);
     }
 
@@ -43,6 +53,10 @@ export class IdentityFlagsStrategy extends FlagsStrategy {
     }
 }
 
+/**
+ * Use to save the Token Hotbar on actor, if the provided entity is a token with a linked actor.
+ * Otherwise it will return given entity.
+ */
 export class LinkedFlagsStrategy extends FlagsStrategy {
     get(entityId: string): Flaggable {
         const entity = this.getEntity(entityId);
@@ -52,6 +66,11 @@ export class LinkedFlagsStrategy extends FlagsStrategy {
     }
 }
 
+/**
+ * Use to save the Token Hotbar on actor, even if the provided token is not linked to the actor.
+ * If the provided entity is not a token or no longer contains a reference to the token,
+ * it will return the given entity.
+ */
 export class AlwaysLinkedFlagsStrategy extends FlagsStrategy {
     get(entityId: string): Flaggable {
         const entity = this.getEntity(entityId);

@@ -13,6 +13,11 @@ export class HotbarFlagsFactory {
     }
 }
 
+/**
+ * Given the settings, provide the appropriate strategy of:
+ * 1. where to save the Token Hotbar,
+ * 2. which key to use to save the Token Hotbar (generally the id of the returned entity).
+ */
 export class FlagStrategyFactory {
 
     constructor(private settings: Settings, private game: Game, private canvas: Canvas) { }

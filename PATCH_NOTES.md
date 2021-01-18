@@ -1,6 +1,7 @@
-Use UpdateUser hook and use delete syntax
+Fix compatibility issue with Custom Hotbar
 
-I observed some changes since 0.7.7:
-- preUpdateUser hook does not seem to be called anymore when updating the hotbar
-- flags are merged rather than overwritten. Delete syntax (-=key: val)
-  seems to be required now.
+Users have observed broken behavior with Custom Hotbar. This change reverts changes made in 4.2.0 in relation to Custom Hotbar.
+
+Also added a sprinkle of documentation.
+
+This is the last version by Stan (github.com/janssen-io), as maintenance is being transferred to the League of Extraordinary FoundryVTT Developers.

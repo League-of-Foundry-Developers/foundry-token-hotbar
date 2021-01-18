@@ -4,7 +4,11 @@ import { Logger } from '../utils/logger';
 import { Hotbar, HotbarSlots } from './hotbar';
 import { calculatePageSlots, pickPageSlots } from './uiHotbar';
 
+/**
+ * Describes the behavior of the hotbar when no token is selected.
+ */
 export class DeselectedHotbar implements Hotbar {
+    // Arbitrary key, as long as it doesn't look like an actual id.
     private readonly flagKey = 'noTokenControlled';
 
     constructor(

@@ -82,7 +82,8 @@ Hooks.on('init', () => {
     console.log('[Token Hotbar]', 'Initialized Token Hotbar');
 });
 
-Hooks.on('updateUser', (_, updateData: { hotbar?: HotbarSlots, flags?: { 'custom-hotbar': { 'chbMacroMap': HotbarSlots } } }) => {
+// preUpdateUser no longer triggers on regular Hotbar updates, but removing this seems to break compatibility with Norc's Custom Hotbar
+Hooks.on('preUpdateUser', (_, updateData: { flags?: { 'custom-hotbar': { 'chbMacroMap': HotbarSlots } } }) => {
     const chbFlag = 'custom-hotbar';
     const chbKey = 'chbMacroMap';
     const settings = Settings._load();
@@ -90,12 +91,23 @@ Hooks.on('updateUser', (_, updateData: { hotbar?: HotbarSlots, flags?: { 'custom
     const token: IToken | undefined = canvas.tokens.controlled[0];
     const controller = new ControllerFactory(Settings._load()).create(token);
 
-    // TODO: move this logic to its own class?
-    if (!settings.useCustomHotbar && updateData.hotbar)
-        controller.save(game.user, token?.id, updateData.hotbar);
-
     if (settings.useCustomHotbar && (updateData.flags?.[chbFlag]?.[chbKey]))
         controller.save(game.user, token?.id, updateData.flags[chbFlag][chbKey]);
+
+    return true;
+});
+
+// Switched from preUpdateUser since 0.7.7, seems to fix issues but might cause new issues.
+// This has not been thoroughly tested yet.
+// Note to future developers: document *why* you (do not) use specific hooks, it will help you future self.
+Hooks.on('updateUser', (_, updateData: { hotbar?: HotbarSlots }) => {
+    const settings = Settings._load();
+
+    const token: IToken | undefined = canvas.tokens.controlled[0];
+    const controller = new ControllerFactory(Settings._load()).create(token);
+
+    if (!settings.useCustomHotbar && updateData.hotbar)
+        controller.save(game.user, token?.id, updateData.hotbar);
 
     return true;
 });
@@ -105,6 +117,7 @@ Hooks.on('controlToken', () => {
     if (controlTokenTimeout)
         clearTimeout(controlTokenTimeout);
 
+    // use a time-out, to prevent flickering/race conditions when multiple tokens are selected.
     controlTokenTimeout = window.setTimeout(() => {
         const token: IToken | undefined = canvas.tokens.controlled[0];
 
@@ -145,7 +158,7 @@ function reload(tokenId: string) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 Hooks.on('preDeleteToken', (_: Scene, token: any) => {
-    // TODO: reload on socket, but make sure you don't respond to your own socket message (singleton + messageIds)
+    // TODO: reload on socket, but make sure you don't respond to your own socket message (singleton + messageIds?)
     new TokenHotbarFactory(Settings._load())
         .createRemover(token._id)
         .removeTokenMacros(game.actors, canvas.tokens);
