@@ -1,7 +1,7 @@
 import { IActor, IToken } from "../utils/foundry";
 
 /**
- * slot is usually a number, but in order to unset it it sometimes has to be `-=<slot>`
+ * slot is a number.
  */
 export type HotbarSlots = { [slot: number] : string | undefined }
 export type HotbarSlot = { slot: number, macroId: string }

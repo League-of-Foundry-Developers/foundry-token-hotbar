@@ -85,7 +85,7 @@ export class FoundryHotbar implements UiHotbar, Hotbar {
 
     private unset(hotbar, slot: number) {
         delete hotbar[slot];
-        hotbar[`-=${slot}`] = null;
+        //hotbar[`-=${slot}`] = null;  <- This breaks 0.8.8.
     }
 
     private getAllHotbarMacros(): HotbarSlots {

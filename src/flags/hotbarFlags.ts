@@ -47,7 +47,7 @@ export class ModuleHotbarFlags implements HotbarFlags {
             for (const slot in data[tokenId]) {
                 if (!data[tokenId][slot]) {
                     delete data[tokenId][slot];
-                    data[tokenId][`-=${slot}`] = null;
+                    //data[tokenId][`-=${slot}`] = null;
                 }
             }
         }
