@@ -20,7 +20,6 @@ describe('TokenHotbar.setTokenMacros', () => {
             for (const slot in data[id])
                 if (!data[id][slot]) {
                     delete data[id][slot];
-                    data[id][`-=${slot}`] = null;
                 }
 
         return data;
