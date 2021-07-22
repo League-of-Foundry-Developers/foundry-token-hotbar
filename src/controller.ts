@@ -78,6 +78,7 @@ export class TokenHotbarController {
 
     /**
      * Transforms `-=<slot>` keys into `<slot>`
+     * This method may be unnecessary?
      * @param hotbarUpdate
      */
     private transformHotbarUpdate(hotbarUpdate: HotbarSlots) {
