@@ -1,3 +1,7 @@
+### ⚠ _This module is deprecated in favour of [Token Hotbar (v8+)](https://github.com/janssen-io/foundry-tokenhotbar-js)_
+
+---
+
 <h1 align="center">Token Hotbar</h1>
 <p align="center">
 <img src="https://github.com/janssen-io/foundry-token-hotbar/workflows/TokenHotbar%20CI/badge.svg" alt="build status" /> <img src="https://img.shields.io/github/downloads-pre/janssen-io/foundry-token-hotbar/v4.2.1/TokenHotbar.zip?label=v4.2.1" alt="v4.2.1 downloads" />
