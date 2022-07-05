@@ -1,0 +1,37 @@
+{
+    "TokenHotbar": {
+        "settings": {
+            "page": {
+                "Page": "快捷欄頁",
+                "hint": "該快捷欄頁會被應用到此token。更改此設定不會影響已存在的token快捷欄！"
+            },
+            "linkToActor": {
+                "name": "鏈接快捷欄到對應的actor上",
+                "hint": "如果token與快捷欄鏈接，則快捷欄同樣與該token對應的actor相連。"
+            },
+            "alwaysLinkToActor": {
+                "name": "總是鏈接到actor。",
+                "hint": "即使token沒有被快捷欄鏈接，依舊將快捷欄鏈接到token對應的actor上。"
+            },
+            "shareHotbar": {
+                "name": "共享Token快捷欄",
+                "hint": "每個token都會擁有一個被玩家們共享的快捷欄頁。"
+            },
+            "lockHotbar": {
+                "name": "鎖定共享快捷欄。",
+                "hint": "當鎖定時，只有GM可以改動token的快捷欄。僅對共享快捷欄生效。"
+            },
+            "useCustomHotbar": {
+                "name": "使用自定義快捷欄（beta)",
+                "hint": "⚠ 需要開啟Norc's Custom Hotbar模組。"
+            },
+            "debugMode": {
+                "name": "Debug模式",
+                "hint": "完整日誌請見控制台。"
+            }
+        },
+        "notifications": {
+            "lockedWarning": "Token快捷欄對玩家鎖定。將放棄所有改動。"
+        }
+    }
+}

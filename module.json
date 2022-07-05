@@ -22,7 +22,8 @@
         { "lang": "pl", "name": "Polski (Polish)", "path": "lang/pl.json" },
         { "lang": "pt-BR", "name": "Português (Brasil)", "path": "lang/pt-BR.json" },
         { "lang": "ro", "name": "Romănă (Romanian)", "path": "lang/ro.json" },
-        { "lang": "zh-HANS", "name": "中文（简体）(Chinese)", "path": "lang/zh-HANS.json" }
+        { "lang": "zh-HANS", "name": "中文（简体）(Chinese)", "path": "lang/zh-HANS.json" },
+        { "lang": "zh-tw", "name": "正體中文", "path": "lang/zh-TW.json" }
     ],
     "socket": true
 }
